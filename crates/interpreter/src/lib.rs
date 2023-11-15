@@ -1,14 +1,12 @@
-pub fn add(left: usize, right: usize) -> usize {
-	left + right
-}
+mod environment;
+use environment::Environment;
+mod error;
+use error::Error;
+mod interrupt;
+use interrupt::Interrupt;
+mod std;
+mod value;
+use value::Value;
 
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	#[test]
-	fn it_works() {
-		let result = add(2, 2);
-		assert_eq!(result, 4);
-	}
-}
+pub mod interpreter;
+pub use interpreter::Interpreter;
