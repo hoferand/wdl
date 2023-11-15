@@ -1,14 +1,33 @@
-use ast::{Block, Node, Order, Span, Workflow};
+use clap::Parser;
+
+use ast::{Block, Expression, Literal, Node, Order, Print, Sleep, Span, Statement, Workflow};
 use interpreter::Interpreter;
+
+#[derive(Debug, Parser)]
+enum Cli {
+	#[clap(name = "run", about = "Run the program")]
+	Run { file: String },
+	#[clap(name = "fmt", about = "Format the program")]
+	Fmt { file: String },
+	#[clap(name = "check", about = "Check the program")]
+	Check { file: String },
+	#[clap(name = "router", about = "Simulates the router")]
+	Router,
+}
 
 #[tokio::main]
 async fn main() {
-	// run
-	// fmt
-	// check
+	match Cli::parse() {
+		Cli::Run { file } => run(&file).await,
+		Cli::Fmt { .. } => todo!(),
+		Cli::Check { .. } => todo!(),
+		Cli::Router => todo!(),
+	}
+}
 
-	// router
-
+async fn run(_file: &str) {
+	// TODO: read wf from file, lex and parse it
+	println!("Run:");
 	let wf = Workflow {
 		imports: Vec::new(),
 		globals: Vec::new(),
@@ -17,7 +36,31 @@ async fn main() {
 			val: Order {
 				block: Node {
 					span: Span::default(),
-					val: Block { stmts: Vec::new() },
+					val: Block {
+						stmts: vec![
+							Statement::Sleep(Node {
+								span: Span::default(),
+								val: Sleep {
+									time: Node {
+										span: Span::default(),
+										val: Expression::Literal(Node {
+											span: Span::default(),
+											val: Literal::Number(2000.0),
+										}),
+									},
+								},
+							}),
+							Statement::Print(Node {
+								span: Span::default(),
+								val: Print {
+									value: Expression::Literal(Node {
+										span: Span::default(),
+										val: Literal::String("Hello World!".to_owned()),
+									}),
+								},
+							}),
+						],
+					},
 				},
 			},
 		},
