@@ -3,7 +3,7 @@ use tokio::sync::RwLock;
 
 use ast::{Binary, BinaryOperator, Node};
 
-use crate::{environment::Environment, Error, Value};
+use crate::{Environment, Error, Value};
 
 use super::interpret_expr;
 
@@ -13,6 +13,10 @@ pub async fn interpret_binary(
 	env: &RwLock<Environment>,
 ) -> Result<Value, Error> {
 	let left = interpret_expr(&expr.val.left, env).await?;
+	if expr.val.op.val == BinaryOperator::NullCoalescing && left != Value::Null {
+		return Ok(left);
+	};
+
 	let right = interpret_expr(&expr.val.right, env).await?;
 
 	match expr.val.op.val {
@@ -27,6 +31,7 @@ pub async fn interpret_binary(
 		BinaryOperator::LessEqual => Ok(Value::Bool(left <= right)),
 		BinaryOperator::Greater => Ok(Value::Bool(left > right)),
 		BinaryOperator::GreaterEqual => Ok(Value::Bool(left >= right)),
+		BinaryOperator::NullCoalescing => Ok(right),
 	}
 }
 

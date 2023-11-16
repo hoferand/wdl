@@ -175,6 +175,23 @@ impl<'t> Parser<'t> {
 		})
 	}
 
+	fn token_next_null_op(&mut self) -> Option<Node<BinaryOperator>> {
+		let token = self.tokens.get(self.pointer)?;
+
+		let op = match token.value {
+			TokenValue::QuestionQuestion => BinaryOperator::NullCoalescing,
+
+			_ => return None,
+		};
+
+		self.pointer += 1;
+
+		Some(Node {
+			span: token.span.clone(),
+			val: op,
+		})
+	}
+
 	// statements
 	fn parse_statement(&mut self) -> Result<Option<Statement>, ParserError> {
 		let Some(token) = self.token_peek() else {
@@ -677,13 +694,35 @@ impl<'t> Parser<'t> {
 				},
 			}))
 		} else {
-			self.parse_atomic()
+			self.parse_null_coalescing()
 		}
 	}
 
-	/*fn parse_member_call_index(&mut self) -> Result<Expression, ParserError> {
-		todo!()
-	}*/
+	fn parse_null_coalescing(&mut self) -> Result<Expression, ParserError> {
+		let mut left = self.parse_member_call_index()?;
+
+		while let Some(op) = self.token_next_null_op() {
+			let right = self.parse_member_call_index()?;
+
+			left = Expression::Binary(Node {
+				span: Span {
+					start: left.get_span().start.clone(),
+					end: right.get_span().end.clone(),
+				},
+				val: Binary {
+					left: Box::new(left),
+					op,
+					right: Box::new(right),
+				},
+			})
+		}
+
+		Ok(left)
+	}
+
+	fn parse_member_call_index(&mut self) -> Result<Expression, ParserError> {
+		self.parse_atomic()
+	}
 
 	fn parse_atomic(&mut self) -> Result<Expression, ParserError> {
 		let Some(token) = self.token_next() else {

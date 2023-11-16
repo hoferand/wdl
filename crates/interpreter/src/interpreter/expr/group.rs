@@ -3,7 +3,7 @@ use tokio::sync::RwLock;
 
 use ast::{Group, Node};
 
-use crate::{environment::Environment, Error, Value};
+use crate::{Environment, Error, Value};
 
 use super::interpret_expr;
 

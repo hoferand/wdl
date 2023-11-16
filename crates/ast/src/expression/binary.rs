@@ -7,13 +7,14 @@ pub struct Binary {
 	pub right: Box<Expression>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BinaryOperator {
 	Add,
 	Subtract,
 	Multiply,
 	Divide,
 	Modulo,
+	NullCoalescing,
 	Equal,
 	NotEqual,
 	Less,
