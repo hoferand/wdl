@@ -85,7 +85,7 @@
       "patterns": [
 				{
           "name": "support.type",
-          "match": "\\b(void1|bool|number|string|any)\\b"
+          "match": "\\b(void|bool|number|string|any)\\b"
         }
       ]
     }
