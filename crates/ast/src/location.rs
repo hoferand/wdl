@@ -1,5 +1,5 @@
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct Location {
-	pub row: usize,
-	pub col: usize,
+	pub line: usize,
+	pub column: usize,
 }

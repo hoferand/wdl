@@ -1,6 +1,6 @@
 use clap::Parser;
+use tokio::fs::read_to_string;
 
-use ast::{Block, Expression, Literal, Node, Order, Print, Sleep, Span, Statement, Workflow};
 use interpreter::Interpreter;
 
 #[derive(Debug, Parser)]
@@ -25,55 +25,37 @@ async fn main() {
 	}
 }
 
-async fn run(_file: &str) {
-	// TODO: read wf from file, lex and parse it
+async fn run(file: &str) {
+	let src_code = read_to_string(file).await.expect("Failed to read file!");
+	let workflow = match parser::get_ast(&src_code) {
+		Ok(wf) => wf,
+		Err(error) => {
+			print_parser_error(&error);
+			std::process::exit(1);
+		}
+	};
+
 	println!("Run:");
-	let wf = Workflow {
-		imports: Vec::new(),
-		globals: Vec::new(),
-		order: Node {
-			span: Span::default(),
-			val: Order {
-				block: Node {
-					span: Span::default(),
-					val: Block {
-						stmts: vec![
-							Statement::Sleep(Node {
-								span: Span::default(),
-								val: Sleep {
-									time: Node {
-										span: Span::default(),
-										val: Expression::Literal(Node {
-											span: Span::default(),
-											val: Literal::Number(2000.0),
-										}),
-									},
-								},
-							}),
-							Statement::Print(Node {
-								span: Span::default(),
-								val: Print {
-									value: Expression::Literal(Node {
-										span: Span::default(),
-										val: Literal::String("Hello World!".to_owned()),
-									}),
-								},
-							}),
-						],
-					},
-				},
-			},
-		},
-		functions: Vec::new(),
+	let interpreter = Interpreter::new(&workflow);
+
+	let interpreter = match interpreter.init(Vec::new()).await {
+		Ok(i) => i,
+		Err(error) => {
+			print_interpreter_error(&error);
+			std::process::exit(1);
+		}
 	};
 
-	let interpreter = Interpreter::new(&wf);
-
-	let Ok(interpreter) = interpreter.init(Vec::new()).await else {
-		panic!("failed to init interpreter");
+	if let Err(error) = interpreter.run().await {
+		print_interpreter_error(&error);
+		std::process::exit(1);
 	};
+}
 
-	if interpreter.run().await.is_err() {
-		panic!("failed to run workflow");
-	};
+fn print_interpreter_error(error: &interpreter::Error) {
+	dbg!(error);
+}
+
+fn print_parser_error(error: &parser::Error) {
+	dbg!(error);
 }
