@@ -3,9 +3,9 @@ pub use parser_error::ParserError;
 
 use ast::{
 	Assignment, Binary, BinaryOperator, Block, Break, Continue, Else, Expression,
-	FunctionDeclaration, GlobalDeclaration, Identifier, IdentifierFull, IdentifierTyped, If,
-	Import, Let, Literal, Logical, LogicalOperator, Node, Order, Par, Print, Return, Sleep, Span,
-	Statement, Type, Unary, UnaryOperator, While, Workflow,
+	FunctionDeclaration, GlobalDeclaration, Identifier, If, Let, Literal, Logical, LogicalOperator,
+	Node, Order, Par, Print, Return, Sleep, Span, Statement, Type, Unary, UnaryOperator, While,
+	Workflow,
 };
 
 use crate::{Token, TokenValue};
@@ -32,7 +32,6 @@ impl<'t> Parser<'t> {
 	}
 
 	pub fn parse(mut self) -> Result<Workflow, ParserError> {
-		let mut imports = Vec::new();
 		let mut globals = Vec::new();
 		let mut wf_order = None;
 		let mut functions = Vec::new();
@@ -40,7 +39,6 @@ impl<'t> Parser<'t> {
 		// parse
 		while let Some(stmt) = self.parse_statement()? {
 			match stmt {
-				Statement::Import(import) => imports.push(import),
 				Statement::GlobalDeclaration(global) => globals.push(global),
 				Statement::Order(order) if wf_order.is_none() => wf_order = Some(order),
 				Statement::FunctionDeclaration(fn_) => functions.push(fn_),
@@ -58,7 +56,6 @@ impl<'t> Parser<'t> {
 		};
 
 		Ok(Workflow {
-			imports,
 			globals,
 			order,
 			functions,
@@ -194,7 +191,6 @@ impl<'t> Parser<'t> {
 			TokenValue::EoF => return Ok(None),
 
 			// statements
-			TokenValue::Use => Statement::Import(self.parse_use()?),
 			TokenValue::Global | TokenValue::At => {
 				Statement::GlobalDeclaration(self.parse_global()?)
 			}
@@ -213,11 +209,6 @@ impl<'t> Parser<'t> {
 			// expression
 			_ => Statement::Expression(self.parse_expression()?),
 		}))
-	}
-
-	fn parse_use(&mut self) -> Result<Node<Import>, ParserError> {
-		let start = self.token_expect(TokenValue::Use)?.span.start.clone();
-		todo!()
 	}
 
 	fn parse_global(&mut self) -> Result<Node<GlobalDeclaration>, ParserError> {
@@ -242,13 +233,7 @@ impl<'t> Parser<'t> {
 				start: id_token.span.start.clone(),
 				end: type_.span.end.clone(),
 			},
-			val: IdentifierTyped {
-				id: Node {
-					span: id_token.span.clone(),
-					val: Identifier(id.to_owned()),
-				},
-				type_,
-			},
+			val: Identifier(id.to_owned()),
 		};
 
 		self.token_expect(TokenValue::Equal)?;
@@ -264,6 +249,7 @@ impl<'t> Parser<'t> {
 			span: Span { start, end },
 			val: GlobalDeclaration {
 				id: id_node,
+				type_,
 				value: Some(value),
 				description: None,
 			},
@@ -310,20 +296,6 @@ impl<'t> Parser<'t> {
 
 		let type_ = self.parse_type()?;
 
-		let id_node = Node {
-			span: Span {
-				start: id_token.span.start.clone(),
-				end: type_.span.end.clone(),
-			},
-			val: IdentifierTyped {
-				id: Node {
-					span: id_token.span.clone(),
-					val: Identifier(id.to_owned()),
-				},
-				type_,
-			},
-		};
-
 		self.token_expect(TokenValue::Equal)?;
 
 		// TODO: make it optional
@@ -331,9 +303,21 @@ impl<'t> Parser<'t> {
 
 		let end = self.token_expect(TokenValue::Semicolon)?.span.end.clone();
 
+		let id_node = Node {
+			span: Span {
+				start: id_token.span.start.clone(),
+				end: type_.span.end.clone(),
+			},
+			val: Identifier(id.to_owned()),
+		};
+
 		Ok(Node {
 			span: Span { start, end },
-			val: Let { id: id_node, value },
+			val: Let {
+				id: id_node,
+				type_,
+				value,
+			},
 		})
 	}
 
@@ -548,7 +532,7 @@ impl<'t> Parser<'t> {
 			return Ok(expr);
 		}
 
-		let Expression::IdentifierFull(id) = expr else {
+		let Expression::Identifier(id) = expr else {
 			return Ok(expr);
 		};
 
@@ -734,19 +718,10 @@ impl<'t> Parser<'t> {
 				self.token_expect(TokenValue::ParenClose)?;
 				expr
 			}
-			TokenValue::Identifier(id) => {
-				// TODO: fix for ksdf::ksdjfk
-				Expression::IdentifierFull(Node {
-					span: token.span.clone(),
-					val: IdentifierFull {
-						id: Node {
-							span: token.span.clone(),
-							val: Identifier(id.clone()),
-						},
-						module: Vec::new(),
-					},
-				})
-			}
+			TokenValue::Identifier(id) => Expression::Identifier(Node {
+				span: token.span.clone(),
+				val: Identifier(id.to_owned()),
+			}),
 			// TODO: arrays, objects
 			_ => {
 				return Err(ParserError::UnexpectedToken {

@@ -12,14 +12,12 @@ pub mod index;
 pub use index::Index;
 pub mod member;
 pub use member::Member;
-pub mod identifier_full;
-pub use identifier_full::IdentifierFull;
 pub mod assignment;
 pub use assignment::Assignment;
 pub mod group;
 pub use group::Group;
 
-use crate::{Node, Span};
+use crate::{Identifier, Node, Span};
 
 #[derive(Debug, Clone)]
 pub enum Expression {
@@ -27,7 +25,7 @@ pub enum Expression {
 	Binary(Node<Binary>),
 	FunctionCall(Node<FunctionCall>),
 	Group(Node<Group>),
-	IdentifierFull(Node<IdentifierFull>),
+	Identifier(Node<Identifier>),
 	Index(Node<Index>),
 	Literal(Node<Literal>),
 	Logical(Node<Logical>),
@@ -42,7 +40,7 @@ impl Expression {
 			Expression::Binary(expr) => &expr.span,
 			Expression::FunctionCall(expr) => &expr.span,
 			Expression::Group(expr) => &expr.span,
-			Expression::IdentifierFull(expr) => &expr.span,
+			Expression::Identifier(expr) => &expr.span,
 			Expression::Index(expr) => &expr.span,
 			Expression::Literal(expr) => &expr.span,
 			Expression::Logical(expr) => &expr.span,

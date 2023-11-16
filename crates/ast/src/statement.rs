@@ -4,8 +4,6 @@ pub mod function_declaration;
 pub use function_declaration::FunctionDeclaration;
 pub mod global_declaration;
 pub use global_declaration::GlobalDeclaration;
-pub mod import;
-pub use import::Import;
 pub mod order;
 pub use order::Order;
 pub mod par;
@@ -38,7 +36,6 @@ pub enum Statement {
 	FunctionDeclaration(Node<FunctionDeclaration>),
 	GlobalDeclaration(Node<GlobalDeclaration>),
 	If(Node<If>),
-	Import(Node<Import>),
 	Let(Node<Let>),
 	Order(Node<Order>),
 	Par(Node<Par>),
@@ -58,7 +55,6 @@ impl Statement {
 			Statement::FunctionDeclaration(stmt) => &stmt.span,
 			Statement::GlobalDeclaration(stmt) => &stmt.span,
 			Statement::If(stmt) => &stmt.span,
-			Statement::Import(stmt) => &stmt.span,
 			Statement::Let(stmt) => &stmt.span,
 			Statement::Order(stmt) => &stmt.span,
 			Statement::Par(stmt) => &stmt.span,
@@ -78,7 +74,6 @@ impl Statement {
 			Statement::FunctionDeclaration(_) => "function declaration",
 			Statement::GlobalDeclaration(_) => "global declaration",
 			Statement::If(_) => "if",
-			Statement::Import(_) => "import",
 			Statement::Let(_) => "let",
 			Statement::Order(_) => "order",
 			Statement::Par(_) => "par",

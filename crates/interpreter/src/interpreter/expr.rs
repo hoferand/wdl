@@ -23,7 +23,7 @@ pub async fn interpret_expr(expr: &Expression, env: &RwLock<Environment>) -> Res
 		Expression::Binary(expr) => interpret_binary(expr, env).await,
 		Expression::FunctionCall(_) => todo!(),
 		Expression::Group(expr) => interpret_group(expr, env).await,
-		Expression::IdentifierFull(_) => todo!(),
+		Expression::Identifier(_) => todo!(),
 		Expression::Index(_) => todo!(),
 		Expression::Literal(lit) => interpret_literal(lit),
 		Expression::Logical(expr) => interpret_logical(expr, env).await,

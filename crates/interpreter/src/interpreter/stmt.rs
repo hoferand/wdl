@@ -22,8 +22,6 @@ mod function_declaration;
 use function_declaration::interpret_function_declaration;
 mod global_declaration;
 use global_declaration::interpret_global_declaration;
-mod import;
-use import::interpret_import;
 mod let_;
 use let_::interpret_let;
 
@@ -52,7 +50,6 @@ pub async fn interpret_stmt(
 		Statement::FunctionDeclaration(fn_) => interpret_function_declaration(fn_, env).await,
 		Statement::GlobalDeclaration(global) => interpret_global_declaration(global, env).await,
 		Statement::If(if_) => interpret_if(if_, env).await,
-		Statement::Import(import) => interpret_import(import, env).await,
 		Statement::Let(let_) => interpret_let(let_, env).await,
 		Statement::Order(order) => interpret_order(order, env).await,
 		Statement::Par(par) => {
