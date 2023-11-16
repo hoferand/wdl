@@ -74,6 +74,7 @@ pub enum TokenValue {
 	Return,
 
 	// Types
+	TVoid,   // void
 	TBool,   // bool
 	TNumber, // number
 	TString, // string

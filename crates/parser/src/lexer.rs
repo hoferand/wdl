@@ -280,6 +280,7 @@ impl<'c> Lexer<'c> {
 			"continue" => TokenValue::Continue,
 			"break" => TokenValue::Break,
 			"return" => TokenValue::Return,
+			"void" => TokenValue::TVoid,
 			"bool" => TokenValue::TBool,
 			"number" => TokenValue::TNumber,
 			"string" => TokenValue::TString,
