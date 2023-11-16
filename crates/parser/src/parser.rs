@@ -22,7 +22,7 @@ pub(crate) struct Parser<'t> {
 impl<'t> Parser<'t> {
 	pub fn new(tokens: &'t [Token]) -> Self {
 		Self {
-			tokens: tokens,
+			tokens,
 			pointer: 0,
 			in_order: 0,
 			in_function: 0,
@@ -175,12 +175,6 @@ impl<'t> Parser<'t> {
 		})
 	}
 
-	fn token_rewind(&mut self) {
-		if self.pointer > 0 {
-			self.pointer -= 1;
-		}
-	}
-
 	// statements
 	fn parse_statement(&mut self) -> Result<Option<Statement>, ParserError> {
 		let Some(token) = self.token_peek() else {
@@ -272,7 +266,7 @@ impl<'t> Parser<'t> {
 	}
 
 	fn parse_fn(&mut self) -> Result<Node<FunctionDeclaration>, ParserError> {
-		let start = self.token_expect(TokenValue::Fn)?.span.start.clone();
+		let _start = self.token_expect(TokenValue::Fn)?.span.start.clone();
 		self.in_function += 1;
 		// parse
 		self.in_function -= 1;
@@ -546,7 +540,7 @@ impl<'t> Parser<'t> {
 				end: value.get_span().end.clone(),
 			},
 			val: Assignment {
-				id: id,
+				id,
 				value: Box::new(value),
 			},
 		}))

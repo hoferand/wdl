@@ -7,8 +7,8 @@ use crate::{Environment, Error, Interrupt};
 
 #[async_recursion]
 pub async fn interpret_let(
-	stmt: &Node<Let>,
-	env: &RwLock<Environment>,
+	_stmt: &Node<Let>,
+	_env: &RwLock<Environment>,
 ) -> Result<Interrupt, Error> {
 	todo!()
 }
