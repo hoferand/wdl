@@ -59,6 +59,8 @@ impl<'wf> Interpreter<'wf, Initialized> {
 
 #[cfg(test)]
 mod tests {
+	use std::fmt::Debug;
+
 	use super::*;
 	use tokio::test;
 
@@ -66,7 +68,7 @@ mod tests {
 
 	use crate::value::Value;
 
-	fn create_node<T>(val: T) -> Node<T> {
+	fn create_node<T: Clone + Debug>(val: T) -> Node<T> {
 		Node {
 			span: Span::default(),
 			val,

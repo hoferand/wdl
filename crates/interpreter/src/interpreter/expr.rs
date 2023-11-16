@@ -6,6 +6,8 @@ mod unary;
 use unary::interpret_unary;
 mod logical;
 use logical::interpret_logical;
+mod group;
+use group::interpret_group;
 
 use async_recursion::async_recursion;
 use tokio::sync::RwLock;
@@ -20,6 +22,7 @@ pub async fn interpret_expr(expr: &Expression, env: &RwLock<Environment>) -> Res
 		Expression::Assignment(_) => todo!(),
 		Expression::Binary(expr) => interpret_binary(expr, env).await,
 		Expression::FunctionCall(_) => todo!(),
+		Expression::Group(expr) => interpret_group(expr, env).await,
 		Expression::IdentifierFull(_) => todo!(),
 		Expression::Index(_) => todo!(),
 		Expression::Literal(lit) => interpret_literal(lit),

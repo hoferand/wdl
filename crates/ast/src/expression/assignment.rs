@@ -1,6 +1,7 @@
-use crate::{Expression, Identifier, Node};
+use crate::{Expression, IdentifierFull, Node};
 
+#[derive(Debug, Clone)]
 pub struct Assignment {
-	pub id: Node<Identifier>,
+	pub id: Node<IdentifierFull>,
 	pub value: Box<Expression>,
 }

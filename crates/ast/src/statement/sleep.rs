@@ -1,6 +1,7 @@
-use crate::{Expression, Node};
+use crate::Expression;
 
 // TODO: replace by std lib function
+#[derive(Debug, Clone)]
 pub struct Sleep {
-	pub time: Node<Expression>,
+	pub time: Expression,
 }

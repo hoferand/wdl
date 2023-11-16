@@ -1,7 +1,7 @@
-use crate::{Expression, IdentifierFull, Node, Type};
+use crate::{Expression, IdentifierTyped, Node};
 
+#[derive(Debug, Clone)]
 pub struct Let {
-	pub id: Node<IdentifierFull>,
-	pub type_: Node<Type>,
+	pub id: Node<IdentifierTyped>,
 	pub value: Expression,
 }

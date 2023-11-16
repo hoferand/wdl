@@ -15,7 +15,7 @@ pub use identifier::Identifier;
 pub mod function;
 pub use function::Function;
 pub mod identifier_typed;
-pub use identifier_typed::IdentfierTyped;
+pub use identifier_typed::IdentifierTyped;
 pub mod span;
 pub use span::Span;
 pub mod workflow;

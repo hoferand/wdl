@@ -1,1 +1,2 @@
-pub struct Identifier(String);
+#[derive(Debug, Clone)]
+pub struct Identifier(pub String);

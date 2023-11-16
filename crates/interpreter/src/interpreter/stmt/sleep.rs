@@ -11,7 +11,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_sleep(stmt: &Node<Sleep>, env: &RwLock<Environment>) -> Result<(), Error> {
-	let time = interpret_expr(&stmt.val.time.val, env).await?;
+	let time = interpret_expr(&stmt.val.time, env).await?;
 
 	if let Value::Number(millis) = time {
 		sleep(Duration::from_millis(millis as u64)).await;

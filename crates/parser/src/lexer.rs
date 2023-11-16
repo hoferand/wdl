@@ -115,11 +115,11 @@ impl<'c> Lexer<'c> {
 					let mut terminated = false;
 					while let Some(next_char) = self.get_char() {
 						src.push(next_char);
-						string.push(next_char);
 						if next_char == '"' {
 							terminated = true;
 							break;
 						}
+						string.push(next_char);
 					}
 					if !terminated {
 						errors.push(LexerError::UnexpectedEndOfString {

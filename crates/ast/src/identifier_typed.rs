@@ -1,6 +1,7 @@
 use crate::{Identifier, Node, Type};
 
-pub struct IdentfierTyped {
+#[derive(Debug, Clone)]
+pub struct IdentifierTyped {
 	pub id: Node<Identifier>,
 	pub type_: Node<Type>,
 }

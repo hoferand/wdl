@@ -14,7 +14,8 @@ pub fn get_ast(src_code: &str) -> Result<Workflow, Error> {
 	let lexer = Lexer::new(src_code);
 	let tokens = lexer.get_tokens()?;
 
-	dbg!(tokens);
+	let parser = Parser::new(&tokens);
+	let ast = parser.parse()?;
 
-	todo!()
+	Ok(ast)
 }
