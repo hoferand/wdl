@@ -60,6 +60,7 @@ pub enum TokenValue {
 	Order,
 	Fn,
 	Let,
+	Type,
 	Par,
 	Sleep,
 	Print,

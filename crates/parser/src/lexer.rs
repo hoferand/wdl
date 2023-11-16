@@ -268,6 +268,7 @@ impl<'c> Lexer<'c> {
 			"order" => TokenValue::Order,
 			"fn" => TokenValue::Fn,
 			"let" => TokenValue::Let,
+			"type" => TokenValue::Type,
 			"par" => TokenValue::Par,
 			"sleep" => TokenValue::Sleep,
 			"print" => TokenValue::Print,

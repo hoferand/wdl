@@ -38,7 +38,7 @@
 				},
 				{
 					"name": "keyword.other.wdl",
-					"match": "\\b(let|fn|true|false|null|global|use|print|sleep)\\b"
+					"match": "\\b(let|fn|true|false|null|global|use|type|print|sleep)\\b"
 				}
 			]
 		},
