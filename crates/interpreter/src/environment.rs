@@ -7,15 +7,22 @@ use ast::{Identifier, Node};
 
 use crate::{Error, Value};
 
-pub struct Environment {
-	parent: Option<Arc<RwLock<Environment>>>,
+pub struct Environment<'p> {
+	parent: Option<&'p Environment<'p>>,
 	variables: Arc<RwLock<HashMap<Identifier, Value>>>,
 }
 
-impl Environment {
+impl<'p> Environment<'p> {
 	pub fn new() -> Self {
 		Environment {
 			parent: None,
+			variables: Arc::new(RwLock::new(HashMap::new())),
+		}
+	}
+
+	pub fn with_parent(parent: &'p Environment) -> Self {
+		Environment {
+			parent: Some(parent),
 			variables: Arc::new(RwLock::new(HashMap::new())),
 		}
 	}
@@ -59,11 +66,11 @@ impl Environment {
 	}
 
 	#[async_recursion]
-	async fn resolve(&self, id: &Identifier) -> Option<Arc<RwLock<HashMap<Identifier, Value>>>> {
+	async fn resolve(&self, id: &Identifier) -> Option<&Arc<RwLock<HashMap<Identifier, Value>>>> {
 		if self.variables.read().await.contains_key(id) {
-			Some(Arc::clone(&self.variables))
+			Some(&self.variables)
 		} else if let Some(ref parent) = self.parent {
-			parent.read().await.resolve(id).await
+			parent.resolve(id).await
 		} else {
 			None
 		}

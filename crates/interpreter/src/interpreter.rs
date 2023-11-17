@@ -13,14 +13,14 @@ impl InterpreterState for New {}
 pub struct Initialized;
 impl InterpreterState for Initialized {}
 
-pub struct Interpreter<'wf, State> {
-	ast: &'wf Workflow,
-	global_env: Arc<Environment>,
+pub struct Interpreter<'a, State> {
+	ast: &'a Workflow,
+	global_env: Arc<Environment<'a>>,
 	state: PhantomData<State>,
 }
 
-impl<'wf> Interpreter<'wf, New> {
-	pub fn new(ast: &'wf Workflow) -> Self {
+impl<'a> Interpreter<'a, New> {
+	pub fn new(ast: &'a Workflow) -> Self {
 		Interpreter {
 			ast,
 			global_env: Arc::new(Environment::new()),
@@ -31,7 +31,7 @@ impl<'wf> Interpreter<'wf, New> {
 	pub async fn init(
 		self,
 		_vars: Vec<(String, String)>,
-	) -> Result<Interpreter<'wf, Initialized>, Error> {
+	) -> Result<Interpreter<'a, Initialized>, Error> {
 		// TODO: add imports to env
 		// TODO: add globals and functions to env
 
@@ -69,7 +69,7 @@ mod tests {
 		}
 	}
 
-	fn create_env() -> Environment {
+	fn create_env<'p>() -> Environment<'p> {
 		Environment::new()
 	}
 
