@@ -9,7 +9,7 @@ use expression::*;
 mod statement;
 use statement::*;
 mod type_;
-use type_::*;
+//use type_::*;
 
 use ast::{Statement, Workflow};
 
@@ -42,7 +42,7 @@ impl<'t> Parser<'t> {
 					return Err(ParserError::UnexpectedStatement {
 						name: stmt.get_type(),
 						span: stmt.get_span().clone(),
-					})
+					});
 				}
 			}
 		}

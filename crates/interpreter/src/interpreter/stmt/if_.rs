@@ -1,5 +1,4 @@
 use async_recursion::async_recursion;
-use tokio::sync::RwLock;
 
 use ast::{Else, If, Node};
 
@@ -8,7 +7,7 @@ use crate::{Environment, Error, Interrupt};
 use super::{interpret_block, interpret_expr};
 
 #[async_recursion]
-pub async fn interpret_if(stmt: &Node<If>, env: &RwLock<Environment>) -> Result<Interrupt, Error> {
+pub async fn interpret_if(stmt: &Node<If>, env: &Environment) -> Result<Interrupt, Error> {
 	if interpret_expr(&stmt.val.condition, env).await?.boolify() {
 		interpret_block(&stmt.val.then, env).await
 	} else if let Some(else_) = &stmt.val.else_ {

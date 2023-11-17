@@ -26,7 +26,6 @@ mod let_;
 use let_::interpret_let;
 
 use async_recursion::async_recursion;
-use tokio::sync::RwLock;
 
 use ast::Statement;
 
@@ -35,10 +34,7 @@ use crate::{Environment, Error, Interrupt};
 use super::expr::interpret_expr;
 
 #[async_recursion]
-pub async fn interpret_stmt(
-	stmt: &Statement,
-	env: &RwLock<Environment>,
-) -> Result<Interrupt, Error> {
+pub async fn interpret_stmt(stmt: &Statement, env: &Environment) -> Result<Interrupt, Error> {
 	match stmt {
 		Statement::Expression(expr) => {
 			interpret_expr(expr, env).await?;

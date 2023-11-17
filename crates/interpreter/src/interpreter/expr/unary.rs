@@ -1,5 +1,4 @@
 use async_recursion::async_recursion;
-use tokio::sync::RwLock;
 
 use ast::{Node, Unary, UnaryOperator};
 
@@ -8,10 +7,7 @@ use crate::{Environment, Error, Value};
 use super::interpret_expr;
 
 #[async_recursion]
-pub async fn interpret_unary(
-	expr: &Node<Unary>,
-	env: &RwLock<Environment>,
-) -> Result<Value, Error> {
+pub async fn interpret_unary(expr: &Node<Unary>, env: &Environment) -> Result<Value, Error> {
 	let right = interpret_expr(&expr.val.right, env).await?;
 
 	match expr.val.op.val {

@@ -3,8 +3,6 @@ mod stmt;
 
 use std::{marker::PhantomData, sync::Arc};
 
-use tokio::sync::RwLock;
-
 use ast::Workflow;
 
 use crate::{Environment, Error};
@@ -17,7 +15,7 @@ impl InterpreterState for Initialized {}
 
 pub struct Interpreter<'wf, State> {
 	ast: &'wf Workflow,
-	global_env: Arc<RwLock<Environment>>,
+	global_env: Arc<Environment>,
 	state: PhantomData<State>,
 }
 
@@ -25,7 +23,7 @@ impl<'wf> Interpreter<'wf, New> {
 	pub fn new(ast: &'wf Workflow) -> Self {
 		Interpreter {
 			ast,
-			global_env: Arc::new(RwLock::new(Environment::new())),
+			global_env: Arc::new(Environment::new()),
 			state: PhantomData,
 		}
 	}
@@ -34,12 +32,8 @@ impl<'wf> Interpreter<'wf, New> {
 		self,
 		_vars: Vec<(String, String)>,
 	) -> Result<Interpreter<'wf, Initialized>, Error> {
-		let mut _env = self.global_env.write().await;
-
 		// TODO: add imports to env
 		// TODO: add globals and functions to env
-
-		drop(_env);
 
 		Ok(Interpreter {
 			ast: self.ast,
@@ -75,8 +69,8 @@ mod tests {
 		}
 	}
 
-	fn create_env() -> RwLock<Environment> {
-		RwLock::new(Environment::new())
+	fn create_env() -> Environment {
+		Environment::new()
 	}
 
 	#[test]

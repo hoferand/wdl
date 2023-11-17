@@ -1,14 +1,14 @@
 use async_recursion::async_recursion;
-use tokio::sync::RwLock;
 
 use ast::{Let, Node};
 
-use crate::{Environment, Error, Interrupt};
+use crate::{interpreter::expr::interpret_expr, Environment, Error, Interrupt};
 
 #[async_recursion]
-pub async fn interpret_let(
-	_stmt: &Node<Let>,
-	_env: &RwLock<Environment>,
-) -> Result<Interrupt, Error> {
-	todo!()
+pub async fn interpret_let(stmt: &Node<Let>, env: &Environment) -> Result<Interrupt, Error> {
+	let value = interpret_expr(&stmt.val.value, env).await?;
+	let id = stmt.val.id.clone();
+	env.declare(id, value).await?;
+
+	Ok(Interrupt::None)
 }

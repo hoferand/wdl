@@ -1,5 +1,4 @@
 use async_recursion::async_recursion;
-use tokio::sync::RwLock;
 
 use ast::{Binary, BinaryOperator, Node};
 
@@ -8,10 +7,7 @@ use crate::{Environment, Error, Value};
 use super::interpret_expr;
 
 #[async_recursion]
-pub async fn interpret_binary(
-	expr: &Node<Binary>,
-	env: &RwLock<Environment>,
-) -> Result<Value, Error> {
+pub async fn interpret_binary(expr: &Node<Binary>, env: &Environment) -> Result<Value, Error> {
 	let left = interpret_expr(&expr.val.left, env).await?;
 	if expr.val.op.val == BinaryOperator::NullCoalescing && left != Value::Null {
 		return Ok(left);

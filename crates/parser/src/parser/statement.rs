@@ -58,6 +58,10 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 		TokenValue::Return => Statement::Return(parse_return(parser)?),
 
 		// expression
-		_ => Statement::Expression(parse_expression(parser)?),
+		_ => {
+			let val = Statement::Expression(parse_expression(parser)?);
+			parser.tokens.expect(TokenValue::Semicolon)?;
+			val
+		}
 	}))
 }

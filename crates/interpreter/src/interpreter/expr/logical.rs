@@ -1,5 +1,4 @@
 use async_recursion::async_recursion;
-use tokio::sync::RwLock;
 
 use ast::{Logical, LogicalOperator, Node};
 
@@ -8,10 +7,7 @@ use crate::{Environment, Error, Value};
 use super::interpret_expr;
 
 #[async_recursion]
-pub async fn interpret_logical(
-	expr: &Node<Logical>,
-	env: &RwLock<Environment>,
-) -> Result<Value, Error> {
+pub async fn interpret_logical(expr: &Node<Logical>, env: &Environment) -> Result<Value, Error> {
 	let left = interpret_expr(&expr.val.left, env).await?;
 
 	// short circuit evaluation

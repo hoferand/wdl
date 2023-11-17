@@ -1,6 +1,5 @@
 use async_recursion::async_recursion;
 use futures::future::try_join_all;
-use tokio::sync::RwLock;
 
 use ast::{Node, Par};
 
@@ -9,7 +8,7 @@ use crate::{Environment, Error, Interrupt};
 use super::interpret_block;
 
 #[async_recursion]
-pub async fn interpret_par(stmt: &Node<Par>, env: &RwLock<Environment>) -> Result<(), Error> {
+pub async fn interpret_par(stmt: &Node<Par>, env: &Environment) -> Result<(), Error> {
 	let mut futures = Vec::new();
 	for block in stmt.val.blocks.iter() {
 		futures.push(interpret_block(block, env));
