@@ -43,7 +43,7 @@ impl<'a> Interpreter<'a, New> {
 	}
 }
 
-impl<'wf> Interpreter<'wf, Initialized> {
+impl<'a> Interpreter<'a, Initialized> {
 	pub async fn run(self) -> Result<(), Error> {
 		stmt::interpret_order(&self.ast.order, &self.global_env).await?;
 
