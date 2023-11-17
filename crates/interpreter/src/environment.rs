@@ -28,6 +28,7 @@ impl<'p> Environment<'p> {
 	}
 
 	pub async fn declare(&self, id: Node<Identifier>, val: Value) -> Result<(), Error> {
+		// TODO: check if variable shadowing should be allowed
 		let mut lock = self.variables.write().await;
 		if lock.contains_key(&id.val) {
 			return Err(Error::VariableAlreadyInUse {
