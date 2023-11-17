@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use ast::Identifier;
 use clap::Parser;
 use tokio::fs::read_to_string;
 
@@ -6,7 +9,10 @@ use interpreter::Interpreter;
 #[derive(Debug, Parser)]
 enum Cli {
 	#[clap(name = "run", about = "Run the program")]
-	Run { file: String },
+	Run {
+		file: String,
+		variables: Vec<String>,
+	},
 	#[clap(name = "fmt", about = "Format the program")]
 	Fmt { file: String },
 	#[clap(name = "check", about = "Check the program")]
@@ -18,14 +24,30 @@ enum Cli {
 #[tokio::main]
 async fn main() {
 	match Cli::parse() {
-		Cli::Run { file } => run(&file).await,
+		Cli::Run { file, variables } => run(&file, variables).await,
 		Cli::Fmt { .. } => todo!(),
 		Cli::Check { .. } => todo!(),
 		Cli::Router => todo!(),
 	}
 }
 
-async fn run(file: &str) {
+async fn run(file: &str, vars: Vec<String>) {
+	let mut variables = HashMap::new();
+	for var in vars {
+		let Some(parts) = var.split_once('=') else {
+			println!("Variable malformed");
+			return;
+		};
+
+		let id = Identifier(parts.0.to_owned());
+		let Ok(val) = serde_json::from_str::<serde_json::Value>(parts.1) else {
+			println!("Invalid variable value given");
+			return;
+		};
+
+		variables.insert(id, val);
+	}
+
 	let src_code = read_to_string(file).await.expect("Failed to read file!");
 	let workflow = match parser::get_ast(&src_code) {
 		Ok(wf) => wf,
@@ -38,7 +60,7 @@ async fn run(file: &str) {
 	println!("Run:");
 	let interpreter = Interpreter::new(&workflow);
 
-	let interpreter = match interpreter.init(Vec::new()).await {
+	let interpreter = match interpreter.init(variables).await {
 		Ok(i) => i,
 		Err(error) => {
 			print_interpreter_error(&error);

@@ -1,11 +1,13 @@
 mod expr;
 mod stmt;
 
-use std::{marker::PhantomData, sync::Arc};
+use std::{collections::HashMap, marker::PhantomData, sync::Arc};
 
-use ast::Workflow;
+use serde_json;
 
-use crate::{Environment, Error};
+use ast::{Identifier, Workflow};
+
+use crate::{Environment, Error, Value};
 
 pub trait InterpreterState {}
 pub struct New;
@@ -30,10 +32,25 @@ impl<'a> Interpreter<'a, New> {
 
 	pub async fn init(
 		self,
-		_vars: Vec<(String, String)>,
+		vars: HashMap<Identifier, serde_json::Value>,
 	) -> Result<Interpreter<'a, Initialized>, Error> {
-		// TODO: add imports to env
-		// TODO: add globals and functions to env
+		// global declarations
+		for global_decl in self.ast.globals.iter() {
+			let mut default = None;
+			if let Some(json_val) = vars.get(&global_decl.val.id.val) {
+				let Some(val) = convert_json_to_value(json_val.clone()) else {
+					return Err(Error::Fatal("Invalid variable value given".to_owned()));
+				};
+				default = Some(val);
+			}
+
+			stmt::interpret_global_declaration(global_decl, &self.global_env, default).await?;
+		}
+
+		// function declarations
+		for fn_decl in self.ast.functions.iter() {
+			stmt::interpret_function_declaration(fn_decl, &self.global_env).await?;
+		}
 
 		Ok(Interpreter {
 			ast: self.ast,
@@ -45,9 +62,22 @@ impl<'a> Interpreter<'a, New> {
 
 impl<'a> Interpreter<'a, Initialized> {
 	pub async fn run(self) -> Result<(), Error> {
-		stmt::interpret_order(&self.ast.order, &self.global_env).await?;
+		let inner_env = Environment::with_parent(&self.global_env);
+
+		stmt::interpret_order(&self.ast.order, &inner_env).await?;
 
 		Ok(())
+	}
+}
+
+fn convert_json_to_value(value: serde_json::Value) -> Option<Value> {
+	match value {
+		serde_json::Value::Null => Some(Value::Null),
+		serde_json::Value::Bool(b) => Some(Value::Bool(b)),
+		serde_json::Value::Number(n) => n.as_f64().map(Value::Number),
+		serde_json::Value::String(s) => Some(Value::String(s)),
+		serde_json::Value::Array(_) => None,
+		serde_json::Value::Object(_) => None,
 	}
 }
 

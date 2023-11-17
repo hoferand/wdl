@@ -19,9 +19,9 @@ use return_::interpret_return;
 mod sleep;
 use sleep::interpret_sleep;
 mod function_declaration;
-use function_declaration::interpret_function_declaration;
+pub use function_declaration::interpret_function_declaration;
 mod global_declaration;
-use global_declaration::interpret_global_declaration;
+pub use global_declaration::interpret_global_declaration;
 mod let_;
 use let_::interpret_let;
 
@@ -43,11 +43,8 @@ pub async fn interpret_stmt(stmt: &Statement, env: &Environment) -> Result<Inter
 		Statement::Block(block) => interpret_block(block, env).await,
 		Statement::Break(_) => interpret_break(),
 		Statement::Continue(_) => interpret_continue(),
-		Statement::FunctionDeclaration(fn_) => interpret_function_declaration(fn_, env).await,
-		Statement::GlobalDeclaration(global) => interpret_global_declaration(global, env).await,
 		Statement::If(if_) => interpret_if(if_, env).await,
 		Statement::Let(let_) => interpret_let(let_, env).await,
-		Statement::Order(order) => interpret_order(order, env).await,
 		Statement::Par(par) => {
 			interpret_par(par, env).await?;
 			Ok(Interrupt::None)

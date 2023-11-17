@@ -27,11 +27,33 @@ pub(crate) use let_::parse_let;
 mod function_declaration;
 pub(crate) use function_declaration::parse_function_declaration;
 
-use ast::Statement;
+use ast::{Declaration, Statement};
 
 use crate::{Parser, ParserError, TokenValue};
 
 use super::expression::parse_expression;
+
+pub(crate) fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaration>, ParserError> {
+	let Some(token) = parser.tokens.peek() else {
+		return Ok(None);
+	};
+
+	Ok(Some(match token.value {
+		TokenValue::EoF => return Ok(None),
+
+		// statements
+		TokenValue::Global => Declaration::GlobalDeclaration(parse_global_declaration(parser)?),
+		TokenValue::Order => Declaration::Order(parse_order(parser)?),
+		TokenValue::Fn => Declaration::FunctionDeclaration(parse_function_declaration(parser)?),
+
+		_ => {
+			return Err(ParserError::UnexpectedToken {
+				src: token.src.clone(),
+				span: token.span.clone(),
+			});
+		}
+	}))
+}
 
 pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {
@@ -42,11 +64,6 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 		TokenValue::EoF => return Ok(None),
 
 		// statements
-		TokenValue::Global | TokenValue::At => {
-			Statement::GlobalDeclaration(parse_global_declaration(parser)?)
-		}
-		TokenValue::Order => Statement::Order(parse_order(parser)?),
-		TokenValue::Fn => Statement::FunctionDeclaration(parse_function_declaration(parser)?),
 		TokenValue::Let => Statement::Let(parse_let(parser)?),
 		TokenValue::Par => Statement::Par(parse_par(parser)?),
 		TokenValue::Sleep => Statement::Sleep(parse_sleep(parser)?),

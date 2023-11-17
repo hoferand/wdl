@@ -11,7 +11,7 @@ use statement::*;
 mod type_;
 //use type_::*;
 
-use ast::{Statement, Workflow};
+use ast::{Declaration, Workflow};
 
 use crate::Token;
 
@@ -33,17 +33,17 @@ impl<'t> Parser<'t> {
 		let mut wf_order = None;
 		let mut functions = Vec::new();
 
-		while let Some(stmt) = parse_statement(&mut self)? {
+		while let Some(stmt) = parse_declaration(&mut self)? {
 			match stmt {
-				Statement::GlobalDeclaration(global) => globals.push(global),
-				Statement::Order(order) if wf_order.is_none() => wf_order = Some(order),
-				Statement::FunctionDeclaration(fn_) => functions.push(fn_),
-				_ => {
-					return Err(ParserError::UnexpectedStatement {
-						name: stmt.get_type(),
-						span: stmt.get_span().clone(),
-					});
+				Declaration::GlobalDeclaration(global) => globals.push(global),
+				Declaration::Order(order) => {
+					if wf_order.is_none() {
+						wf_order = Some(order);
+					} else {
+						return Err(ParserError::SecondOrder { span: order.span });
+					}
 				}
+				Declaration::FunctionDeclaration(fn_) => functions.push(fn_),
 			}
 		}
 

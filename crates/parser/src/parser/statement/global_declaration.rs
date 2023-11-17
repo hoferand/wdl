@@ -1,9 +1,6 @@
 use ast::{GlobalDeclaration, Identifier, Node, Span};
 
-use crate::{
-	parser::{expression::parse_expression, type_::parse_type},
-	Parser, ParserError, TokenValue,
-};
+use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValue};
 
 pub(crate) fn parse_global_declaration(
 	parser: &mut Parser,
@@ -20,15 +17,8 @@ pub(crate) fn parse_global_declaration(
 		});
 	};
 
-	parser.tokens.expect(TokenValue::Colon)?;
-
-	let type_ = parse_type(parser)?;
-
 	let id_node = Node {
-		span: Span {
-			start: id_token.span.start.clone(),
-			end: type_.span.end.clone(),
-		},
+		span: id_token.span,
 		val: Identifier(id.to_owned()),
 	};
 
@@ -50,7 +40,6 @@ pub(crate) fn parse_global_declaration(
 		span: Span { start, end },
 		val: GlobalDeclaration {
 			id: id_node,
-			type_,
 			value: Some(value),
 			description: None,
 		},

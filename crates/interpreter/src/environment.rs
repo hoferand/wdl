@@ -70,7 +70,7 @@ impl<'p> Environment<'p> {
 	async fn resolve(&self, id: &Identifier) -> Option<&Arc<RwLock<HashMap<Identifier, Value>>>> {
 		if self.variables.read().await.contains_key(id) {
 			Some(&self.variables)
-		} else if let Some(ref parent) = self.parent {
+		} else if let Some(parent) = self.parent {
 			parent.resolve(id).await
 		} else {
 			None
