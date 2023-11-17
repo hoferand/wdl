@@ -56,6 +56,7 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 		TokenValue::Continue => Statement::Continue(parse_continue(parser)?),
 		TokenValue::Break => Statement::Break(parse_break(parser)?),
 		TokenValue::Return => Statement::Return(parse_return(parser)?),
+		TokenValue::CurlyOpen => Statement::Block(parse_block(parser)?),
 
 		// expression
 		_ => {
