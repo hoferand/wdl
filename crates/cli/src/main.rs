@@ -4,11 +4,10 @@ use std::process::exit;
 use clap::Parser;
 use tokio::fs::read_to_string;
 
-use ast::Identifier;
+use ast::{Identifier, Location};
+use interpreter::Interpreter;
 use logger::error;
 use logger::Colorize;
-
-use interpreter::Interpreter;
 
 #[derive(Debug, Parser)]
 enum Cli {
@@ -65,34 +64,133 @@ async fn run(file: &str, vars: Vec<String>) -> ! {
 	let workflow = match parser::get_ast(&src_code) {
 		Ok(wf) => wf,
 		Err(error) => {
-			print_parser_error(&error);
+			print_parser_error(&error, &src_code);
 			exit(1);
 		}
 	};
 
-	println!("Run:");
 	let interpreter = Interpreter::new(&workflow);
 
 	let interpreter = match interpreter.init(variables).await {
 		Ok(i) => i,
 		Err(error) => {
-			print_interpreter_error(&error);
+			print_interpreter_error(&error, &src_code);
 			exit(1);
 		}
 	};
 
 	if let Err(error) = interpreter.run().await {
-		print_interpreter_error(&error);
+		print_interpreter_error(&error, &src_code);
 		exit(1);
 	};
 
 	exit(0);
 }
 
-fn print_interpreter_error(error: &interpreter::Error) {
-	dbg!(error);
+fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
+	match error {
+		interpreter::Error::Fatal(msg) => error!("{}!", msg),
+		interpreter::Error::VariableAlreadyInUse { id, span } => {
+			error!("Variable `{}` already in use!", id.0);
+			print_error_location(&span.start, &span.end, src_code);
+		}
+		interpreter::Error::VariableNotFound { id, span } => {
+			error!("Variable `{}` not found!", id.0);
+			print_error_location(&span.start, &span.end, src_code);
+		}
+		interpreter::Error::InvalidType { msg, span } => {
+			error!("Invalid types, {}!", msg);
+			print_error_location(&span.start, &span.end, src_code);
+		}
+		interpreter::Error::DivisionByZero { span } => {
+			error!("Division by zero!");
+			print_error_location(&span.start, &span.end, src_code);
+		}
+	}
 }
 
-fn print_parser_error(error: &parser::Error) {
-	dbg!(error);
+fn print_parser_error(error: &parser::Error, src_code: &str) {
+	match error {
+		parser::Error::Lexer(errors) => {
+			for err in errors {
+				match err {
+					parser::LexerError::InvalidCharacter { char, loc } => {
+						error!("Invalid character `{}` found!", char);
+						print_error_location(
+							loc,
+							&Location {
+								line: loc.line,
+								column: loc.column + 1,
+							},
+							src_code,
+						);
+					}
+					parser::LexerError::InvalidNumber { src, span } => {
+						error!("Invalid number `{}` found!", src);
+						print_error_location(&span.start, &span.end, src_code);
+					}
+					parser::LexerError::UnexpectedEndOfString { span, .. } => {
+						error!("Unexpected end of string!");
+						print_error_location(&span.start, &span.end, src_code);
+					}
+				}
+			}
+		}
+		parser::Error::Parser(err) => match err {
+			parser::ParserError::Fatal(msg) => error!("{}!", msg),
+			parser::ParserError::UnexpectedToken { src, span } => {
+				error!("Unexpected token `{}`!", src);
+				print_error_location(&span.start, &span.end, src_code);
+			}
+			parser::ParserError::SecondOrder { order1, order2 } => {
+				error!("Multiple order blocks found!");
+				println!("First block:");
+				print_error_location(&order1.start, &order1.end, src_code);
+				println!("Second block:");
+				print_error_location(&order2.start, &order2.end, src_code);
+			}
+			parser::ParserError::UnexpectedEoF => error!("Unexpected end of file!"),
+		},
+	}
+}
+
+fn print_error_location(start: &Location, end: &Location, src: &str) {
+	let mut lines: Vec<&str> = src.lines().collect();
+	lines.push("");
+
+	let number_padding = (end.line + 1).to_string().len();
+	println!("{:>pad$}", "|".blue(), pad = number_padding + 2);
+
+	let show_lines = 3;
+	let mut skipped = false;
+	for line_number in start.line..=end.line {
+		if (end.line - start.line) > show_lines * 2
+			&& !(line_number - start.line < show_lines || end.line - line_number < show_lines)
+		{
+			if !skipped {
+				skipped = true;
+				println!(
+					"{:>pad$} {}",
+					"|".blue(),
+					"...".blue(),
+					pad = number_padding + 2
+				);
+			}
+		} else if let Some(line) = lines.get(line_number) {
+			println!(
+				"{:<pad$} {:} {}",
+				(line_number + 1).to_string().blue(),
+				"|".blue(),
+				line,
+				pad = number_padding,
+			);
+		} else {
+			error!(
+				"Internal error, line number `{}` does not exist!",
+				line_number + 1
+			);
+		}
+	}
+
+	println!("{:>pad$}", "|".blue(), pad = number_padding + 2);
 }

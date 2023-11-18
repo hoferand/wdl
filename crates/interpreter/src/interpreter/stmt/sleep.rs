@@ -17,9 +17,9 @@ pub async fn interpret_sleep(stmt: &Node<Sleep>, env: &Environment) -> Result<()
 		sleep(Duration::from_millis(millis as u64)).await;
 		Ok(())
 	} else {
-		Err(Error::Fatal(format!(
-			"Invalid type, sleep `{}`",
-			time.get_type()
-		)))
+		Err(Error::InvalidType {
+			msg: format!("sleep `{}`", time.get_type()),
+			span: stmt.val.time.get_span().clone(),
+		})
 	}
 }

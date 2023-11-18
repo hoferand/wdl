@@ -39,7 +39,10 @@ impl<'a> Interpreter<'a, New> {
 			let mut default = None;
 			if let Some(json_val) = vars.get(&global_decl.val.id.val) {
 				let Some(val) = convert_json_to_value(json_val.clone()) else {
-					return Err(Error::Fatal("Invalid variable value given".to_owned()));
+					return Err(Error::Fatal(format!(
+						"Invalid value for variable `{}` given",
+						&global_decl.val.id.val.0
+					)));
 				};
 				default = Some(val);
 			}

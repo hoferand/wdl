@@ -44,7 +44,9 @@ pub(crate) fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaratio
 		// statements
 		TokenValue::Global => Declaration::GlobalDeclaration(parse_global_declaration(parser)?),
 		TokenValue::Order => Declaration::Order(parse_order(parser)?),
-		TokenValue::Fn => Declaration::FunctionDeclaration(parse_function_declaration(parser)?),
+		TokenValue::Function => {
+			Declaration::FunctionDeclaration(parse_function_declaration(parser)?)
+		}
 
 		_ => {
 			return Err(ParserError::UnexpectedToken {

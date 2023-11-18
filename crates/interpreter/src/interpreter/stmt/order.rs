@@ -8,10 +8,12 @@ use super::interpret_block;
 
 #[async_recursion]
 pub async fn interpret_order(stmt: &Node<Order>, env: &Environment) -> Result<Interrupt, Error> {
-	if !interpret_block(&stmt.val.block, env).await?.is_none() {
-		return Err(Error::Fatal(
-			"AST invalid, interrupt in order block found".to_owned(),
-		));
+	let ret = interpret_block(&stmt.val.block, env).await?;
+	if !ret.is_none() {
+		return Err(Error::Fatal(format!(
+			"AST invalid, `{}` in order block found",
+			ret.get_type()
+		)));
 	}
 
 	Ok(Interrupt::None)

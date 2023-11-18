@@ -1,6 +1,6 @@
 use async_recursion::async_recursion;
 
-use ast::{Binary, BinaryOperator, Node};
+use ast::{Binary, BinaryOperator, Node, Span};
 
 use crate::{Environment, Error, Value};
 
@@ -16,11 +16,11 @@ pub async fn interpret_binary(expr: &Node<Binary>, env: &Environment) -> Result<
 	let right = interpret_expr(&expr.val.right, env).await?;
 
 	match expr.val.op.val {
-		BinaryOperator::Add => add(&left, &right),
-		BinaryOperator::Subtract => sub(&left, &right),
-		BinaryOperator::Multiply => mul(&left, &right),
-		BinaryOperator::Divide => div(&left, &right),
-		BinaryOperator::Modulo => mod_(&left, &right),
+		BinaryOperator::Add => add(&left, &right, &expr.span),
+		BinaryOperator::Subtract => sub(&left, &right, &expr.span),
+		BinaryOperator::Multiply => mul(&left, &right, &expr.span),
+		BinaryOperator::Divide => div(&left, &right, &expr.span),
+		BinaryOperator::Modulo => mod_(&left, &right, &expr.span),
 		BinaryOperator::Equal => Ok(Value::Bool(left == right)),
 		BinaryOperator::NotEqual => Ok(Value::Bool(left != right)),
 		BinaryOperator::Less => Ok(Value::Bool(left < right)),
@@ -31,68 +31,63 @@ pub async fn interpret_binary(expr: &Node<Binary>, env: &Environment) -> Result<
 	}
 }
 
-fn add(left: &Value, right: &Value) -> Result<Value, Error> {
+fn add(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(*n1 + *n2)),
 		(Value::String(s1), Value::String(s2)) => Ok(Value::String(s1.to_owned() + s2)),
-		_ => Err(Error::Fatal(format!(
-			"Invalid types, `{}` + `{}`",
-			left.get_type(),
-			right.get_type()
-		))),
+		_ => Err(Error::InvalidType {
+			msg: format!("`{}` + `{}`", left.get_type(), right.get_type()),
+			span: span.clone(),
+		}),
 	}
 }
 
-fn sub(left: &Value, right: &Value) -> Result<Value, Error> {
+fn sub(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(*n1 - *n2)),
-		_ => Err(Error::Fatal(format!(
-			"Invalid types, `{}` - `{}`",
-			left.get_type(),
-			right.get_type()
-		))),
+		_ => Err(Error::InvalidType {
+			msg: format!("`{}` - `{}`", left.get_type(), right.get_type()),
+			span: span.clone(),
+		}),
 	}
 }
 
-fn mul(left: &Value, right: &Value) -> Result<Value, Error> {
+fn mul(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(*n1 * *n2)),
-		_ => Err(Error::Fatal(format!(
-			"Invalid types, `{}` * `{}`",
-			left.get_type(),
-			right.get_type()
-		))),
+		_ => Err(Error::InvalidType {
+			msg: format!("`{}` * `{}`", left.get_type(), right.get_type()),
+			span: span.clone(),
+		}),
 	}
 }
 
-fn div(left: &Value, right: &Value) -> Result<Value, Error> {
+fn div(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => {
 			if *n2 == 0.0 {
-				return Err(Error::Fatal("Division by zero".to_owned()));
+				return Err(Error::DivisionByZero { span: span.clone() });
 			}
 			Ok(Value::Number(*n1 / *n2))
 		}
-		_ => Err(Error::Fatal(format!(
-			"Invalid types, `{}` / `{}`",
-			left.get_type(),
-			right.get_type()
-		))),
+		_ => Err(Error::InvalidType {
+			msg: format!("`{}` / `{}`", left.get_type(), right.get_type()),
+			span: span.clone(),
+		}),
 	}
 }
 
-fn mod_(left: &Value, right: &Value) -> Result<Value, Error> {
+fn mod_(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => {
 			if *n2 == 0.0 {
-				return Err(Error::Fatal("Division by zero".to_owned()));
+				return Err(Error::DivisionByZero { span: span.clone() });
 			}
 			Ok(Value::Number(*n1 % *n2))
 		}
-		_ => Err(Error::Fatal(format!(
-			"Invalid types, `{}` % `{}`",
-			left.get_type(),
-			right.get_type()
-		))),
+		_ => Err(Error::InvalidType {
+			msg: format!("`{}` % `{}`", left.get_type(), right.get_type()),
+			span: span.clone(),
+		}),
 	}
 }

@@ -11,7 +11,7 @@ use statement::*;
 mod type_;
 //use type_::*;
 
-use ast::{Declaration, Workflow};
+use ast::{Declaration, Node, Order, Workflow};
 
 use crate::Token;
 
@@ -30,17 +30,20 @@ impl<'t> Parser<'t> {
 
 	pub fn parse(mut self) -> Result<Workflow, ParserError> {
 		let mut globals = Vec::new();
-		let mut wf_order = None;
+		let mut wf_order: Option<Node<Order>> = None;
 		let mut functions = Vec::new();
 
 		while let Some(stmt) = parse_declaration(&mut self)? {
 			match stmt {
 				Declaration::GlobalDeclaration(global) => globals.push(global),
 				Declaration::Order(order) => {
-					if wf_order.is_none() {
-						wf_order = Some(order);
+					if let Some(order1) = wf_order {
+						return Err(ParserError::SecondOrder {
+							order1: order1.span.clone(),
+							order2: order.span,
+						});
 					} else {
-						return Err(ParserError::SecondOrder { span: order.span });
+						wf_order = Some(order);
 					}
 				}
 				Declaration::FunctionDeclaration(fn_) => functions.push(fn_),
@@ -48,7 +51,7 @@ impl<'t> Parser<'t> {
 		}
 
 		let Some(order) = wf_order else {
-			return Err(ParserError::Fatal("No order block".to_owned()));
+			return Err(ParserError::Fatal("No order block found".to_owned()));
 		};
 
 		Ok(Workflow {
