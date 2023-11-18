@@ -7,8 +7,9 @@ edition = "2021"
 
 [dependencies]
 ast = { path = "../ast" }
-parser = { path = "../parser" }
 interpreter = { path = "../interpreter" }
+logger = { path = "../logger" }
+parser = { path = "../parser" }
 
 clap = { version = "4.4.8", features = ["derive"] }
 serde = { version = "1.0.192", features = ["serde_derive"] }
