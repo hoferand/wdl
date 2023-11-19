@@ -67,9 +67,9 @@ impl<'p> Environment<'p> {
 	}
 
 	#[async_recursion]
-	async fn resolve(&self, id: &Identifier) -> Option<&Arc<RwLock<HashMap<Identifier, Value>>>> {
+	async fn resolve(&self, id: &Identifier) -> Option<Arc<RwLock<HashMap<Identifier, Value>>>> {
 		if self.variables.read().await.contains_key(id) {
-			Some(&self.variables)
+			Some(Arc::clone(&self.variables))
 		} else if let Some(parent) = self.parent {
 			parent.resolve(id).await
 		} else {

@@ -2,7 +2,7 @@ use async_recursion::async_recursion;
 
 use ast::{GlobalDeclaration, Node};
 
-use crate::{interpreter::expr::interpret_expr, value::Value, Environment, Error, Interrupt};
+use crate::{interpreter::expr::interpret_expr, Environment, Error, Interrupt, Value};
 
 #[async_recursion]
 pub async fn interpret_global_declaration(
