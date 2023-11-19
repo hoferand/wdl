@@ -4,7 +4,7 @@ mod interrupt;
 use interrupt::Interrupt;
 mod std;
 mod value;
-use value::Value;
+use value::*;
 
 pub mod interpreter;
 pub use interpreter::Interpreter;
