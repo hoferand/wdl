@@ -38,7 +38,7 @@ pub async fn interpret_binary(
 fn add(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(*n1 + *n2)),
-		(Value::String(s1), Value::String(s2)) => Ok(Value::String(s1.to_owned() + s2)),
+		(Value::String(s1), v) => Ok(Value::String(s1.to_owned() + &v.to_string())),
 		_ => Err(Error::InvalidType {
 			msg: format!("`{}` + `{}`", left.get_type(), right.get_type()),
 			span: span.clone(),
