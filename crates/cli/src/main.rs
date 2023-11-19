@@ -57,9 +57,12 @@ async fn run(file: &str, vars: Vec<String>) -> ! {
 		variables.insert(id, val);
 	}
 
-	let Ok(src_code) = read_to_string(file).await else {
-		error!("Failed to read source file!");
-		exit(1);
+	let src_code = match read_to_string(file).await {
+		Ok(content) => content,
+		Err(err) => {
+			error!("Failed to read source file, {}!", err.kind());
+			exit(1);
+		}
 	};
 	let workflow = match parser::get_ast(&src_code) {
 		Ok(wf) => wf,
