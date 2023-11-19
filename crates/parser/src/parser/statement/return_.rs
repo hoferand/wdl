@@ -3,7 +3,16 @@ use ast::{Node, Return, Span};
 use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValue};
 
 pub(crate) fn parse_return(parser: &mut Parser) -> Result<Node<Return>, ParserError> {
-	let start = parser.tokens.expect(TokenValue::Return)?.span.start.clone();
+	let token = parser.tokens.expect(TokenValue::Return)?;
+
+	if parser.state.in_function < 1 {
+		return Err(ParserError::UnexpectedToken {
+			src: token.src.clone(),
+			span: token.span.clone(),
+		});
+	}
+
+	let start = token.span.start.clone();
 
 	let value = parse_expression(parser)?;
 
