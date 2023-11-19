@@ -48,5 +48,5 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 		todo!()
 	}
 
-	return Ok(expr);
+	Ok(expr)
 }
