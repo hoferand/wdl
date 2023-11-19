@@ -10,8 +10,9 @@ use super::interpret_expr;
 pub async fn interpret_assignment(
 	expr: &Node<Assignment>,
 	env: &Environment,
+	g_env: &Environment,
 ) -> Result<Value, Error> {
-	let value = interpret_expr(&expr.val.value, env).await?;
+	let value = interpret_expr(&expr.val.value, env, g_env).await?;
 	let id = expr.val.id.clone();
 	env.assign(id, value.clone()).await?;
 

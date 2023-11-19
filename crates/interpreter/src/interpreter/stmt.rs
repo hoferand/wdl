@@ -1,7 +1,7 @@
 mod order;
 pub use order::interpret_order;
 mod block;
-use block::interpret_block;
+pub use block::interpret_block;
 mod par;
 use par::interpret_par;
 mod if_;
@@ -34,30 +34,34 @@ use crate::{Environment, Error, Interrupt};
 use super::expr::interpret_expr;
 
 #[async_recursion]
-pub async fn interpret_stmt(stmt: &Statement, env: &Environment) -> Result<Interrupt, Error> {
+pub async fn interpret_stmt(
+	stmt: &Statement,
+	env: &Environment,
+	g_env: &Environment,
+) -> Result<Interrupt, Error> {
 	match stmt {
 		Statement::Expression(expr) => {
-			interpret_expr(expr, env).await?;
+			interpret_expr(expr, env, g_env).await?;
 			Ok(Interrupt::None)
 		}
-		Statement::Block(block) => interpret_block(block, env).await,
+		Statement::Block(block) => interpret_block(block, env, g_env).await,
 		Statement::Break(_) => interpret_break(),
 		Statement::Continue(_) => interpret_continue(),
-		Statement::If(if_) => interpret_if(if_, env).await,
-		Statement::Let(let_) => interpret_let(let_, env).await,
+		Statement::If(if_) => interpret_if(if_, env, g_env).await,
+		Statement::Let(let_) => interpret_let(let_, env, g_env).await,
 		Statement::Par(par) => {
-			interpret_par(par, env).await?;
+			interpret_par(par, env, g_env).await?;
 			Ok(Interrupt::None)
 		}
 		Statement::Print(print) => {
-			interpret_print(print, env).await?;
+			interpret_print(print, env, g_env).await?;
 			Ok(Interrupt::None)
 		}
-		Statement::Return(return_) => interpret_return(return_, env).await,
+		Statement::Return(return_) => interpret_return(return_, env, g_env).await,
 		Statement::Sleep(sleep) => {
-			interpret_sleep(sleep, env).await?;
+			interpret_sleep(sleep, env, g_env).await?;
 			Ok(Interrupt::None)
 		}
-		Statement::While(while_) => interpret_while(while_, env).await,
+		Statement::While(while_) => interpret_while(while_, env, g_env).await,
 	}
 }

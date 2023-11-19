@@ -7,13 +7,17 @@ use crate::{Environment, Error, Value};
 use super::interpret_expr;
 
 #[async_recursion]
-pub async fn interpret_binary(expr: &Node<Binary>, env: &Environment) -> Result<Value, Error> {
-	let left = interpret_expr(&expr.val.left, env).await?;
+pub async fn interpret_binary(
+	expr: &Node<Binary>,
+	env: &Environment,
+	g_env: &Environment,
+) -> Result<Value, Error> {
+	let left = interpret_expr(&expr.val.left, env, g_env).await?;
 	if expr.val.op.val == BinaryOperator::NullCoalescing && left != Value::Null {
 		return Ok(left);
 	};
 
-	let right = interpret_expr(&expr.val.right, env).await?;
+	let right = interpret_expr(&expr.val.right, env, g_env).await?;
 
 	match expr.val.op.val {
 		BinaryOperator::Add => add(&left, &right, &expr.span),

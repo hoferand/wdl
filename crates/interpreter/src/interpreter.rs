@@ -67,7 +67,7 @@ impl<'a> Interpreter<'a, Initialized> {
 	pub async fn run(self) -> Result<(), Error> {
 		let inner_env = Environment::with_parent(&self.global_env);
 
-		stmt::interpret_order(&self.ast.order, &inner_env).await?;
+		stmt::interpret_order(&self.ast.order, &inner_env, &self.global_env).await?;
 
 		Ok(())
 	}
@@ -111,7 +111,9 @@ mod tests {
 		let expr = Expression::Literal(create_node(Literal::Number(2.0)));
 
 		assert_eq!(
-			expr::interpret_expr(&expr, &create_env()).await.unwrap(),
+			expr::interpret_expr(&expr, &create_env(), &create_env())
+				.await
+				.unwrap(),
 			Value::Number(2.0)
 		)
 	}
@@ -129,7 +131,9 @@ mod tests {
 		}));
 
 		assert_eq!(
-			expr::interpret_expr(&expr, &create_env()).await.unwrap(),
+			expr::interpret_expr(&expr, &create_env(), &create_env())
+				.await
+				.unwrap(),
 			Value::Number(7.0)
 		)
 	}

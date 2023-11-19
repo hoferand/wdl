@@ -10,8 +10,12 @@ use crate::{Environment, Error, Value};
 use super::interpret_expr;
 
 #[async_recursion]
-pub async fn interpret_sleep(stmt: &Node<Sleep>, env: &Environment) -> Result<(), Error> {
-	let time = interpret_expr(&stmt.val.time, env).await?;
+pub async fn interpret_sleep(
+	stmt: &Node<Sleep>,
+	env: &Environment,
+	g_env: &Environment,
+) -> Result<(), Error> {
+	let time = interpret_expr(&stmt.val.time, env, g_env).await?;
 
 	if let Value::Number(millis) = time {
 		sleep(Duration::from_millis(millis as u64)).await;
