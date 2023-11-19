@@ -109,6 +109,17 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			error!("Division by zero!");
 			print_error_location(&span.start, &span.end, src_code);
 		}
+		interpreter::Error::ArityMismatch {
+			expected,
+			given,
+			span,
+		} => {
+			error!(
+				"Invalid count of function call parameter, expected `{}`, given `{}`!",
+				expected, given
+			);
+			print_error_location(&span.start, &span.end, src_code);
+		}
 	}
 }
 

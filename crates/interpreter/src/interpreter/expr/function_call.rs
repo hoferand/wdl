@@ -30,18 +30,15 @@ pub async fn interpret_function_call(
 			let inner_env = Environment::with_parent(g_env);
 
 			let mut ids = function.parameter.iter();
-			let mut vals = expr.val.parameter.iter();
+			let mut vals = expr.val.parameter.val.iter();
 			loop {
 				match (ids.next(), vals.next()) {
-					(None, Some(_)) => {
-						return Err(Error::Fatal(
-							"Too many parameter for function call given".to_owned(),
-						))
-					}
-					(Some(_), None) => {
-						return Err(Error::Fatal(
-							"Too few parameter for function call given".to_owned(),
-						))
+					(None, Some(_)) | (Some(_), None) => {
+						return Err(Error::ArityMismatch {
+							expected: function.parameter.len(),
+							given: expr.val.parameter.val.len(),
+							span: expr.val.parameter.span.clone(),
+						});
 					}
 					(Some(id_node), Some(val_expr)) => {
 						let id = id_node.val.id.clone();
