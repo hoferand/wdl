@@ -20,10 +20,6 @@ pub mod return_;
 pub use return_::Return;
 pub mod let_;
 pub use let_::Let;
-pub mod print;
-pub use print::Print;
-pub mod sleep;
-pub use sleep::Sleep;
 
 use crate::{Expression, Node, Span};
 
@@ -62,9 +58,7 @@ pub enum Statement {
 	If(Node<If>),
 	Let(Node<Let>),
 	Par(Node<Par>),
-	Print(Node<Print>),
 	Return(Node<Return>),
-	Sleep(Node<Sleep>),
 	While(Node<While>),
 }
 
@@ -78,9 +72,7 @@ impl Statement {
 			Statement::If(stmt) => &stmt.span,
 			Statement::Let(stmt) => &stmt.span,
 			Statement::Par(stmt) => &stmt.span,
-			Statement::Print(stmt) => &stmt.span,
 			Statement::Return(stmt) => &stmt.span,
-			Statement::Sleep(stmt) => &stmt.span,
 			Statement::While(stmt) => &stmt.span,
 		}
 	}
@@ -94,9 +86,7 @@ impl Statement {
 			Statement::If(_) => "if",
 			Statement::Let(_) => "let",
 			Statement::Par(_) => "par",
-			Statement::Print(_) => "print",
 			Statement::Return(_) => "return",
-			Statement::Sleep(_) => "sleep",
 			Statement::While(_) => "while",
 		}
 		.to_owned()

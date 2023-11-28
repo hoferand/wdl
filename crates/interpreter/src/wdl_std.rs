@@ -9,8 +9,8 @@ use crate::value::{FunctionValue, Value};
 
 pub fn get_std(id: &str) -> Option<Value> {
 	match id {
-		"printfn" => Some(Value::Function(FunctionValue::Std(Arc::new(print)))),
-		"sleepfn" => Some(Value::Function(FunctionValue::Std(Arc::new(sleep)))),
+		"print" => Some(Value::Function(FunctionValue::Std(Arc::new(print)))),
+		"sleep" => Some(Value::Function(FunctionValue::Std(Arc::new(sleep)))),
 		_ => None,
 	}
 }

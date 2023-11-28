@@ -270,8 +270,6 @@ impl<'c> Lexer<'c> {
 			"let" => TokenValue::Let,
 			"type" => TokenValue::Type,
 			"par" => TokenValue::Par,
-			"sleep" => TokenValue::Sleep,
-			"print" => TokenValue::Print,
 			"and" => TokenValue::LAnd,
 			"or" => TokenValue::LOr,
 			"if" => TokenValue::If,

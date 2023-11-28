@@ -8,16 +8,12 @@ mod if_;
 use if_::interpret_if;
 mod while_;
 use while_::interpret_while;
-mod print;
-use print::interpret_print;
 mod break_;
 use break_::interpret_break;
 mod continue_;
 use continue_::interpret_continue;
 mod return_;
 use return_::interpret_return;
-mod sleep;
-use sleep::interpret_sleep;
 mod function_declaration;
 pub use function_declaration::interpret_function_declaration;
 mod global_declaration;
@@ -53,15 +49,7 @@ pub async fn interpret_stmt(
 			interpret_par(par, env, g_env).await?;
 			Ok(Interrupt::None)
 		}
-		Statement::Print(print) => {
-			interpret_print(print, env, g_env).await?;
-			Ok(Interrupt::None)
-		}
 		Statement::Return(return_) => interpret_return(return_, env, g_env).await,
-		Statement::Sleep(sleep) => {
-			interpret_sleep(sleep, env, g_env).await?;
-			Ok(Interrupt::None)
-		}
 		Statement::While(while_) => interpret_while(while_, env, g_env).await,
 	}
 }

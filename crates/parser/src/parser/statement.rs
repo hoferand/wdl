@@ -16,10 +16,6 @@ mod else_;
 pub(crate) use else_::parse_else;
 mod if_;
 pub(crate) use if_::parse_if;
-mod print;
-pub(crate) use print::parse_print;
-mod sleep;
-pub(crate) use sleep::parse_sleep;
 mod par;
 pub(crate) use par::parse_par;
 mod let_;
@@ -68,8 +64,6 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 		// statements
 		TokenValue::Let => Statement::Let(parse_let(parser)?),
 		TokenValue::Par => Statement::Par(parse_par(parser)?),
-		TokenValue::Sleep => Statement::Sleep(parse_sleep(parser)?),
-		TokenValue::Print => Statement::Print(parse_print(parser)?),
 		TokenValue::If => Statement::If(parse_if(parser)?),
 		TokenValue::While => Statement::While(parse_while(parser)?),
 		TokenValue::Continue => Statement::Continue(parse_continue(parser)?),

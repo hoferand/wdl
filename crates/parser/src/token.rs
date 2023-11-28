@@ -62,8 +62,6 @@ pub enum TokenValue {
 	Let,
 	Type,
 	Par,
-	Sleep,
-	Print,
 	LAnd, // and
 	LOr,  // or
 	If,
