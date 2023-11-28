@@ -2,8 +2,8 @@ mod environment;
 use environment::Environment;
 mod interrupt;
 use interrupt::Interrupt;
-mod std;
 mod value;
+mod wdl_std;
 use value::*;
 
 pub mod interpreter;

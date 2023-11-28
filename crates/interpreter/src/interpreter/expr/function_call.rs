@@ -2,9 +2,7 @@ use async_recursion::async_recursion;
 
 use ast::{FunctionCall, Node};
 
-use crate::{
-	interpreter::stmt, interrupt::Interrupt, value::FunctionValue, Environment, Error, Value,
-};
+use crate::{interpreter::stmt, Environment, Error, FunctionValue, Interrupt, Value};
 
 use super::interpret_expr;
 
@@ -60,7 +58,15 @@ pub async fn interpret_function_call(
 				}
 			}
 		}
-		FunctionValue::_Std => todo!(),
+		FunctionValue::Std(std_fn) => {
+			// TODO: improve
+			if let Some(param_expr) = expr.val.parameter.val.get(0) {
+				let param = interpret_expr(param_expr, env, g_env).await?;
+				val = std_fn(param).await?;
+			} else {
+				return Err(Error::Fatal("No parameter given!".to_owned()));
+			}
+		}
 	}
 
 	Ok(val)

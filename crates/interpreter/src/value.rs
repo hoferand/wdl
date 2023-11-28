@@ -1,4 +1,9 @@
+use std::{fmt::Debug, sync::Arc};
+
 use ast::Function;
+use futures::future::BoxFuture;
+
+use crate::Error;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
@@ -9,15 +14,21 @@ pub enum Value {
 	Function(FunctionValue),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum FunctionValue {
 	Custom(Function),
-	_Std,
+	Std(Arc<dyn Fn(Value) -> BoxFuture<'static, Result<Value, Error>> + Send + Sync>),
 }
 
 impl PartialEq for FunctionValue {
 	fn eq(&self, _: &Self) -> bool {
 		false
+	}
+}
+
+impl Debug for FunctionValue {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "Function")
 	}
 }
 

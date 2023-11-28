@@ -5,7 +5,7 @@ use tokio::sync::RwLock;
 
 use ast::{Identifier, Node};
 
-use crate::{Error, Value};
+use crate::{wdl_std::get_std, Error, Value};
 
 pub struct Environment<'p> {
 	parent: Option<&'p Environment<'p>>,
@@ -58,6 +58,10 @@ impl<'p> Environment<'p> {
 			if let Some(value) = env.read().await.get(&id.val) {
 				return Ok(value.clone());
 			}
+		}
+
+		if let Some(std_fn) = get_std(&id.val.0) {
+			return Ok(std_fn);
 		}
 
 		Err(Error::VariableNotFound {
