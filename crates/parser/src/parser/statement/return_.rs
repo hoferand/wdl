@@ -5,7 +5,7 @@ use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValu
 pub(crate) fn parse_return(parser: &mut Parser) -> Result<Node<Return>, ParserError> {
 	let token = parser.tokens.expect(TokenValue::Return)?;
 
-	if parser.state.in_function < 1 {
+	if parser.state.in_par > 0 || parser.state.in_function < 1 {
 		return Err(ParserError::UnexpectedToken {
 			src: token.src.clone(),
 			span: token.span.clone(),
