@@ -1,8 +1,8 @@
-use std::vec::IntoIter;
-
 use crate::{Error, Value};
+
+use super::Arguments;
 
 pub(crate) trait StdFunction {
 	fn clone_box(&self) -> Box<dyn StdFunction>;
-	fn call_with_args(&self, args: &mut IntoIter<Value>) -> Result<Value, Error>;
+	fn call_with_args(&self, args: &mut Arguments) -> Result<Value, Error>;
 }

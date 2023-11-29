@@ -1,11 +1,9 @@
-use std::vec::IntoIter;
-
 use crate::{Error, Value};
 
-use super::{FromArguments, IntoResult};
+use super::{Arguments, FromArguments, IntoResult};
 
 pub trait Handler<T> {
-	fn call(&self, args: &mut IntoIter<Value>) -> Result<Value, Error>;
+	fn call(&self, args: &mut Arguments) -> Result<Value, Error>;
 }
 
 impl_handler!();
@@ -22,7 +20,7 @@ macro_rules! impl_handler {
 			R: IntoResult
 		{
       #[allow(unused_variables)]
-			fn call(&self, args: &mut IntoIter<Value>) -> Result<Value, Error> {
+			fn call(&self, args: &mut Arguments) -> Result<Value, Error> {
 				(self)($($ty::from_args(args)?,)*).into_result()
 			}
 		}

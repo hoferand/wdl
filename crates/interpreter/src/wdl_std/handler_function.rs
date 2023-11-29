@@ -1,12 +1,10 @@
-use std::vec::IntoIter;
-
 use crate::{Error, Value};
 
-use super::StdFunction;
+use super::{Arguments, StdFunction};
 
 pub(crate) struct HandlerFunction<H: Clone> {
 	pub handler: H,
-	pub call: fn(&H, &mut IntoIter<Value>) -> Result<Value, Error>,
+	pub call: fn(&H, &mut Arguments) -> Result<Value, Error>,
 }
 
 impl<H: Clone> Clone for HandlerFunction<H> {
@@ -26,7 +24,7 @@ where
 		Box::new(self.clone())
 	}
 
-	fn call_with_args(&self, args: &mut IntoIter<Value>) -> Result<Value, Error> {
+	fn call_with_args(&self, args: &mut Arguments) -> Result<Value, Error> {
 		(self.call)(&self.handler, args)
 	}
 }

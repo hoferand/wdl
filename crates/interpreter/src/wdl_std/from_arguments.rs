@@ -1,13 +1,13 @@
-use std::vec::IntoIter;
-
 use crate::{Error, Value};
 
+use super::Arguments;
+
 pub(crate) trait FromArguments: Sized {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error>;
+	fn from_args(args: &mut Arguments) -> Result<Self, Error>;
 }
 
 impl FromArguments for Value {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error> {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		if let Some(arg) = args.next() {
 			Ok(arg)
 		} else {
@@ -18,13 +18,13 @@ impl FromArguments for Value {
 }
 
 impl FromArguments for Option<Value> {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error> {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		Ok(args.next())
 	}
 }
 
 impl FromArguments for bool {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error> {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		if let Some(Value::Bool(arg)) = args.next() {
 			Ok(arg)
 		} else {
@@ -35,7 +35,7 @@ impl FromArguments for bool {
 }
 
 impl FromArguments for Option<bool> {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error> {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		if let Some(arg) = args.next() {
 			if let Value::Bool(arg) = arg {
 				Ok(Some(arg))
@@ -50,7 +50,7 @@ impl FromArguments for Option<bool> {
 }
 
 impl FromArguments for f64 {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error> {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		if let Some(Value::Number(arg)) = args.next() {
 			Ok(arg)
 		} else {
@@ -61,7 +61,7 @@ impl FromArguments for f64 {
 }
 
 impl FromArguments for Option<f64> {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error> {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		if let Some(arg) = args.next() {
 			if let Value::Number(arg) = arg {
 				Ok(Some(arg))
@@ -76,7 +76,7 @@ impl FromArguments for Option<f64> {
 }
 
 impl FromArguments for String {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error> {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		if let Some(Value::String(arg)) = args.next() {
 			Ok(arg)
 		} else {
@@ -87,7 +87,7 @@ impl FromArguments for String {
 }
 
 impl FromArguments for Option<String> {
-	fn from_args(args: &mut IntoIter<Value>) -> Result<Self, Error> {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		if let Some(arg) = args.next() {
 			if let Value::String(arg) = arg {
 				Ok(Some(arg))
