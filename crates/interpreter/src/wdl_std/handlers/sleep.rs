@@ -15,10 +15,3 @@ pub fn sleep(val: Value) -> BoxFuture<'static, Result<Value, Error>> {
 		Ok(Value::Null)
 	})
 }
-
-/*
-TODO:
-pub async fn sleep(ms: f64) {
-	tokio::time::sleep(Duration::from_millis(ms as u64)).await;
-}
-*/

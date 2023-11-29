@@ -5,7 +5,7 @@ use tokio::sync::RwLock;
 
 use ast::{Identifier, Node};
 
-use crate::{wdl_std::get_std, Error, Value};
+use crate::{wdl_std::get_function, Error, Value};
 
 pub struct Environment<'p> {
 	parent: Option<&'p Environment<'p>>,
@@ -60,7 +60,7 @@ impl<'p> Environment<'p> {
 			}
 		}
 
-		if let Some(std_fn) = get_std(&id.val.0) {
+		if let Some(std_fn) = get_function(&id.val.0) {
 			return Ok(std_fn);
 		}
 

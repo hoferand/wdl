@@ -67,6 +67,15 @@ pub async fn interpret_function_call(
 				return Err(Error::Fatal("No parameter given!".to_owned()));
 			}
 		}
+		FunctionValue::Magic(std_fn) => {
+			let mut args: Vec<Value> = Vec::new();
+			for arg in &expr.val.parameter.val {
+				args.push(interpret_expr(arg, env, g_env).await?);
+			}
+
+			let mut args = args.into_iter();
+			val = std_fn.call_with_args(&mut args)?;
+		}
 	}
 
 	Ok(val)
