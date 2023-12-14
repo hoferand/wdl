@@ -18,6 +18,8 @@ pub async fn interpret_offset(
 
 	let val = match (&value, &offset) {
 		(Value::Array(a), Value::Number(n)) => a.get(*n as usize).unwrap_or(&Value::Null).clone(),
+		// TODO: (Value::String(s), Value::Number(n)) => todo!(),
+		// TODO: (Value::Object(o), Value::String(s)) => todo!(),
 		_ => {
 			return Err(Error::InvalidType {
 				msg: format!("{}[{}]", value.get_type(), offset.get_type()),
