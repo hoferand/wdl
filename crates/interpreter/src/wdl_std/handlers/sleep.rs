@@ -15,3 +15,14 @@ pub fn sleep(val: Value) -> BoxFuture<'static, Result<Value, Error>> {
 		Ok(Value::Null)
 	})
 }
+
+/*
+pub async fn sleep(val: Value) {
+	let ms = match val {
+		Value::Number(n) => Duration::from_millis(n as u64),
+		_ => Duration::ZERO,
+	};
+
+	tokio::time::sleep(ms).await;
+}
+*/
