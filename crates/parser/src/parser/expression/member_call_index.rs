@@ -1,6 +1,6 @@
-use ast::{Expression, FunctionCall, Node, Offset, Span};
+use ast::{Expression, FunctionCall, Member, Node, Offset, Span};
 
-use crate::{Parser, ParserError, TokenValue};
+use crate::{parser::identifier::parse_identifier, Parser, ParserError, TokenValue};
 
 use super::{parse_atomic, parse_expression};
 
@@ -61,9 +61,22 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 					offset: Box::new(offset),
 				},
 			});
-		} else if parser.tokens.want(TokenValue::Point).is_some() {
+		} else if let Some(point) = parser.tokens.want(TokenValue::BracketOpen) {
 			// parse member
-			todo!()
+			let start = point.span.start.clone();
+
+			let id = parse_identifier(parser)?;
+
+			expr = Expression::Member(Node {
+				span: Span {
+					start,
+					end: id.span.end.clone(),
+				},
+				val: Member {
+					object: Box::new(expr),
+					member: id,
+				},
+			})
 		} else {
 			break;
 		}
