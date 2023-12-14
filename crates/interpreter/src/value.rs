@@ -1,4 +1,4 @@
-use std::{fmt::Debug, sync::Arc};
+use std::{collections::HashMap, fmt::Debug, sync::Arc};
 
 use ast::Function;
 use futures::future::BoxFuture;
@@ -12,6 +12,7 @@ pub enum Value {
 	Number(f64),
 	String(String),
 	Array(Vec<Value>),
+	Object(HashMap<String, Value>),
 	Function(FunctionValue),
 }
 
@@ -42,6 +43,7 @@ impl Value {
 			Value::Number(n) => *n != 0.0,
 			Value::String(s) => !s.is_empty(),
 			Value::Array(a) => !a.is_empty(),
+			Value::Object(o) => !o.is_empty(),
 			Value::Function(_) => true,
 		}
 	}
@@ -53,6 +55,7 @@ impl Value {
 			Value::Number(_) => "number",
 			Value::String(_) => "string",
 			Value::Array(_) => "array",
+			Value::Object(_) => "object",
 			Value::Function(_) => "function",
 		}
 		.to_owned()
@@ -79,6 +82,23 @@ impl ToString for Value {
 					out.push_str(&val.to_string());
 				}
 				out.push(']');
+				out
+			}
+			Value::Object(o) => {
+				let mut out = String::new();
+				out.push('{');
+				let mut first = true;
+				for (id, val) in o {
+					if !first {
+						out.push_str(", ");
+					}
+					first = false;
+
+					out.push_str(id);
+					out.push_str(": ");
+					out.push_str(&val.to_string());
+				}
+				out.push('}');
 				out
 			}
 			Value::Function(_) => "function".to_owned(),
