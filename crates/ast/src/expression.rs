@@ -16,11 +16,14 @@ pub mod assignment;
 pub use assignment::Assignment;
 pub mod group;
 pub use group::Group;
+pub mod array;
+pub use array::Array;
 
 use crate::{Identifier, Node, Span};
 
 #[derive(Debug, Clone)]
 pub enum Expression {
+	Array(Node<Array>),
 	Assignment(Node<Assignment>),
 	Binary(Node<Binary>),
 	FunctionCall(Node<FunctionCall>),
@@ -36,6 +39,7 @@ pub enum Expression {
 impl Expression {
 	pub fn get_span(&self) -> &Span {
 		match self {
+			Expression::Array(expr) => &expr.span,
 			Expression::Assignment(expr) => &expr.span,
 			Expression::Binary(expr) => &expr.span,
 			Expression::FunctionCall(expr) => &expr.span,

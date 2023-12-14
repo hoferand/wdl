@@ -14,6 +14,8 @@ mod assignment;
 use assignment::interpret_assignment;
 mod function_call;
 use function_call::interpret_function_call;
+mod array;
+use array::interpret_array;
 
 use async_recursion::async_recursion;
 
@@ -28,6 +30,7 @@ pub async fn interpret_expr(
 	g_env: &Environment,
 ) -> Result<Value, Error> {
 	match expr {
+		Expression::Array(expr) => interpret_array(expr, env, g_env).await,
 		Expression::Assignment(expr) => interpret_assignment(expr, env, g_env).await,
 		Expression::Binary(expr) => interpret_binary(expr, env, g_env).await,
 		Expression::FunctionCall(expr) => interpret_function_call(expr, env, g_env).await,

@@ -35,7 +35,7 @@ pub fn get_function(id: &str) -> Option<Value> {
 
 fn optional(arg: Option<f64>) {
 	if let Some(arg) = arg {
-		println!("{}", arg.to_string());
+		println!("{}", arg);
 	} else {
 		println!("No argument given!");
 	}

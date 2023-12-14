@@ -11,6 +11,7 @@ pub enum Value {
 	Bool(bool),
 	Number(f64),
 	String(String),
+	Array(Vec<Value>),
 	Function(FunctionValue),
 }
 
@@ -40,6 +41,7 @@ impl Value {
 			Value::Bool(b) => *b,
 			Value::Number(n) => *n != 0.0,
 			Value::String(s) => !s.is_empty(),
+			Value::Array(a) => !a.is_empty(),
 			Value::Function(_) => true,
 		}
 	}
@@ -50,6 +52,7 @@ impl Value {
 			Value::Bool(_) => "bool",
 			Value::Number(_) => "number",
 			Value::String(_) => "string",
+			Value::Array(_) => "array",
 			Value::Function(_) => "function",
 		}
 		.to_owned()
@@ -63,6 +66,21 @@ impl ToString for Value {
 			Value::Bool(b) => b.to_string(),
 			Value::Number(n) => n.to_string(),
 			Value::String(s) => s.to_owned(),
+			Value::Array(a) => {
+				let mut out = String::new();
+				out.push('[');
+				let mut first = true;
+				for val in a {
+					if !first {
+						out.push_str(", ");
+					}
+					first = false;
+
+					out.push_str(&val.to_string());
+				}
+				out.push(']');
+				out
+			}
 			Value::Function(_) => "function".to_owned(),
 		}
 	}
