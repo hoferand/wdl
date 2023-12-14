@@ -8,8 +8,6 @@ pub mod unary;
 pub use unary::*;
 pub mod function_call;
 pub use function_call::FunctionCall;
-pub mod index;
-pub use index::Index;
 pub mod member;
 pub use member::Member;
 pub mod assignment;
@@ -18,6 +16,8 @@ pub mod group;
 pub use group::Group;
 pub mod array;
 pub use array::Array;
+pub mod offset;
+pub use offset::Offset;
 
 use crate::{Identifier, Node, Span};
 
@@ -29,10 +29,10 @@ pub enum Expression {
 	FunctionCall(Node<FunctionCall>),
 	Group(Node<Group>),
 	Identifier(Node<Identifier>),
-	Index(Node<Index>),
 	Literal(Node<Literal>),
 	Logical(Node<Logical>),
 	Member(Node<Member>),
+	Offset(Node<Offset>),
 	Unary(Node<Unary>),
 }
 
@@ -45,10 +45,10 @@ impl Expression {
 			Expression::FunctionCall(expr) => &expr.span,
 			Expression::Group(expr) => &expr.span,
 			Expression::Identifier(expr) => &expr.span,
-			Expression::Index(expr) => &expr.span,
 			Expression::Literal(expr) => &expr.span,
 			Expression::Logical(expr) => &expr.span,
 			Expression::Member(expr) => &expr.span,
+			Expression::Offset(expr) => &expr.span,
 			Expression::Unary(expr) => &expr.span,
 		}
 	}

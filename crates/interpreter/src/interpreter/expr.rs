@@ -16,6 +16,8 @@ mod function_call;
 use function_call::interpret_function_call;
 mod array;
 use array::interpret_array;
+mod offset;
+use offset::interpret_offset;
 
 use async_recursion::async_recursion;
 
@@ -36,10 +38,10 @@ pub async fn interpret_expr(
 		Expression::FunctionCall(expr) => interpret_function_call(expr, env, g_env).await,
 		Expression::Group(expr) => interpret_group(expr, env, g_env).await,
 		Expression::Identifier(expr) => interpret_identifier(expr, env).await,
-		Expression::Index(_) => todo!(),
 		Expression::Literal(expr) => interpret_literal(expr),
 		Expression::Logical(expr) => interpret_logical(expr, env, g_env).await,
 		Expression::Member(_) => todo!(),
+		Expression::Offset(expr) => interpret_offset(expr, env, g_env).await,
 		Expression::Unary(expr) => interpret_unary(expr, env, g_env).await,
 	}
 }
