@@ -17,8 +17,7 @@ pub async fn interpret_logical(
 	// short circuit evaluation
 	match (left.boolify(), &expr.val.op.val) {
 		(false, LogicalOperator::And) => Ok(Value::Bool(false)),
-		(true, LogicalOperator::And) => interpret_expr(&expr.val.right, env, g_env).await,
-		(false, LogicalOperator::Or) => interpret_expr(&expr.val.right, env, g_env).await,
 		(true, LogicalOperator::Or) => Ok(Value::Bool(true)),
+		_ => interpret_expr(&expr.val.right, env, g_env).await,
 	}
 }
