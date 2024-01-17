@@ -4,15 +4,22 @@ pub(crate) trait IntoResult {
 	fn into_result(self) -> Result<Value, Error>;
 }
 
-impl IntoResult for Value {
-	fn into_result(self) -> Result<Value, Error> {
-		Ok(self)
-	}
-}
-
 impl IntoResult for () {
 	fn into_result(self) -> Result<Value, Error> {
 		Ok(Value::Null)
+	}
+}
+
+impl IntoResult for Result<(), Error> {
+	fn into_result(self) -> Result<Value, Error> {
+		self?;
+		Ok(Value::Null)
+	}
+}
+
+impl IntoResult for Value {
+	fn into_result(self) -> Result<Value, Error> {
+		Ok(self)
 	}
 }
 
