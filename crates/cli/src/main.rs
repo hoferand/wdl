@@ -120,6 +120,10 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			);
 			print_error_location(&span.start, &span.end, src_code);
 		}
+		interpreter::Error::TooFewArguments { span } => {
+			error!("Too few arguments given for function call!");
+			print_error_location(&span.start, &span.end, src_code);
+		}
 	}
 }
 

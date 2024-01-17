@@ -1,8 +1,6 @@
 use futures::future::BoxFuture;
 
-use crate::{Error, Value};
-
-use super::arguments::Arguments;
+use crate::{Arguments, Error, Value};
 
 pub(crate) trait StdFunction {
 	fn clone_box(&self) -> Box<dyn StdFunction>;

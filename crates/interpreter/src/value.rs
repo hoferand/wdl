@@ -4,6 +4,7 @@ use ast::Function;
 
 use crate::wdl_std::StdFunction;
 
+#[allow(dead_code)] // TODO: remove
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
 	Null,

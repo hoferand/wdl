@@ -2,7 +2,10 @@ use async_recursion::async_recursion;
 
 use ast::{FunctionCall, Node};
 
-use crate::{interpreter::stmt, Environment, Error, FunctionValue, Interrupt, Value};
+use crate::{
+	interpreter::stmt, ArgumentValue, Arguments, Environment, Error, FunctionValue, Interrupt,
+	Value,
+};
 
 use super::interpret_expr;
 
@@ -59,13 +62,24 @@ pub async fn interpret_function_call(
 			}
 		}
 		FunctionValue::Std(std_fn) => {
-			let mut args: Vec<Value> = Vec::new();
+			let mut args: Vec<ArgumentValue> = Vec::new();
+			let mut idx = 0;
 			for arg in &expr.val.parameter.val {
-				args.push(interpret_expr(arg, env, g_env).await?);
+				idx += 1;
+				args.push(ArgumentValue {
+					idx,
+					span: arg.get_span().clone(),
+					val: interpret_expr(arg, env, g_env).await?,
+				});
 			}
 
 			let args = args.into_iter();
-			val = std_fn.call_with_args(args).await?;
+			val = std_fn
+				.call_with_args(Arguments {
+					fn_span: expr.val.function.get_span().clone(),
+					args,
+				})
+				.await?;
 		}
 	}
 

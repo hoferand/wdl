@@ -1,8 +1,8 @@
 use futures::future::BoxFuture;
 
-use crate::{Error, Value};
+use crate::{Arguments, Error, Value};
 
-use super::{Arguments, StdFunction};
+use super::StdFunction;
 
 pub(crate) struct HandlerFunction<H: Clone> {
 	pub handler: H,

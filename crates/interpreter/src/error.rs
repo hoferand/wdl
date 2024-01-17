@@ -23,4 +23,7 @@ pub enum Error {
 		given: usize,
 		span: Span,
 	},
+	TooFewArguments {
+		span: Span,
+	},
 }

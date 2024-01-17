@@ -2,9 +2,9 @@ use std::future::Future;
 
 use futures::future::BoxFuture;
 
-use crate::{Error, Value};
+use crate::{Arguments, Error, Value};
 
-use super::{Arguments, FromArguments, IntoResult};
+use super::{FromArguments, IntoResult};
 
 pub trait Handler<T>: Clone + Send + Sized + 'static {
 	fn call(self, args: Arguments) -> BoxFuture<'static, Result<Value, Error>>;

@@ -5,6 +5,8 @@ use interrupt::Interrupt;
 mod value;
 mod wdl_std;
 use value::*;
+mod arguments;
+use arguments::*;
 
 pub mod interpreter;
 pub use interpreter::Interpreter;

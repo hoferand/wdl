@@ -6,8 +6,6 @@ mod handler;
 use handler::Handler;
 mod into_result;
 use into_result::IntoResult;
-mod arguments;
-use arguments::Arguments;
 mod handlers;
 
 pub(crate) mod std_function;
