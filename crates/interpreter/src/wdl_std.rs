@@ -7,8 +7,9 @@ use handler::Handler;
 mod into_result;
 use into_result::IntoResult;
 mod arguments;
-mod handlers;
 use arguments::Arguments;
+mod handlers;
+
 pub(crate) mod std_function;
 pub(crate) use std_function::StdFunction;
 
@@ -17,14 +18,9 @@ use std::sync::Arc;
 use crate::value::{FunctionValue, Value};
 
 pub fn get_function(id: &str) -> Option<Value> {
-	if id == "sleep" {
-		return Some(Value::Function(FunctionValue::Std(Arc::new(
-			handlers::sleep,
-		))));
-	}
-
-	Some(Value::Function(FunctionValue::Magic(match id {
+	Some(Value::Function(FunctionValue::Std(match id {
 		"print" => get_handler(handlers::print),
+		"sleep" => get_handler(handlers::sleep),
 		"test" => get_handler(test),
 		"get_string" => get_handler(get_string),
 		"get_number" => get_handler(get_number),
@@ -33,7 +29,7 @@ pub fn get_function(id: &str) -> Option<Value> {
 	})))
 }
 
-fn optional(arg: Option<f64>) {
+async fn optional(arg: Option<f64>) {
 	if let Some(arg) = arg {
 		println!("{}", arg);
 	} else {
@@ -41,16 +37,16 @@ fn optional(arg: Option<f64>) {
 	}
 }
 
-fn test() -> f64 {
+async fn test() -> f64 {
 	println!("test");
 	23.0
 }
 
-fn get_string() -> String {
+async fn get_string() -> String {
 	"My String".to_owned()
 }
 
-fn get_number() -> f64 {
+async fn get_number() -> f64 {
 	34.0
 }
 

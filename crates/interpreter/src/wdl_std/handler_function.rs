@@ -1,10 +1,12 @@
+use futures::future::BoxFuture;
+
 use crate::{Error, Value};
 
 use super::{Arguments, StdFunction};
 
 pub(crate) struct HandlerFunction<H: Clone> {
 	pub handler: H,
-	pub call: fn(&H, &mut Arguments) -> Result<Value, Error>,
+	pub call: fn(H, Arguments) -> BoxFuture<'static, Result<Value, Error>>,
 }
 
 impl<H: Clone> Clone for HandlerFunction<H> {
@@ -24,7 +26,7 @@ where
 		Box::new(self.clone())
 	}
 
-	fn call_with_args(&self, args: &mut Arguments) -> Result<Value, Error> {
-		(self.call)(&self.handler, args)
+	fn call_with_args(&self, args: Arguments) -> BoxFuture<Result<Value, Error>> {
+		(self.call)(self.handler.clone(), args)
 	}
 }

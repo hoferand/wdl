@@ -1,9 +1,8 @@
 use std::{collections::HashMap, fmt::Debug, sync::Arc};
 
 use ast::Function;
-use futures::future::BoxFuture;
 
-use crate::{wdl_std::StdFunction, Error};
+use crate::wdl_std::StdFunction;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
@@ -19,8 +18,7 @@ pub enum Value {
 #[derive(Clone)]
 pub(crate) enum FunctionValue {
 	Custom(Function),
-	Std(Arc<dyn Fn(Value) -> BoxFuture<'static, Result<Value, Error>> + Send + Sync>),
-	Magic(Arc<dyn StdFunction + Send + Sync>),
+	Std(Arc<dyn StdFunction + Send + Sync>),
 }
 
 impl PartialEq for FunctionValue {

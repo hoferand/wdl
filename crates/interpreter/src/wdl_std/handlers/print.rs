@@ -1,5 +1,5 @@
 use crate::Value;
 
-pub fn print(val: Value) {
+pub async fn print(val: Value) {
 	println!("{}", val.to_string());
 }
