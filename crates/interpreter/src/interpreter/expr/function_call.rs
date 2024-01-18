@@ -62,12 +62,10 @@ pub async fn interpret_function_call(
 			}
 		}
 		FunctionValue::Std(std_fn) => {
-			let mut args: Vec<ArgumentValue> = Vec::new();
-			let mut idx = 0;
-			for arg in &expr.val.parameter.val {
-				idx += 1;
+			let mut args = Vec::new();
+			for (idx, arg) in expr.val.parameter.val.iter().enumerate() {
 				args.push(ArgumentValue {
-					idx,
+					idx: idx + 1,
 					span: arg.get_span().clone(),
 					val: interpret_expr(arg, env, g_env).await?,
 				});

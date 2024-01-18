@@ -87,7 +87,7 @@ async fn run(file: &str, vars: Vec<String>) -> ExitCode {
 		return ExitCode::FAILURE;
 	};
 
-	return ExitCode::SUCCESS;
+	ExitCode::SUCCESS
 }
 
 fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
