@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::process::exit;
+use std::process::ExitCode;
 
 use clap::Parser;
 use tokio::fs::read_to_string;
@@ -25,7 +25,7 @@ enum Cli {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> ExitCode {
 	match Cli::parse() {
 		Cli::Run { file, variables } => run(&file, variables).await,
 		Cli::Fmt { .. } => todo!(),
@@ -34,7 +34,7 @@ async fn main() {
 	}
 }
 
-async fn run(file: &str, vars: Vec<String>) -> ! {
+async fn run(file: &str, vars: Vec<String>) -> ExitCode {
 	let mut variables = HashMap::new();
 	for var in vars {
 		let Some(parts) = var.split_once('=') else {
@@ -42,7 +42,7 @@ async fn run(file: &str, vars: Vec<String>) -> ! {
 				"Variable malformed `{}`, expected format <identifier>=<JSON value>!",
 				var
 			);
-			exit(1);
+			return ExitCode::FAILURE;
 		};
 
 		let id = Identifier(parts.0.to_owned());
@@ -51,7 +51,7 @@ async fn run(file: &str, vars: Vec<String>) -> ! {
 				"Invalid variable value `{}`, cannot be deserialized!",
 				parts.1
 			);
-			exit(1);
+			return ExitCode::FAILURE;
 		};
 
 		variables.insert(id, val);
@@ -61,14 +61,14 @@ async fn run(file: &str, vars: Vec<String>) -> ! {
 		Ok(content) => content,
 		Err(err) => {
 			error!("Failed to read source file, {}!", err.kind());
-			exit(1);
+			return ExitCode::FAILURE;
 		}
 	};
 	let workflow = match parser::get_ast(&src_code) {
 		Ok(wf) => wf,
 		Err(error) => {
 			print_parser_error(&error, &src_code);
-			exit(1);
+			return ExitCode::FAILURE;
 		}
 	};
 
@@ -78,16 +78,16 @@ async fn run(file: &str, vars: Vec<String>) -> ! {
 		Ok(i) => i,
 		Err(error) => {
 			print_interpreter_error(&error, &src_code);
-			exit(1);
+			return ExitCode::FAILURE;
 		}
 	};
 
 	if let Err(error) = interpreter.run().await {
 		print_interpreter_error(&error, &src_code);
-		exit(1);
+		return ExitCode::FAILURE;
 	};
 
-	exit(0);
+	return ExitCode::SUCCESS;
 }
 
 fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
