@@ -61,7 +61,9 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 
 				values.push(parse_expression(parser)?);
 
-				parser.tokens.want(TokenValue::Comma);
+				if parser.tokens.want(TokenValue::Comma).is_none() {
+					break;
+				}
 			}
 
 			let end = parser
@@ -105,7 +107,9 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 
 				values.insert(key, parse_expression(parser)?);
 
-				parser.tokens.want(TokenValue::Comma);
+				if parser.tokens.want(TokenValue::Comma).is_none() {
+					break;
+				}
 			}
 
 			let end = parser
@@ -124,7 +128,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 			return Err(ParserError::UnexpectedToken {
 				src: token.src.clone(),
 				span: token.span.clone(),
-			})
+			});
 		}
 	};
 
