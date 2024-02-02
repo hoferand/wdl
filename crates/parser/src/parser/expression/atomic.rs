@@ -1,4 +1,6 @@
-use ast::{Array, Expression, Group, Identifier, Literal, Node, Span};
+use std::collections::HashMap;
+
+use ast::{Array, Expression, Group, Identifier, Literal, Node, Object, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
@@ -74,7 +76,50 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 				val: Array { values },
 			})
 		}
-		// TODO: objects
+		TokenValue::CurlyOpen => {
+			let start = token.span.start.clone();
+
+			let mut values = HashMap::new();
+			while let Some(token) = parser.tokens.peek() {
+				if token.value == TokenValue::CurlyClose {
+					break;
+				}
+
+				let Some(key_token) = parser.tokens.next() else {
+					return Err(ParserError::UnexpectedEoF);
+				};
+
+				let key = match &key_token.value {
+					TokenValue::Identifier(id) => id,
+					TokenValue::String(s) => s,
+					_ => {
+						return Err(ParserError::UnexpectedToken {
+							src: key_token.src.clone(),
+							span: key_token.span.clone(),
+						});
+					}
+				}
+				.to_owned();
+
+				parser.tokens.expect(TokenValue::Colon)?;
+
+				values.insert(key, parse_expression(parser)?);
+
+				parser.tokens.want(TokenValue::Comma);
+			}
+
+			let end = parser
+				.tokens
+				.expect(TokenValue::CurlyClose)?
+				.span
+				.end
+				.clone();
+
+			Expression::Object(Node {
+				span: Span { start, end },
+				val: Object { values },
+			})
+		}
 		_ => {
 			return Err(ParserError::UnexpectedToken {
 				src: token.src.clone(),

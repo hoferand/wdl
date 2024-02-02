@@ -61,7 +61,7 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 					offset: Box::new(offset),
 				},
 			});
-		} else if let Some(point) = parser.tokens.want(TokenValue::BracketOpen) {
+		} else if let Some(point) = parser.tokens.want(TokenValue::Point) {
 			// parse member
 			let start = point.span.start.clone();
 

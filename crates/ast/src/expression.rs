@@ -10,6 +10,8 @@ pub mod function_call;
 pub use function_call::FunctionCall;
 pub mod member;
 pub use member::Member;
+pub mod object;
+pub use object::Object;
 pub mod assignment;
 pub use assignment::Assignment;
 pub mod group;
@@ -32,6 +34,7 @@ pub enum Expression {
 	Literal(Node<Literal>),
 	Logical(Node<Logical>),
 	Member(Node<Member>),
+	Object(Node<Object>),
 	Offset(Node<Offset>),
 	Unary(Node<Unary>),
 }
@@ -39,17 +42,18 @@ pub enum Expression {
 impl Expression {
 	pub fn get_span(&self) -> &Span {
 		match self {
-			Expression::Array(expr) => &expr.span,
-			Expression::Assignment(expr) => &expr.span,
-			Expression::Binary(expr) => &expr.span,
-			Expression::FunctionCall(expr) => &expr.span,
-			Expression::Group(expr) => &expr.span,
-			Expression::Identifier(expr) => &expr.span,
-			Expression::Literal(expr) => &expr.span,
-			Expression::Logical(expr) => &expr.span,
-			Expression::Member(expr) => &expr.span,
-			Expression::Offset(expr) => &expr.span,
-			Expression::Unary(expr) => &expr.span,
+			Self::Array(expr) => &expr.span,
+			Self::Assignment(expr) => &expr.span,
+			Self::Binary(expr) => &expr.span,
+			Self::FunctionCall(expr) => &expr.span,
+			Self::Group(expr) => &expr.span,
+			Self::Identifier(expr) => &expr.span,
+			Self::Literal(expr) => &expr.span,
+			Self::Logical(expr) => &expr.span,
+			Self::Member(expr) => &expr.span,
+			Self::Object(expr) => &expr.span,
+			Self::Offset(expr) => &expr.span,
+			Self::Unary(expr) => &expr.span,
 		}
 	}
 }
