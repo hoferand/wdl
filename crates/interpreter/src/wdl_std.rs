@@ -48,7 +48,7 @@ async fn get_number() -> f64 {
 	34.0
 }
 
-pub(crate) fn get_handler<H, T>(fun: H) -> Arc<HandlerFunction<H>>
+fn get_handler<H, T>(fun: H) -> Arc<HandlerFunction<H>>
 where
 	H: Handler<T> + Clone + 'static,
 	T: 'static,

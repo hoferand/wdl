@@ -14,7 +14,7 @@ pub async fn interpret_par(
 	g_env: &Environment,
 ) -> Result<(), Error> {
 	let mut futures = Vec::new();
-	for block in stmt.val.blocks.iter() {
+	for block in &stmt.val.blocks {
 		futures.push(interpret_block(block, env, g_env));
 	}
 

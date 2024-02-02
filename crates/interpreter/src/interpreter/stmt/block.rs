@@ -14,7 +14,7 @@ pub async fn interpret_block(
 ) -> Result<Interrupt, Error> {
 	let inner_env = Environment::with_parent(env);
 
-	for stmt in stmt.val.stmts.iter() {
+	for stmt in &stmt.val.stmts {
 		let ret = interpret_stmt(stmt, &inner_env, g_env).await?;
 		if !ret.is_none() {
 			return Ok(ret);

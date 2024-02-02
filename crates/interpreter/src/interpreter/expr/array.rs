@@ -15,7 +15,7 @@ pub async fn interpret_array(
 	let mut values = Vec::new();
 
 	for val_expr in &expr.val.values {
-		values.push(interpret_expr(val_expr, env, g_env).await?)
+		values.push(interpret_expr(val_expr, env, g_env).await?);
 	}
 
 	Ok(Value::Array(values))

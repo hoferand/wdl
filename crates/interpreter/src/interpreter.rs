@@ -35,7 +35,7 @@ impl<'a> Interpreter<'a, New> {
 		vars: HashMap<Identifier, serde_json::Value>,
 	) -> Result<Interpreter<'a, Initialized>, Error> {
 		// global declarations
-		for global_decl in self.ast.globals.iter() {
+		for global_decl in &self.ast.globals {
 			let mut default = None;
 			if let Some(json_val) = vars.get(&global_decl.val.id.val) {
 				let Some(val) = convert_json_to_value(json_val.clone()) else {
@@ -51,7 +51,7 @@ impl<'a> Interpreter<'a, New> {
 		}
 
 		// function declarations
-		for fn_decl in self.ast.functions.iter() {
+		for fn_decl in &self.ast.functions {
 			stmt::interpret_function_declaration(fn_decl, &self.global_env).await?;
 		}
 
@@ -79,8 +79,8 @@ fn convert_json_to_value(value: serde_json::Value) -> Option<Value> {
 		serde_json::Value::Bool(b) => Some(Value::Bool(b)),
 		serde_json::Value::Number(n) => n.as_f64().map(Value::Number),
 		serde_json::Value::String(s) => Some(Value::String(s)),
-		serde_json::Value::Array(_) => None,
-		serde_json::Value::Object(_) => None,
+		serde_json::Value::Array(_) => None,  // TODO
+		serde_json::Value::Object(_) => None, // TODO
 	}
 }
 

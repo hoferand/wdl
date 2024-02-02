@@ -17,7 +17,7 @@ pub async fn interpret_offset(
 	let offset = interpret_expr(&expr.val.offset, env, g_env).await?;
 
 	let val = match (&value, &offset) {
-		(Value::Array(a), Value::Number(n)) => a.get(*n as usize).unwrap_or(&Value::Null).clone(),
+		(Value::Array(a), Value::Number(n)) => a.get(*n as usize).unwrap_or(&Value::Null).clone(), // TODO: fix `*n as usize`
 		// TODO: (Value::String(s), Value::Number(n)) => todo!(),
 		// TODO: (Value::Object(o), Value::String(s)) => todo!(),
 		_ => {

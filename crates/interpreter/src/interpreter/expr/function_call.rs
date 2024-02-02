@@ -53,7 +53,7 @@ pub async fn interpret_function_call(
 			match stmt::interpret_block(&function.body, &inner_env, g_env).await? {
 				Interrupt::None => val = Value::Null,
 				Interrupt::Return(ret_val) => val = ret_val,
-				int @ Interrupt::Continue | int @ Interrupt::Break => {
+				int @ (Interrupt::Continue | Interrupt::Break) => {
 					return Err(Error::Fatal(format!(
 						"AST invalid, {} inside of function found",
 						int.get_type()

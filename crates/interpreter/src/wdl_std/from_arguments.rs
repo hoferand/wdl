@@ -6,7 +6,7 @@ pub(crate) trait FromArguments: Sized {
 
 impl FromArguments for Value {
 	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
-		expect(Option::<Value>::from_args(args)?, args)
+		expect(Option::<Self>::from_args(args)?, args)
 	}
 }
 
@@ -18,7 +18,7 @@ impl FromArguments for Option<Value> {
 
 impl FromArguments for bool {
 	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
-		expect(Option::<bool>::from_args(args)?, args)
+		expect(Option::<Self>::from_args(args)?, args)
 	}
 }
 
@@ -45,7 +45,7 @@ impl FromArguments for Option<bool> {
 
 impl FromArguments for f64 {
 	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
-		expect(Option::<f64>::from_args(args)?, args)
+		expect(Option::<Self>::from_args(args)?, args)
 	}
 }
 
@@ -72,7 +72,7 @@ impl FromArguments for Option<f64> {
 
 impl FromArguments for String {
 	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
-		expect(Option::<String>::from_args(args)?, args)
+		expect(Option::<Self>::from_args(args)?, args)
 	}
 }
 
@@ -97,7 +97,7 @@ impl FromArguments for Option<String> {
 	}
 }
 
-fn expect<T>(val: Option<T>, args: &mut Arguments) -> Result<T, Error> {
+fn expect<T>(val: Option<T>, args: &Arguments) -> Result<T, Error> {
 	if let Some(val) = val {
 		Ok(val)
 	} else {

@@ -10,15 +10,15 @@ pub enum Interrupt {
 
 impl Interrupt {
 	pub fn is_none(&self) -> bool {
-		matches!(self, Interrupt::None)
+		matches!(self, Self::None)
 	}
 
 	pub fn get_type(&self) -> String {
 		match self {
-			Interrupt::None => "none",
-			Interrupt::Continue => "continue",
-			Interrupt::Break => "break",
-			Interrupt::Return(_) => "return",
+			Self::None => "none",
+			Self::Continue => "continue",
+			Self::Break => "break",
+			Self::Return(_) => "return",
 		}
 		.to_owned()
 	}
