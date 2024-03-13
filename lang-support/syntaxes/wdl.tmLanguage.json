@@ -15,6 +15,9 @@
 			"include": "#keywords"
 		},
 		{
+			"include": "#semantic_strings"
+		},
+		{
 			"include": "#strings"
 		},
 		{
@@ -67,6 +70,14 @@
 				{
 					"name": "constant.numeric.decimal.wdl",
 					"match": "\\b(\\d+\\.\\d+)\\b"
+				}
+			]
+		},
+		"semantic_strings": {
+			"patterns": [
+				{
+					"name": "string.regexp",
+					"match": "[rusa]\"[^\"]*\""
 				}
 			]
 		},
