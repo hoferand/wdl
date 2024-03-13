@@ -1,7 +1,7 @@
 mod global_declaration;
 pub(crate) use global_declaration::parse_global_declaration;
-mod order;
-pub(crate) use order::parse_order;
+mod actions;
+pub(crate) use actions::parse_actions;
 mod block;
 pub(crate) use block::parse_block;
 mod return_;
@@ -39,7 +39,7 @@ pub(crate) fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaratio
 
 		// statements
 		TokenValue::Global => Declaration::GlobalDeclaration(parse_global_declaration(parser)?),
-		TokenValue::Order => Declaration::Order(parse_order(parser)?),
+		TokenValue::Actions => Declaration::Actions(parse_actions(parser)?),
 		TokenValue::Function => {
 			Declaration::FunctionDeclaration(parse_function_declaration(parser)?)
 		}

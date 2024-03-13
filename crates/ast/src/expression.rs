@@ -21,9 +21,11 @@ pub use array::Array;
 pub mod offset;
 pub use offset::Offset;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{Identifier, Node, Span};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Expression {
 	Array(Node<Array>),
 	Assignment(Node<Assignment>),

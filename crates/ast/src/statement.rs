@@ -4,8 +4,8 @@ pub mod function_declaration;
 pub use function_declaration::FunctionDeclaration;
 pub mod global_declaration;
 pub use global_declaration::GlobalDeclaration;
-pub mod order;
-pub use order::Order;
+pub mod actions;
+pub use actions::Actions;
 pub mod par;
 pub use par::Par;
 pub mod if_;
@@ -21,12 +21,14 @@ pub use return_::Return;
 pub mod let_;
 pub use let_::Let;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{Expression, Node, Span};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Declaration {
 	GlobalDeclaration(Node<GlobalDeclaration>),
-	Order(Node<Order>),
+	Actions(Node<Actions>),
 	FunctionDeclaration(Node<FunctionDeclaration>),
 }
 
@@ -34,7 +36,7 @@ impl Declaration {
 	pub fn get_span(&self) -> &Span {
 		match self {
 			Declaration::GlobalDeclaration(stmt) => &stmt.span,
-			Declaration::Order(stmt) => &stmt.span,
+			Declaration::Actions(stmt) => &stmt.span,
 			Declaration::FunctionDeclaration(stmt) => &stmt.span,
 		}
 	}
@@ -42,14 +44,14 @@ impl Declaration {
 	pub fn get_type(&self) -> String {
 		match self {
 			Declaration::GlobalDeclaration(_) => "global declaration",
-			Declaration::Order(_) => "order",
+			Declaration::Actions(_) => "actions",
 			Declaration::FunctionDeclaration(_) => "function declaration",
 		}
 		.to_owned()
 	}
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Statement {
 	Expression(Expression),
 	Block(Node<Block>),

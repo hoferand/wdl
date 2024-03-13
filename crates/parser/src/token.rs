@@ -57,7 +57,7 @@ pub enum TokenValue {
 	Mod,
 	Import,
 	Global,
-	Order,
+	Actions,
 	Function,
 	Let,
 	Type,

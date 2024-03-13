@@ -1,13 +1,15 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{Expression, Node};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Binary {
 	pub left: Box<Expression>,
 	pub op: Node<BinaryOperator>,
 	pub right: Box<Expression>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BinaryOperator {
 	Add,
 	Subtract,

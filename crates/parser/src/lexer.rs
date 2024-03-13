@@ -265,7 +265,7 @@ impl<'c> Lexer<'c> {
 			"mod" => TokenValue::Mod,
 			"import" => TokenValue::Import,
 			"global" => TokenValue::Global,
-			"order" => TokenValue::Order,
+			"actions" => TokenValue::Actions,
 			"function" => TokenValue::Function,
 			"let" => TokenValue::Let,
 			"type" => TokenValue::Type,

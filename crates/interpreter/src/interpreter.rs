@@ -67,7 +67,7 @@ impl<'a> Interpreter<'a, Initialized> {
 	pub async fn run(self) -> Result<(), Error> {
 		let inner_env = Environment::with_parent(&self.global_env);
 
-		stmt::interpret_order(&self.ast.order, &inner_env, &self.global_env).await?;
+		stmt::interpret_actions(&self.ast.actions, &inner_env, &self.global_env).await?;
 
 		Ok(())
 	}
