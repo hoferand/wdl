@@ -1,10 +1,13 @@
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::{FunctionCall, Node};
 
 use crate::{
-	interpreter::stmt, ArgumentValue, Arguments, Environment, Error, FunctionValue, Interrupt,
-	Value,
+	stmt,
+	wdl_std::{ArgumentValue, Arguments},
+	Environment, Error, FunctionValue, Interrupt, Value,
 };
 
 use super::interpret_expr;
@@ -12,8 +15,8 @@ use super::interpret_expr;
 #[async_recursion]
 pub async fn interpret_function_call(
 	expr: &Node<FunctionCall>,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	let function_val = match interpret_expr(&expr.val.function, env, g_env).await? {
 		Value::Function(f) => f,
@@ -28,7 +31,7 @@ pub async fn interpret_function_call(
 	let val;
 	match function_val {
 		FunctionValue::Custom(function) => {
-			let inner_env = Environment::with_parent(g_env);
+			let inner_env = Arc::new(Environment::with_parent(Arc::clone(g_env)));
 
 			let mut ids = function.parameter.iter();
 			let mut vals = expr.val.parameter.val.iter();

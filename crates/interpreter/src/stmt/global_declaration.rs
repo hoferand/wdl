@@ -1,13 +1,15 @@
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::{GlobalDeclaration, Node};
 
-use crate::{interpreter::expr::interpret_expr, Environment, Error, Interrupt, Value};
+use crate::{expr::interpret_expr, Environment, Error, Interrupt, Value};
 
 #[async_recursion]
 pub async fn interpret_global_declaration(
 	stmt: &Node<GlobalDeclaration>,
-	g_env: &Environment,
+	g_env: &Arc<Environment>,
 	input_value: Option<Value>,
 ) -> Result<Interrupt, Error> {
 	let id = stmt.val.id.clone();

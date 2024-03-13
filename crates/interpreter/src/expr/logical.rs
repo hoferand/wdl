@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::{Logical, LogicalOperator, Node};
@@ -9,8 +11,8 @@ use super::interpret_expr;
 #[async_recursion]
 pub async fn interpret_logical(
 	expr: &Node<Logical>,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	let left = interpret_expr(&expr.val.left, env, g_env).await?;
 

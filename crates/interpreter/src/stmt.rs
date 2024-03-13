@@ -21,6 +21,8 @@ pub use global_declaration::interpret_global_declaration;
 mod let_;
 use let_::interpret_let;
 
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::Statement;
@@ -32,8 +34,8 @@ use super::expr::interpret_expr;
 #[async_recursion]
 pub async fn interpret_stmt(
 	stmt: &Statement,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
 	match stmt {
 		Statement::Expression(expr) => {

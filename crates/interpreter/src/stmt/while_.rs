@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::{Node, While};
@@ -9,8 +11,8 @@ use super::{interpret_block, interpret_expr};
 #[async_recursion]
 pub async fn interpret_while(
 	while_: &Node<While>,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
 	while interpret_expr(&while_.val.condition, env, g_env)
 		.await?

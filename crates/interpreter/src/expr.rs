@@ -23,6 +23,8 @@ use member::interpret_member;
 mod object;
 use object::interpret_object;
 
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::Expression;
@@ -32,8 +34,8 @@ use crate::{Environment, Error, Value};
 #[async_recursion]
 pub async fn interpret_expr(
 	expr: &Expression,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	match expr {
 		Expression::Array(expr) => interpret_array(expr, env, g_env).await,

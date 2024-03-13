@@ -1,4 +1,6 @@
-use crate::{Arguments, Error, Value};
+use crate::{Error, Value};
+
+use super::Arguments;
 
 pub(crate) trait FromArguments: Sized {
 	fn from_args(args: &mut Arguments) -> Result<Self, Error>;

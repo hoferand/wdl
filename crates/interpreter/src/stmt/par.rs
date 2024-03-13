@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 use futures::future::try_join_all;
 
@@ -10,8 +12,8 @@ use super::interpret_block;
 #[async_recursion]
 pub async fn interpret_par(
 	stmt: &Node<Par>,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<(), Error> {
 	let mut futures = Vec::new();
 	for block in &stmt.val.blocks {

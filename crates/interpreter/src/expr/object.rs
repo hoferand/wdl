@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use async_recursion::async_recursion;
 
@@ -11,8 +11,8 @@ use super::interpret_expr;
 #[async_recursion]
 pub async fn interpret_object(
 	expr: &Node<Object>,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	let mut values = HashMap::new();
 

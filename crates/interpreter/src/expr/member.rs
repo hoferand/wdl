@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::{Member, Node};
@@ -9,8 +11,8 @@ use super::interpret_expr;
 #[async_recursion]
 pub async fn interpret_member(
 	expr: &Node<Member>,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	let value = interpret_expr(&expr.val.object, env, g_env).await?;
 

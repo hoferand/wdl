@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::{FunctionDeclaration, Node};
@@ -7,7 +9,7 @@ use crate::{Environment, Error, FunctionValue, Interrupt, Value};
 #[async_recursion]
 pub async fn interpret_function_declaration(
 	stmt: &Node<FunctionDeclaration>,
-	env: &Environment,
+	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
 	env.declare(
 		stmt.val.id.clone(),

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_recursion::async_recursion;
 
 use ast::{Node, Span, Unary, UnaryOperator};
@@ -9,8 +11,8 @@ use super::interpret_expr;
 #[async_recursion]
 pub async fn interpret_unary(
 	expr: &Node<Unary>,
-	env: &Environment,
-	g_env: &Environment,
+	env: &Arc<Environment>,
+	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	let right = interpret_expr(&expr.val.right, env, g_env).await?;
 

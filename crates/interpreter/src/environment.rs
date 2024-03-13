@@ -7,12 +7,12 @@ use ast::{Identifier, Node};
 
 use crate::{wdl_std::get_function, Error, Value};
 
-pub struct Environment<'p> {
-	parent: Option<&'p Environment<'p>>,
+pub struct Environment {
+	parent: Option<Arc<Environment>>,
 	variables: Arc<RwLock<HashMap<Identifier, Value>>>,
 }
 
-impl<'p> Environment<'p> {
+impl Environment {
 	pub fn new() -> Self {
 		Environment {
 			parent: None,
@@ -20,7 +20,7 @@ impl<'p> Environment<'p> {
 		}
 	}
 
-	pub fn with_parent(parent: &'p Environment) -> Self {
+	pub fn with_parent(parent: Arc<Environment>) -> Self {
 		Environment {
 			parent: Some(parent),
 			variables: Arc::new(RwLock::new(HashMap::new())),
@@ -74,7 +74,7 @@ impl<'p> Environment<'p> {
 	async fn resolve(&self, id: &Identifier) -> Option<Arc<RwLock<HashMap<Identifier, Value>>>> {
 		if self.variables.read().await.contains_key(id) {
 			Some(Arc::clone(&self.variables))
-		} else if let Some(parent) = self.parent {
+		} else if let Some(parent) = &self.parent {
 			parent.resolve(id).await
 		} else {
 			None

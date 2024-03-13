@@ -8,6 +8,8 @@ mod into_result;
 use into_result::IntoResult;
 mod handlers;
 
+pub(crate) mod arguments;
+pub(crate) use arguments::*;
 pub(crate) mod std_function;
 pub(crate) use std_function::StdFunction;
 

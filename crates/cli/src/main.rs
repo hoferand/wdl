@@ -2,10 +2,10 @@ use std::collections::HashMap;
 use std::process::ExitCode;
 
 use clap::Parser;
+use tokio::fs;
 use tokio::fs::read_to_string;
 
 use ast::{Identifier, Location};
-use interpreter::Interpreter;
 use logger::error;
 use logger::Colorize;
 
@@ -16,6 +16,8 @@ enum Cli {
 		file: String,
 		variables: Vec<String>,
 	},
+	#[clap(name = "compile", about = "Compile the program")]
+	Compile { file: String },
 	#[clap(name = "fmt", about = "Format the program")]
 	Fmt { file: String },
 	#[clap(name = "check", about = "Check the program")]
@@ -28,6 +30,7 @@ enum Cli {
 async fn main() -> ExitCode {
 	match Cli::parse() {
 		Cli::Run { file, variables } => run(&file, variables).await,
+		Cli::Compile { file } => compile(&file).await,
 		Cli::Fmt { .. } => todo!(),
 		Cli::Check { .. } => todo!(),
 		Cli::Router => todo!(),
@@ -72,20 +75,47 @@ async fn run(file: &str, vars: Vec<String>) -> ExitCode {
 		}
 	};
 
-	let interpreter = Interpreter::new(&workflow);
-
-	let interpreter = match interpreter.init(variables).await {
-		Ok(i) => i,
+	let order = match interpreter::start_workflow(workflow, variables).await {
+		Ok(o) => o,
 		Err(error) => {
 			print_interpreter_error(&error, &src_code);
 			return ExitCode::FAILURE;
 		}
 	};
 
-	if let Err(error) = interpreter.run().await {
+	if let Err(error) = interpreter::run_order(order).await {
 		print_interpreter_error(&error, &src_code);
 		return ExitCode::FAILURE;
+	}
+
+	ExitCode::SUCCESS
+}
+
+async fn compile(file: &str) -> ExitCode {
+	let src_code = match read_to_string(file).await {
+		Ok(content) => content,
+		Err(err) => {
+			error!("Failed to read source file, {}!", err.kind());
+			return ExitCode::FAILURE;
+		}
 	};
+	let workflow = match parser::get_ast(&src_code) {
+		Ok(wf) => wf,
+		Err(error) => {
+			print_parser_error(&error, &src_code);
+			return ExitCode::FAILURE;
+		}
+	};
+
+	let Ok(json) = serde_json::to_string_pretty(&workflow) else {
+		error!("Failed to stringify compiled workflow!");
+		return ExitCode::FAILURE;
+	};
+
+	if fs::write(format!("{}.compiled", file), json).await.is_err() {
+		error!("Failed to write compiled workflow to file!");
+		return ExitCode::FAILURE;
+	}
 
 	ExitCode::SUCCESS
 }
@@ -160,12 +190,12 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 				error!("Unexpected token `{}`!", src);
 				print_error_location(&span.start, &span.end, src_code);
 			}
-			parser::ParserError::SecondOrder { order1, order2 } => {
-				error!("Multiple order blocks found!");
+			parser::ParserError::SecondActions { actions1, actions2 } => {
+				error!("Multiple actions blocks found!");
 				println!("First block:");
-				print_error_location(&order1.start, &order1.end, src_code);
+				print_error_location(&actions1.start, &actions1.end, src_code);
 				println!("Second block:");
-				print_error_location(&order2.start, &order2.end, src_code);
+				print_error_location(&actions2.start, &actions2.end, src_code);
 			}
 			parser::ParserError::UnexpectedEoF => error!("Unexpected end of file!"),
 		},
