@@ -4,6 +4,7 @@ pub use lexer_error::LexerError;
 use std::{iter::Peekable, str::Chars};
 
 use regex::Regex;
+use reqwest::Url;
 
 use ast::{Location, Span};
 
@@ -212,7 +213,43 @@ impl<'c> Lexer<'c> {
 				}
 				"u" => {
 					if let Some(string) = self.parse_string()? {
-						// TODO: add checks
+						let url = match Url::parse(&string) {
+							Err(err) => {
+								return Err(LexerError::ExternalError {
+									src: self.curr_src.clone(),
+									msg: err.to_string(),
+									span: Span {
+										start: Location {
+											line: self.start_line,
+											column: self.start_column,
+										},
+										end: Location {
+											line: self.line,
+											column: self.column,
+										},
+									},
+								});
+							}
+							Ok(u) => u,
+						};
+
+						if !["http", "https"].contains(&url.scheme()) {
+							return Err(LexerError::ExternalError {
+								src: self.curr_src.clone(),
+								msg: "Only 'http://' and 'https://' schemas are allowed!"
+									.to_owned(),
+								span: Span {
+									start: Location {
+										line: self.start_line,
+										column: self.start_column,
+									},
+									end: Location {
+										line: self.line,
+										column: self.column,
+									},
+								},
+							});
+						}
 
 						return Ok(Some(TokenValue::String(string)));
 					};
