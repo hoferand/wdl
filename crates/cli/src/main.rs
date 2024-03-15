@@ -181,6 +181,10 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 						error!("Unexpected end of string!");
 						print_error_location(&span.start, &span.end, src_code);
 					}
+					parser::LexerError::ExternalError { msg, span, .. } => {
+						error!("{}", msg);
+						print_error_location(&span.start, &span.end, src_code);
+					}
 				}
 			}
 		}

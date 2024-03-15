@@ -3,6 +3,8 @@ pub use lexer_error::LexerError;
 
 use std::{iter::Peekable, str::Chars};
 
+use regex::Regex;
+
 use ast::{Location, Span};
 
 use crate::{Token, TokenValue};
@@ -10,7 +12,10 @@ use crate::{Token, TokenValue};
 pub(crate) struct Lexer<'c> {
 	chars: Peekable<Chars<'c>>,
 	line: usize,
+	start_line: usize,
 	column: usize,
+	start_column: usize,
+	curr_src: String,
 	new_line: bool,
 }
 
@@ -19,7 +24,10 @@ impl<'c> Lexer<'c> {
 		Self {
 			chars: src_code.chars().peekable(),
 			line: 0,
+			start_line: 0,
 			column: 0,
+			start_column: 0,
+			curr_src: String::new(),
 			new_line: false,
 		}
 	}
@@ -28,193 +36,59 @@ impl<'c> Lexer<'c> {
 		let mut tokens = Vec::new();
 		let mut errors = Vec::new();
 
-		while let Some(curr_char) = self.get_char() {
-			let start_line = self.line;
-			let start_column = self.column - 1;
+		let handlers = [
+			Self::lex_symbol,
+			Self::lex_string,
+			Self::lex_number,
+			Self::lex_identifier,
+		];
+		while self.chars.peek().is_some() {
+			if self.lex_whitespace().is_some() {
+				continue;
+			}
 
-			// create token
-			let value;
-			let mut src = curr_char.to_string();
-			match curr_char {
-				// ignore whitespaces and newlines
-				' ' | '\t' | '\n' => continue,
+			self.start_line = self.line;
+			self.start_column = self.column;
+			self.curr_src = String::new();
 
-				// single character
-				'+' => value = TokenValue::Plus,
-				'*' => value = TokenValue::Star,
-				'/' => value = TokenValue::Slash,
-				'%' => value = TokenValue::Percent,
-				'#' => value = TokenValue::Hash,
-				'@' => value = TokenValue::At,
-				'|' => value = TokenValue::Pipe,
-				'.' => value = TokenValue::Point,
-				',' => value = TokenValue::Comma,
-				';' => value = TokenValue::Semicolon,
-
-				'(' => value = TokenValue::ParenOpen,
-				')' => value = TokenValue::ParenClose,
-				'[' => value = TokenValue::BracketOpen,
-				']' => value = TokenValue::BracketClose,
-				'{' => value = TokenValue::CurlyOpen,
-				'}' => value = TokenValue::CurlyClose,
-
-				// two character
-				'-' => match self.chars.peek() {
-					Some('>') => {
-						value = TokenValue::Arrow;
-						src.push(self.get_char().unwrap());
+			let mut invalid = true;
+			for handler in handlers {
+				match handler(&mut self) {
+					Ok(None) => (),
+					Err(err) => {
+						errors.push(err);
+						invalid = false;
 					}
-					_ => value = TokenValue::Minus,
-				},
-				':' => match self.chars.peek() {
-					Some(':') => {
-						value = TokenValue::ColonColon;
-						src.push(self.get_char().unwrap());
-					}
-					_ => value = TokenValue::Colon,
-				},
-				'?' => match self.chars.peek() {
-					Some('?') => {
-						value = TokenValue::QuestionQuestion;
-						src.push(self.get_char().unwrap());
-					}
-					_ => value = TokenValue::Question,
-				},
-				'=' => match self.chars.peek() {
-					Some('=') => {
-						value = TokenValue::EqualEqual;
-						src.push(self.get_char().unwrap());
-					}
-					_ => value = TokenValue::Equal,
-				},
-				'!' => match self.chars.peek() {
-					Some('=') => {
-						value = TokenValue::BangEqual;
-						src.push(self.get_char().unwrap());
-					}
-					_ => value = TokenValue::Bang,
-				},
-				'<' => match self.chars.peek() {
-					Some('=') => {
-						value = TokenValue::LessEqual;
-						src.push(self.get_char().unwrap());
-					}
-					_ => value = TokenValue::Less,
-				},
-				'>' => match self.chars.peek() {
-					Some('=') => {
-						value = TokenValue::GreaterEqual;
-						src.push(self.get_char().unwrap());
-					}
-					_ => value = TokenValue::Greater,
-				},
-
-				// string
-				'"' => {
-					let mut string = String::new();
-					let mut terminated = false;
-					while let Some(next_char) = self.get_char() {
-						src.push(next_char);
-						if next_char == '"' {
-							terminated = true;
-							break;
-						}
-						string.push(next_char);
-					}
-					if !terminated {
-						errors.push(LexerError::UnexpectedEndOfString {
-							src,
+					Ok(Some(value)) => {
+						tokens.push(Token {
+							value,
 							span: Span {
 								start: Location {
-									line: start_line,
-									column: start_column,
+									line: self.start_line,
+									column: self.start_column,
 								},
 								end: Location {
 									line: self.line,
 									column: self.column,
 								},
 							},
+							src: self.curr_src.clone(),
 						});
-						continue;
+						invalid = false;
+						break;
 					}
-
-					value = TokenValue::String(string);
-				}
-
-				// number
-				c if c.is_ascii_digit() => {
-					let mut point = false;
-					while let Some(next_char) = self.chars.peek() {
-						if next_char.is_ascii_digit() {
-							src.push(self.get_char().unwrap());
-						} else if !point && *next_char == '.' {
-							point = true;
-							src.push(self.get_char().unwrap());
-						} else {
-							break;
-						}
-					}
-
-					if let Ok(number) = src.parse() {
-						value = TokenValue::Number(number);
-					} else {
-						errors.push(LexerError::InvalidNumber {
-							src,
-							span: Span {
-								start: Location {
-									line: start_line,
-									column: start_column,
-								},
-								end: Location {
-									line: self.line,
-									column: self.column,
-								},
-							},
-						});
-						continue;
-					}
-				}
-
-				// identifier / keyword
-				c if c.is_ascii_alphabetic() || c == '_' => {
-					while let Some(next_char) = self.chars.peek() {
-						if next_char.is_ascii_alphanumeric() || *next_char == '_' {
-							src.push(self.get_char().unwrap());
-						} else {
-							break;
-						}
-					}
-					value = Lexer::get_keyword(&src);
-				}
-
-				// invalid character
-				_ => {
-					errors.push(LexerError::InvalidCharacter {
-						char: curr_char,
-						loc: Location {
-							line: start_line,
-							column: start_column,
-						},
-					});
-					continue;
 				}
 			}
 
-			// add token
-			tokens.push(Token {
-				value,
-				span: Span {
-					start: Location {
-						line: start_line,
-						column: start_column,
+			if invalid {
+				errors.push(LexerError::InvalidCharacter {
+					char: self.get_char().unwrap(),
+					loc: Location {
+						line: self.start_line,
+						column: self.start_column,
 					},
-					end: Location {
-						line: self.line,
-						column: self.column,
-					},
-				},
-				src,
-			});
+				});
+			}
 		}
 
 		if !errors.is_empty() {
@@ -239,6 +113,220 @@ impl<'c> Lexer<'c> {
 		}
 	}
 
+	fn lex_whitespace(&mut self) -> Option<()> {
+		// TODO: detect empty lines, necessary for auto formatting
+		let mut ret = None;
+		while [Some(&' '), Some(&'\t'), Some(&'\n')].contains(&self.chars.peek()) {
+			self.get_char();
+			ret = Some(());
+		}
+
+		ret
+	}
+
+	fn lex_number(&mut self) -> Result<Option<TokenValue>, LexerError> {
+		let Some(ch) = self.chars.peek() else {
+			return Ok(None);
+		};
+		if !ch.is_ascii_digit() {
+			return Ok(None);
+		}
+
+		self.get_char();
+
+		let mut point = false;
+		while let Some(next_char) = self.chars.peek() {
+			if next_char.is_ascii_digit() {
+				self.get_char();
+			} else if !point && *next_char == '.' {
+				self.get_char();
+				point = true;
+			} else {
+				break;
+			}
+		}
+
+		if let Ok(number) = self.curr_src.parse() {
+			Ok(Some(TokenValue::Number(number)))
+		} else {
+			Err(LexerError::InvalidNumber {
+				src: self.curr_src.clone(),
+				span: Span {
+					start: Location {
+						line: self.start_line,
+						column: self.start_column,
+					},
+					end: Location {
+						line: self.line,
+						column: self.column,
+					},
+				},
+			})
+		}
+	}
+
+	fn lex_identifier(&mut self) -> Result<Option<TokenValue>, LexerError> {
+		let Some(ch) = self.chars.peek() else {
+			return Ok(None);
+		};
+		if !ch.is_ascii_alphabetic() || *ch == '_' {
+			return Ok(None);
+		}
+
+		self.get_char();
+
+		let mut semantic_string = false;
+		while let Some(next_char) = self.chars.peek() {
+			if *next_char == '"' {
+				semantic_string = true;
+			} else if next_char.is_ascii_alphanumeric() || *next_char == '_' {
+				self.get_char();
+				continue;
+			}
+			break;
+		}
+
+		if semantic_string {
+			match self.curr_src.as_str() {
+				"r" => {
+					if let Some(string) = self.parse_string()? {
+						if let Err(err) = Regex::new(&string) {
+							return Err(LexerError::ExternalError {
+								src: self.curr_src.clone(),
+								msg: err.to_string(),
+								span: Span {
+									start: Location {
+										line: self.start_line,
+										column: self.start_column,
+									},
+									end: Location {
+										line: self.line,
+										column: self.column,
+									},
+								},
+							});
+						} else {
+							return Ok(Some(TokenValue::String(string)));
+						}
+					};
+				}
+				"u" => {
+					if let Some(string) = self.parse_string()? {
+						// TODO: add checks
+
+						return Ok(Some(TokenValue::String(string)));
+					};
+				}
+				"s" => todo!(),
+				"a" => todo!(),
+				_ => (),
+			}
+		}
+
+		Ok(Some(Lexer::get_keyword(&self.curr_src)))
+	}
+
+	fn lex_string(&mut self) -> Result<Option<TokenValue>, LexerError> {
+		Ok(self.parse_string()?.map(TokenValue::String))
+	}
+
+	fn parse_string(&mut self) -> Result<Option<String>, LexerError> {
+		let Some(ch) = self.chars.peek() else {
+			return Ok(None);
+		};
+		if *ch != '"' {
+			return Ok(None);
+		}
+		self.get_char();
+
+		// TODO: handle escaped characters: \n, \\, ...
+		let mut string = String::new();
+		let mut terminated = false;
+		while let Some(next_char) = self.get_char() {
+			if next_char == '"' {
+				terminated = true;
+				break;
+			} else if next_char == '\n' {
+				// TODO: rethink if multiline strings should be allowed
+				break;
+			}
+			string.push(next_char);
+		}
+
+		if !terminated {
+			Err(LexerError::UnexpectedEndOfString {
+				src: self.curr_src.clone(),
+				span: Span {
+					start: Location {
+						line: self.start_line,
+						column: self.start_column,
+					},
+					end: Location {
+						line: self.line,
+						column: self.column,
+					},
+				},
+			})
+		} else {
+			Ok(Some(string))
+		}
+	}
+
+	fn lex_symbol(&mut self) -> Result<Option<TokenValue>, LexerError> {
+		let Some(ch1) = self.chars.peek().copied() else {
+			return Ok(None);
+		};
+		let mut value = match ch1 {
+			'+' => TokenValue::Plus,
+			'-' => TokenValue::Minus,
+			'*' => TokenValue::Star,
+			'/' => TokenValue::Slash,
+			'%' => TokenValue::Percent,
+			'#' => TokenValue::Hash,
+			'@' => TokenValue::At,
+			'|' => TokenValue::Pipe,
+			'.' => TokenValue::Point,
+			':' => TokenValue::Colon,
+			',' => TokenValue::Comma,
+			';' => TokenValue::Semicolon,
+			'?' => TokenValue::Question,
+			'!' => TokenValue::Bang,
+			'=' => TokenValue::Equal,
+			'<' => TokenValue::Less,
+			'>' => TokenValue::Greater,
+
+			'(' => TokenValue::ParenOpen,
+			')' => TokenValue::ParenClose,
+			'[' => TokenValue::BracketOpen,
+			']' => TokenValue::BracketClose,
+			'{' => TokenValue::CurlyOpen,
+			'}' => TokenValue::CurlyClose,
+
+			_ => return Ok(None),
+		};
+		self.get_char();
+
+		let Some(ch2) = self.chars.peek().copied() else {
+			return Ok(Some(value));
+		};
+		value = match (ch1, ch2) {
+			('-', '>') => TokenValue::Arrow,
+			('/', '/') => todo!("implement comments"),
+			('/', '*') => todo!("implement comments"),
+			(':', ':') => TokenValue::ColonColon,
+			('?', '?') => TokenValue::QuestionQuestion,
+			('=', '=') => TokenValue::EqualEqual,
+			('!', '=') => TokenValue::BangEqual,
+			('<', '=') => TokenValue::LessEqual,
+			('>', '=') => TokenValue::GreaterEqual,
+
+			_ => return Ok(Some(value)),
+		};
+		self.get_char();
+
+		Ok(Some(value))
+	}
+
 	fn get_char(&mut self) -> Option<char> {
 		let curr_char = self.chars.next();
 		if self.new_line {
@@ -247,6 +335,7 @@ impl<'c> Lexer<'c> {
 			self.column = 0;
 		}
 		if let Some(char) = curr_char {
+			self.curr_src.push(char);
 			self.column += 1;
 			if char == '\n' {
 				self.new_line = true;

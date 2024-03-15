@@ -4,7 +4,9 @@
     "words": [
         "arity",
         "boolify",
-        "vals"
+        "vals",
+        "curr",
+        "peekable"
     ],
     "flagWords": []
 }
