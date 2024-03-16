@@ -22,7 +22,7 @@ pub async fn interpret_member(
 		Ok(o.get(&id.val.0).unwrap_or(&Value::Null).clone())
 	} else {
 		Err(Error::InvalidType {
-			msg: format!("{}.{}", value.get_type(), id.val.0),
+			msg: format!("`{}`.{}", value.get_type(), id.val.0),
 			span: expr.span.clone(),
 		})
 	}

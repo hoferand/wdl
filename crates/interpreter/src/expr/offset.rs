@@ -24,7 +24,7 @@ pub async fn interpret_offset(
 		(Value::Object(o), Value::String(s)) => o.get(s).unwrap_or(&Value::Null).clone(),
 		_ => {
 			return Err(Error::InvalidType {
-				msg: format!("{}[{}]", value.get_type(), offset.get_type()),
+				msg: format!("`{}`[`{}`]", value.get_type(), offset.get_type()),
 				span: expr.span.clone(),
 			});
 		}

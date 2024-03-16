@@ -3,13 +3,19 @@ use std::{collections::HashMap, sync::Arc};
 use async_recursion::async_recursion;
 use tokio::sync::RwLock;
 
-use ast::{Identifier, Node};
+use ast::{Identifier, Node, ScopedIdentifier};
 
-use crate::{wdl_std::get_function, Error, Value};
+use crate::{Error, Value};
 
 pub struct Environment {
 	parent: Option<Arc<Environment>>,
 	variables: Arc<RwLock<HashMap<Identifier, Value>>>,
+}
+
+impl Default for Environment {
+	fn default() -> Self {
+		Self::new()
+	}
 }
 
 impl Environment {
@@ -44,7 +50,10 @@ impl Environment {
 	pub async fn assign(&self, id: Node<Identifier>, val: Value) -> Result<(), Error> {
 		let Some(env) = self.resolve(&id.val).await else {
 			return Err(Error::VariableNotFound {
-				id: id.val,
+				id: ScopedIdentifier {
+					id: id.clone(),
+					scope: Vec::new(),
+				},
 				span: id.span,
 			});
 		};
@@ -53,21 +62,14 @@ impl Environment {
 		Ok(())
 	}
 
-	pub async fn get(&self, id: &Node<Identifier>) -> Result<Value, Error> {
+	pub async fn get(&self, id: &Node<Identifier>) -> Option<Value> {
 		if let Some(env) = self.resolve(&id.val).await {
 			if let Some(value) = env.read().await.get(&id.val) {
-				return Ok(value.clone());
+				return Some(value.clone());
 			}
 		}
 
-		if let Some(std_fn) = get_function(&id.val.0) {
-			return Ok(std_fn);
-		}
-
-		Err(Error::VariableNotFound {
-			id: id.val.clone(),
-			span: id.span.clone(),
-		})
+		None
 	}
 
 	#[async_recursion]

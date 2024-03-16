@@ -1,4 +1,4 @@
-use ast::{Identifier, Span};
+use ast::{Identifier, ScopedIdentifier, Span};
 
 #[derive(Debug)]
 pub enum Error {
@@ -8,7 +8,7 @@ pub enum Error {
 		span: Span,
 	},
 	VariableNotFound {
-		id: Identifier,
+		id: ScopedIdentifier,
 		span: Span,
 	},
 	InvalidType {

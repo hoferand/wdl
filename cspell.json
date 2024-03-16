@@ -6,7 +6,8 @@
         "boolify",
         "vals",
         "curr",
-        "peekable"
+        "peekable",
+        "reqwest"
     ],
     "flagWords": []
 }

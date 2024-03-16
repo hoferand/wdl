@@ -20,10 +20,12 @@ pub mod array;
 pub use array::Array;
 pub mod offset;
 pub use offset::Offset;
+pub mod scoped_identifier;
+pub use scoped_identifier::ScopedIdentifier;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{Identifier, Node, Span};
+use crate::{Node, Span};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Expression {
@@ -32,7 +34,7 @@ pub enum Expression {
 	Binary(Node<Binary>),
 	FunctionCall(Node<FunctionCall>),
 	Group(Node<Group>),
-	Identifier(Node<Identifier>),
+	Identifier(Node<ScopedIdentifier>),
 	Literal(Node<Literal>),
 	Logical(Node<Logical>),
 	Member(Node<Member>),

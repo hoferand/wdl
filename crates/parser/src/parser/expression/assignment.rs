@@ -18,6 +18,13 @@ pub(crate) fn parse_assignment(parser: &mut Parser) -> Result<Expression, Parser
 		return Ok(expr);
 	};
 
+	if !id.val.scope.is_empty() {
+		// TODO: make better error
+		return Err(ParserError::Fatal(
+			"It is not allowed to assign values to scoped identifiers!".to_owned(),
+		));
+	}
+
 	parser.tokens.expect(TokenValue::Equal)?;
 
 	let value = parse_or(parser)?;
@@ -28,7 +35,7 @@ pub(crate) fn parse_assignment(parser: &mut Parser) -> Result<Expression, Parser
 			end: value.get_span().end.clone(),
 		},
 		val: Assignment {
-			id,
+			id: id.val.id,
 			value: Box::new(value),
 		},
 	}))

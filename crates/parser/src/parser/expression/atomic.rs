@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use ast::{Array, Expression, Group, Identifier, Literal, Node, Object, Span};
+use ast::{Array, Expression, Group, Identifier, Literal, Node, Object, ScopedIdentifier, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
@@ -45,10 +45,46 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 				},
 			})
 		}
-		TokenValue::Identifier(id) => Expression::Identifier(Node {
-			span: token.span.clone(),
-			val: Identifier(id.to_owned()),
-		}),
+		TokenValue::Identifier(id) => {
+			let mut scope = Vec::new();
+			scope.push(Node {
+				span: token.span.clone(),
+				val: Identifier(id.to_owned()),
+			});
+
+			while let Some(token) = parser.tokens.peek() {
+				if token.value != TokenValue::ColonColon {
+					break;
+				}
+				parser.tokens.expect(TokenValue::ColonColon)?;
+
+				let Some(id) = parser.tokens.next() else {
+					return Err(ParserError::UnexpectedEoF);
+				};
+
+				if let TokenValue::Identifier(id_str) = &id.value {
+					scope.push(Node {
+						span: id.span.clone(),
+						val: Identifier(id_str.to_owned()),
+					});
+				}
+			}
+
+			let id = scope.pop().unwrap(); // can not fail
+
+			let start = id.span.start.clone();
+			let end;
+			if let Some(s) = scope.first() {
+				end = s.span.end.clone();
+			} else {
+				end = id.span.end.clone();
+			}
+
+			Expression::Identifier(Node {
+				span: Span { start, end },
+				val: ScopedIdentifier { id, scope },
+			})
+		}
 		TokenValue::BracketOpen => {
 			let start = token.span.start.clone();
 

@@ -128,7 +128,7 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			print_error_location(&span.start, &span.end, src_code);
 		}
 		interpreter::Error::VariableNotFound { id, span } => {
-			error!("Variable `{}` not found!", id.0);
+			error!("Variable `{}` not found!", id.to_string());
 			print_error_location(&span.start, &span.end, src_code);
 		}
 		interpreter::Error::InvalidType { msg, span } => {

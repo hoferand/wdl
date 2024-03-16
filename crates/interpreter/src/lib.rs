@@ -3,10 +3,10 @@ use environment::Environment;
 mod interrupt;
 use interrupt::Interrupt;
 mod value;
-mod wdl_std;
 use value::*;
 mod expr;
 mod stmt;
+mod wdl_std;
 
 pub mod order;
 pub use order::Order;
@@ -14,8 +14,6 @@ pub mod error;
 pub use error::Error;
 
 use std::{collections::HashMap, sync::Arc};
-
-use serde_json;
 
 use ast::{Identifier, Workflow};
 
@@ -67,8 +65,24 @@ fn convert_json_to_value(value: serde_json::Value) -> Option<Value> {
 		serde_json::Value::Bool(b) => Some(Value::Bool(b)),
 		serde_json::Value::Number(n) => n.as_f64().map(Value::Number),
 		serde_json::Value::String(s) => Some(Value::String(s)),
-		serde_json::Value::Array(_) => None,  // TODO
-		serde_json::Value::Object(_) => None, // TODO
+		serde_json::Value::Array(arr) => {
+			let mut vec = Vec::new();
+
+			for val in arr {
+				vec.push(convert_json_to_value(val)?);
+			}
+
+			Some(Value::Array(vec))
+		}
+		serde_json::Value::Object(obj) => {
+			let mut map = HashMap::new();
+
+			for (key, val) in obj {
+				map.insert(key, convert_json_to_value(val)?);
+			}
+
+			Some(Value::Object(map))
+		}
 	}
 }
 
