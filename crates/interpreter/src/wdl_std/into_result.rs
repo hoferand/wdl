@@ -1,19 +1,22 @@
-use crate::{Error, Value};
+use serde::Serialize;
 
-use super::IntoValue;
+use crate::{Error, Value};
 
 pub(crate) trait IntoResult {
 	fn into_result(self) -> Result<Value, Error>;
 }
 
-impl<T: IntoValue> IntoResult for T {
+impl<T: Serialize> IntoResult for Result<T, Error> {
 	fn into_result(self) -> Result<Value, Error> {
-		Ok(self.into_value())
-	}
-}
+		let json_val = match serde_json::to_value(self?) {
+			Ok(val) => val,
+			Err(err) => return Err(Error::Fatal(err.to_string())),
+		};
 
-impl<T: IntoValue> IntoResult for Result<T, Error> {
-	fn into_result(self) -> Result<Value, Error> {
-		Ok(self?.into_value())
+		let wdl_val = match serde_json::from_value(json_val) {
+			Ok(val) => val,
+			Err(err) => return Err(Error::Fatal(err.to_string())),
+		};
+		Ok(wdl_val)
 	}
 }

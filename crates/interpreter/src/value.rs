@@ -1,6 +1,7 @@
 use std::{collections::HashMap, fmt::Debug, sync::Arc};
 
 use ast::Function;
+use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::wdl_std::StdFunction;
 
@@ -12,7 +13,7 @@ pub enum Value {
 	String(String),
 	Array(Vec<Value>),
 	Object(HashMap<String, Value>),
-	Function(FunctionValue),
+	Function(FunctionValue), // TODO: just save identifier
 }
 
 #[derive(Clone)]
@@ -66,7 +67,7 @@ impl ToString for Value {
 			Self::Null => "null".to_owned(),
 			Self::Bool(b) => b.to_string(),
 			Self::Number(n) => n.to_string(),
-			Self::String(s) => s.to_owned(),
+			Self::String(s) => format!("\"{}\"", s.to_owned()),
 			Self::Array(a) => {
 				let mut out = String::new();
 				out.push('[');
@@ -112,4 +113,68 @@ impl PartialOrd for Value {
 			_ => None,
 		}
 	}
+}
+
+impl Serialize for Value {
+	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+	where
+		S: Serializer,
+	{
+		match self {
+			Self::Null => serializer.serialize_none(),
+			Self::Bool(bool) => serializer.serialize_bool(*bool),
+			Self::Number(nr) => serializer.serialize_f64(*nr),
+			Self::String(str) => serializer.serialize_str(str),
+			Self::Array(arr) => serializer.collect_seq(arr),
+			Self::Object(obj) => serializer.collect_map(obj),
+			Self::Function(_) => todo!(),
+		}
+	}
+}
+
+impl<'de> Deserialize<'de> for Value {
+	fn deserialize<D>(deserializer: D) -> Result<Value, D::Error>
+	where
+		D: Deserializer<'de>,
+	{
+		use serde_json::Value as V;
+		serde_to_value(V::deserialize(deserializer)?)
+	}
+}
+
+fn serde_to_value<E: de::Error>(val: serde_json::Value) -> Result<Value, E> {
+	use serde_json::Value as V;
+	Ok(match val {
+		V::Null => Value::Null,
+		V::Bool(b) => Value::Bool(b),
+		V::Number(nr) => {
+			if let Some(n) = nr.as_f64() {
+				Value::Number(n)
+			} else {
+				return Err(de::Error::custom(format!(
+					"Number `{}` to big for saving",
+					nr
+				)));
+			}
+		}
+		V::String(s) => Value::String(s),
+		V::Array(arr) => {
+			let mut vec = Vec::new();
+
+			for val in arr {
+				vec.push(serde_to_value(val)?);
+			}
+
+			Value::Array(vec)
+		}
+		V::Object(obj) => {
+			let mut map = HashMap::new();
+
+			for (key, val) in obj {
+				map.insert(key, serde_to_value(val)?);
+			}
+
+			Value::Object(map)
+		}
+	})
 }

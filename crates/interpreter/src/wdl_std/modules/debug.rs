@@ -1,6 +1,6 @@
 use ast::ScopedIdentifier;
 
-use crate::{wdl_std::get_handler, Value};
+use crate::{wdl_std::get_handler, Error, Value};
 
 pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 	if id.scope.len() > 1 {
@@ -13,6 +13,7 @@ pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 	}
 }
 
-pub async fn print(val: Value) {
+pub async fn print(val: Value) -> Result<(), Error> {
 	println!("{}", val.to_string());
+	Ok(())
 }

@@ -7,7 +7,9 @@
         "vals",
         "curr",
         "peekable",
-        "reqwest"
+        "reqwest",
+        "stationarea",
+        "stationareas"
     ],
     "flagWords": []
 }

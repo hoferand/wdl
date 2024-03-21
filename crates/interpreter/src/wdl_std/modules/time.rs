@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use ast::ScopedIdentifier;
 
-use crate::{wdl_std::get_handler, Value};
+use crate::{wdl_std::get_handler, Error, Value};
 
 pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 	if id.scope.len() > 1 {
@@ -15,6 +15,7 @@ pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 	}
 }
 
-pub async fn sleep(millis: f64) {
+pub async fn sleep(millis: f64) -> Result<(), Error> {
 	tokio::time::sleep(Duration::from_millis(millis as u64)).await; // TODO: fix millis as u64
+	Ok(())
 }

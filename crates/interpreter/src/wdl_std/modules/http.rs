@@ -5,8 +5,9 @@ use reqwest::{header::CONTENT_TYPE, Response, Url};
 use ast::ScopedIdentifier;
 use logger::error;
 use logger::Colorize;
+use serde::Serialize;
 
-use crate::{convert_json_to_value, wdl_std::get_handler, Error, Value};
+use crate::{wdl_std::get_handler, Error, Value};
 
 pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 	if id.scope.len() > 1 {
@@ -23,58 +24,67 @@ pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 	}
 }
 
-async fn get(url: String) -> Result<Value, Error> {
+#[derive(Debug, Serialize)]
+struct HttpResponse {
+	status: u16,
+	headers: HashMap<String, String>,
+	body: serde_json::Value,
+}
+
+async fn get(url: String) -> Result<Option<HttpResponse>, Error> {
 	process_response(reqwest::get(parse_url(&url)?).await).await
 }
 
-async fn post() {
+async fn post() -> Result<(), Error> {
 	todo!()
 }
 
-async fn put() {
+async fn put() -> Result<(), Error> {
 	todo!()
 }
 
-async fn patch() {
+async fn patch() -> Result<(), Error> {
 	todo!()
 }
 
-async fn delete() {
+async fn delete() -> Result<(), Error> {
 	todo!()
 }
 
 fn parse_url(url: &str) -> Result<Url, Error> {
-	match Url::parse(&url) {
+	match Url::parse(url) {
 		Ok(u) => Ok(u),
 		Err(err) => Err(Error::Fatal(err.to_string())),
 	}
 }
 
-async fn process_response(response: reqwest::Result<Response>) -> Result<Value, Error> {
+async fn process_response(
+	response: reqwest::Result<Response>,
+) -> Result<Option<HttpResponse>, Error> {
 	let response = match response {
 		Ok(r) => r,
 		Err(err) => {
+			// TODO: crash on builder error
 			error!("{}", err.to_string());
-			return Ok(Value::Null);
+			return Ok(None);
 		}
 	};
-
-	let mut map = HashMap::new();
-	map.insert(
-		"status".to_owned(),
-		Value::Number(response.status().as_u16() as f64),
-	);
 
 	let mut headers = HashMap::new();
 	for (h_n, h_v) in response.headers() {
 		match h_v.to_str() {
 			Ok(val) => {
-				headers.insert(h_n.to_string(), Value::String(val.to_owned()));
+				headers.insert(h_n.to_string(), val.to_owned());
 			}
 			Err(err) => error!("Invalid header received `{}`", err),
 		}
 	}
-	map.insert("headers".to_owned(), Value::Object(headers));
+
+	let mut res = HttpResponse {
+		status: response.status().as_u16(),
+		headers,
+		body: serde_json::Value::Null,
+	};
 
 	let mut json = false;
 	if let Some(content_type) = response.headers().get(CONTENT_TYPE) {
@@ -88,30 +98,20 @@ async fn process_response(response: reqwest::Result<Response>) -> Result<Value, 
 		Ok(b) => b,
 		Err(err) => {
 			error!("Failed to read response body `{}`", err);
-			map.insert("body".to_owned(), Value::Null);
-			return Ok(Value::Object(map));
+			return Ok(Some(res));
 		}
 	};
 
 	if json {
 		match serde_json::from_str::<serde_json::Value>(&body) {
-			Ok(val) => match convert_json_to_value(val) {
-				Some(v) => {
-					map.insert("body".to_owned(), v);
-				}
-				None => {
-					error!("Failed to json decode response body");
-					map.insert("body".to_owned(), Value::Null);
-				}
-			},
+			Ok(val) => res.body = val,
 			Err(err) => {
 				error!("Failed to json decode body `{}`", err);
-				map.insert("body".to_owned(), Value::Null);
 			}
 		};
 	} else {
-		map.insert("body".to_owned(), Value::String(body));
+		res.body = serde_json::Value::String(body);
 	}
 
-	Ok(Value::Object(map))
+	Ok(Some(res))
 }

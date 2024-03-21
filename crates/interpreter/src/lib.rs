@@ -60,6 +60,7 @@ pub async fn run_order(order: Order) -> Result<(), Error> {
 }
 
 fn convert_json_to_value(value: serde_json::Value) -> Option<Value> {
+	// TODO: remove this function
 	match value {
 		serde_json::Value::Null => Some(Value::Null),
 		serde_json::Value::Bool(b) => Some(Value::Bool(b)),
