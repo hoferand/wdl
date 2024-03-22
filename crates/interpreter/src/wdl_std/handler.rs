@@ -24,7 +24,7 @@ macro_rules! impl_handler {
 			$($ty: FromArguments + Send,)*
 			R: IntoResult
 		{
-	  #[allow(non_snake_case, unused_variables, unused_mut)]
+			#[allow(non_snake_case, unused_variables, unused_mut)]
 			fn call(self, mut args: Arguments) -> BoxFuture<'static, Result<Value, Error>> {
 				Box::pin(async move {
 					(self)($($ty::from_args(&mut args)?,)*).await.into_result()
