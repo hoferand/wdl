@@ -19,7 +19,7 @@ macro_rules! impl_handler {
 	($($ty:ident),*) => {
 		impl<F, Fut, $($ty,)* R> Handler<($($ty,)*)> for F
 		where
-			F: FnOnce($($ty,)*) -> Fut + Clone + Send + 'static,
+			F: FnOnce($($ty,)*) -> Fut + Clone + Send + 'static, // TODO: check FnOnce
 			Fut: Future<Output = R> + Send,
 			$($ty: FromArguments + Send,)*
 			R: IntoResult
