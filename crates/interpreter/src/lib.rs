@@ -4,6 +4,7 @@ mod interrupt;
 use interrupt::Interrupt;
 mod value;
 use value::*;
+mod channel;
 mod expr;
 mod stmt;
 mod wdl_std;

@@ -3,9 +3,9 @@ use std::{collections::HashMap, fmt::Debug, sync::Arc};
 use ast::Function;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::wdl_std::StdFunction;
+use crate::{channel::Channel, wdl_std::StdFunction};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum Value {
 	Null,
 	Bool(bool),
@@ -14,6 +14,7 @@ pub enum Value {
 	Array(Vec<Value>),
 	Object(HashMap<String, Value>),
 	Function(FunctionValue), // TODO: just save identifier
+	Channel(Channel),        // TODO: just save identifier
 }
 
 #[derive(Clone)]
@@ -44,6 +45,7 @@ impl Value {
 			Self::Array(a) => !a.is_empty(),
 			Self::Object(o) => !o.is_empty(),
 			Self::Function(_) => true,
+			Self::Channel(_) => true,
 		}
 	}
 
@@ -56,6 +58,7 @@ impl Value {
 			Self::Array(_) => "array",
 			Self::Object(_) => "object",
 			Self::Function(_) => "function",
+			Self::Channel(_) => "channel",
 		}
 		.to_owned()
 	}
@@ -101,6 +104,22 @@ impl ToString for Value {
 				out
 			}
 			Self::Function(_) => "function".to_owned(),
+			Self::Channel(_) => "channel".to_owned(),
+		}
+	}
+}
+
+impl PartialEq for Value {
+	fn eq(&self, other: &Self) -> bool {
+		// TODO: rethink
+		match (self, other) {
+			(Value::Null, Value::Null) => true,
+			(Value::Bool(b1), Value::Bool(b2)) => b1 == b2,
+			(Value::Number(n1), Value::Number(n2)) => n1 == n2,
+			(Value::String(s1), Value::String(s2)) => s1 == s2,
+			(Value::Array(a1), Value::Array(a2)) => a1 == a2,
+			(Value::Object(o1), Value::Object(o2)) => o1 == o2,
+			_ => false,
 		}
 	}
 }
@@ -128,6 +147,7 @@ impl Serialize for Value {
 			Self::Array(arr) => serializer.collect_seq(arr),
 			Self::Object(obj) => serializer.collect_map(obj),
 			Self::Function(_) => todo!(),
+			Self::Channel(_) => todo!(),
 		}
 	}
 }
