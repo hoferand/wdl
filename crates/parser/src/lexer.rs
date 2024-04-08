@@ -347,7 +347,8 @@ impl<'c> Lexer<'c> {
 			return Ok(Some(value));
 		};
 		value = match (ch1, ch2) {
-			('-', '>') => TokenValue::Arrow,
+			('-', '>') => TokenValue::ArrowRight,
+			('<', '-') => TokenValue::ArrowLeft,
 			('/', '/') => todo!("implement comments"),
 			('/', '*') => todo!("implement comments"),
 			(':', ':') => TokenValue::ColonColon,

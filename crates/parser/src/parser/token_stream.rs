@@ -113,6 +113,7 @@ impl<'t> TokenStream<'t> {
 		let op = match token.value {
 			TokenValue::Minus => UnaryOperator::Negate,
 			TokenValue::Bang => UnaryOperator::Flip,
+			TokenValue::ArrowLeft => UnaryOperator::Receive,
 
 			_ => return None,
 		};

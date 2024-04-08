@@ -19,6 +19,7 @@ pub async fn interpret_unary(
 	match expr.val.op.val {
 		UnaryOperator::Negate => negate(&right, &expr.span),
 		UnaryOperator::Flip => Ok(Value::Bool(!right.boolify())),
+		UnaryOperator::Receive => receive(right, &expr.span).await,
 	}
 }
 
@@ -29,5 +30,22 @@ fn negate(val: &Value, span: &Span) -> Result<Value, Error> {
 			msg: format!("-`{}`", val.get_type()),
 			span: span.clone(),
 		}),
+	}
+}
+
+pub async fn receive(ch: Value, _span: &Span) -> Result<Value, Error> {
+	// TODO: improve error messages
+	match ch {
+		Value::Channel(ch) => {
+			if let Some(v) = ch.receive().await {
+				Ok(v)
+			} else {
+				Err(Error::Fatal("Cannot receive on closed channel!".to_owned()))
+			}
+		}
+		val => Err(Error::Fatal(format!(
+			"Cannot receive on type `{}`!",
+			val.get_type()
+		))),
 	}
 }

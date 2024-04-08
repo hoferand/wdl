@@ -42,7 +42,8 @@ pub enum TokenValue {
 	LessEqual,        // <=
 	Greater,          // >
 	GreaterEqual,     // >=
-	Arrow,            // ->
+	ArrowRight,       // ->
+	ArrowLeft,        // <-
 
 	// Brackets
 	ParenOpen,    // (

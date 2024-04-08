@@ -18,6 +18,8 @@ mod or;
 pub(crate) use or::parse_or;
 mod assignment;
 pub(crate) use assignment::parse_assignment;
+mod send;
+pub(crate) use send::parse_send;
 
 use ast::Expression;
 

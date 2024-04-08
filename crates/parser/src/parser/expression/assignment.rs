@@ -2,10 +2,10 @@ use ast::{Assignment, Expression, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
-use super::parse_or;
+use super::parse_send;
 
 pub(crate) fn parse_assignment(parser: &mut Parser) -> Result<Expression, ParserError> {
-	let expr = parse_or(parser)?;
+	let expr = parse_send(parser)?;
 
 	let Some(peek) = parser.tokens.peek() else {
 		return Ok(expr);
@@ -27,7 +27,7 @@ pub(crate) fn parse_assignment(parser: &mut Parser) -> Result<Expression, Parser
 
 	parser.tokens.expect(TokenValue::Equal)?;
 
-	let value = parse_or(parser)?;
+	let value = parse_send(parser)?;
 
 	Ok(Expression::Assignment(Node {
 		span: Span {

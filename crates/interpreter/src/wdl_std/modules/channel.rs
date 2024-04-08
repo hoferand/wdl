@@ -13,6 +13,6 @@ pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 	}
 }
 
-pub async fn new(buffer: usize) -> Result<Value, Error> {
-	Ok(Value::Channel(Channel::new(buffer)))
+pub async fn new(buffer: f64) -> Result<Channel, Error> {
+	Ok(Channel::new(buffer as usize)) // TODO: fix cast
 }

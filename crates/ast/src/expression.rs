@@ -22,6 +22,8 @@ pub mod offset;
 pub use offset::Offset;
 pub mod scoped_identifier;
 pub use scoped_identifier::ScopedIdentifier;
+pub mod send;
+pub use send::Send;
 
 use serde::{Deserialize, Serialize};
 
@@ -40,6 +42,7 @@ pub enum Expression {
 	Member(Node<Member>),
 	Object(Node<Object>),
 	Offset(Node<Offset>),
+	Send(Node<Send>),
 	Unary(Node<Unary>),
 }
 
@@ -57,6 +60,7 @@ impl Expression {
 			Self::Member(expr) => &expr.span,
 			Self::Object(expr) => &expr.span,
 			Self::Offset(expr) => &expr.span,
+			Self::Send(expr) => &expr.span,
 			Self::Unary(expr) => &expr.span,
 		}
 	}

@@ -12,4 +12,5 @@ pub struct Unary {
 pub enum UnaryOperator {
 	Negate,
 	Flip,
+	Receive,
 }

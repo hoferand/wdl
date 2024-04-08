@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::{Error, Value};
+use crate::{channel::Channel, Error, Value};
 
 pub(crate) trait IntoResult {
 	fn into_result(self) -> Result<Value, Error>;
@@ -18,5 +18,11 @@ impl<T: Serialize> IntoResult for Result<T, Error> {
 			Err(err) => return Err(Error::Fatal(err.to_string())),
 		};
 		Ok(wdl_val)
+	}
+}
+
+impl IntoResult for Result<Channel, Error> {
+	fn into_result(self) -> Result<Value, Error> {
+		Ok(Value::Channel(self?))
 	}
 }
