@@ -9,4 +9,4 @@ edition = "2021"
 ast = { path = "../ast" }
 
 regex = "1.10.3"
-reqwest = "0.11.26"
+reqwest = "0.12.3"
