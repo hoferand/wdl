@@ -19,13 +19,13 @@ pub async fn interpret_send(
 		Value::Channel(ch) => {
 			let value = interpret_expr(&expr.val.value, env, g_env).await?;
 			if ch.send(value).await.is_none() {
-				Err(Error::Fatal("Cannot send on closed channel!".to_owned()))
+				Err(Error::Fatal("Cannot send on closed channel".to_owned()))
 			} else {
 				Ok(Value::Null)
 			}
 		}
 		val => Err(Error::Fatal(format!(
-			"Cannot send on type `{}`!",
+			"Cannot send on type `{}`",
 			val.get_type()
 		))),
 	}

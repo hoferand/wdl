@@ -40,11 +40,11 @@ pub async fn receive(ch: Value, _span: &Span) -> Result<Value, Error> {
 			if let Some(v) = ch.receive().await {
 				Ok(v)
 			} else {
-				Err(Error::Fatal("Cannot receive on closed channel!".to_owned()))
+				Err(Error::Fatal("Cannot receive on closed channel".to_owned()))
 			}
 		}
 		val => Err(Error::Fatal(format!(
-			"Cannot receive on type `{}`!",
+			"Cannot receive on type `{}`",
 			val.get_type()
 		))),
 	}

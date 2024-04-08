@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::Error;
+use crate::{channel::Channel, Error, Value};
 
 use super::Arguments;
 
@@ -34,6 +34,25 @@ where
 				}
 			};
 			Ok(rust_val)
+		} else {
+			Err(Error::TooFewArguments {
+				span: args.fn_span.clone(),
+			})
+		}
+	}
+}
+
+impl FromArguments for Channel {
+	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
+		if let Some(arg) = args.args.next() {
+			if let Value::Channel(ch) = arg.val {
+				Ok(ch)
+			} else {
+				Err(Error::InvalidType {
+					msg: format!("Expected channel but got `{}`", arg.val.get_type()),
+					span: arg.span,
+				})
+			}
 		} else {
 			Err(Error::TooFewArguments {
 				span: args.fn_span.clone(),

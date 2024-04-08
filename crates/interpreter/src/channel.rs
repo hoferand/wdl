@@ -30,4 +30,8 @@ impl Channel {
 	pub async fn receive(&self) -> Option<Value> {
 		self.rx.lock().await.recv().await
 	}
+
+	pub async fn close(&self) {
+		self.rx.lock().await.close();
+	}
 }
