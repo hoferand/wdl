@@ -1,4 +1,5 @@
 mod action;
+mod channel;
 mod debug;
 mod http;
 mod regex;
@@ -16,6 +17,7 @@ pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 			"http" => http::resolve_id(id),
 			"time" => time::resolve_id(id),
 			"regex" => regex::resolve_id(id),
+			"channel" => channel::resolve_id(id),
 			_ => None,
 		};
 	}
