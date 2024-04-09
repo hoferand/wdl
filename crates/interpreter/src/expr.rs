@@ -10,8 +10,6 @@ mod group;
 use group::interpret_group;
 mod identifier;
 use identifier::interpret_identifier;
-mod assignment;
-use assignment::interpret_assignment;
 mod function_call;
 use function_call::interpret_function_call;
 mod array;
@@ -22,8 +20,6 @@ mod member;
 use member::interpret_member;
 mod object;
 use object::interpret_object;
-mod send;
-use send::interpret_send;
 
 use std::sync::Arc;
 
@@ -41,7 +37,6 @@ pub async fn interpret_expr(
 ) -> Result<Value, Error> {
 	match expr {
 		Expression::Array(expr) => interpret_array(expr, env, g_env).await,
-		Expression::Assignment(expr) => interpret_assignment(expr, env, g_env).await,
 		Expression::Binary(expr) => interpret_binary(expr, env, g_env).await,
 		Expression::FunctionCall(expr) => interpret_function_call(expr, env, g_env).await,
 		Expression::Group(expr) => interpret_group(expr, env, g_env).await,
@@ -51,7 +46,6 @@ pub async fn interpret_expr(
 		Expression::Member(expr) => interpret_member(expr, env, g_env).await,
 		Expression::Object(expr) => interpret_object(expr, env, g_env).await,
 		Expression::Offset(expr) => interpret_offset(expr, env, g_env).await,
-		Expression::Send(expr) => interpret_send(expr, env, g_env).await,
 		Expression::Unary(expr) => interpret_unary(expr, env, g_env).await,
 	}
 }

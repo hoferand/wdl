@@ -20,6 +20,10 @@ mod global_declaration;
 pub use global_declaration::interpret_global_declaration;
 mod let_;
 use let_::interpret_let;
+mod assignment;
+use assignment::interpret_assignment;
+mod send;
+use send::interpret_send;
 
 use std::sync::Arc;
 
@@ -38,6 +42,7 @@ pub async fn interpret_stmt(
 	g_env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
 	match stmt {
+		Statement::Assignment(stmt) => interpret_assignment(stmt, env, g_env).await,
 		Statement::Expression(expr) => {
 			interpret_expr(expr, env, g_env).await?;
 			Ok(Interrupt::None)
@@ -52,6 +57,7 @@ pub async fn interpret_stmt(
 			Ok(Interrupt::None)
 		}
 		Statement::Return(return_) => interpret_return(return_, env, g_env).await,
+		Statement::Send(stmt) => interpret_send(stmt, env, g_env).await,
 		Statement::While(while_) => interpret_while(while_, env, g_env).await,
 	}
 }

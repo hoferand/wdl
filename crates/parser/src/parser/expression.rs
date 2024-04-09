@@ -16,15 +16,11 @@ mod and;
 pub(crate) use and::parse_and;
 mod or;
 pub(crate) use or::parse_or;
-mod assignment;
-pub(crate) use assignment::parse_assignment;
-mod send;
-pub(crate) use send::parse_send;
 
 use ast::Expression;
 
 use crate::{Parser, ParserError};
 
 pub(crate) fn parse_expression(parser: &mut Parser) -> Result<Expression, ParserError> {
-	parse_assignment(parser)
+	parse_or(parser)
 }

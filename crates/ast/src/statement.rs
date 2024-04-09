@@ -20,6 +20,10 @@ pub mod return_;
 pub use return_::Return;
 pub mod let_;
 pub use let_::Let;
+pub mod assignment;
+pub use assignment::Assignment;
+pub mod send;
+pub use send::Send;
 
 use serde::{Deserialize, Serialize};
 
@@ -53,6 +57,7 @@ impl Declaration {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Statement {
+	Assignment(Node<Assignment>),
 	Expression(Expression),
 	Block(Node<Block>),
 	Break(Node<Break>),
@@ -61,12 +66,14 @@ pub enum Statement {
 	Let(Node<Let>),
 	Par(Node<Par>),
 	Return(Node<Return>),
+	Send(Node<Send>),
 	While(Node<While>),
 }
 
 impl Statement {
 	pub fn get_span(&self) -> &Span {
 		match self {
+			Statement::Assignment(stmt) => &stmt.span,
 			Statement::Expression(expr) => expr.get_span(),
 			Statement::Block(stmt) => &stmt.span,
 			Statement::Break(stmt) => &stmt.span,
@@ -75,12 +82,14 @@ impl Statement {
 			Statement::Let(stmt) => &stmt.span,
 			Statement::Par(stmt) => &stmt.span,
 			Statement::Return(stmt) => &stmt.span,
+			Statement::Send(stmt) => &stmt.span,
 			Statement::While(stmt) => &stmt.span,
 		}
 	}
 
 	pub fn get_type(&self) -> String {
 		match self {
+			Statement::Assignment(_) => "assignment",
 			Statement::Expression(_) => "expression",
 			Statement::Block(_) => "block",
 			Statement::Break(_) => "break",
@@ -89,6 +98,7 @@ impl Statement {
 			Statement::Let(_) => "let",
 			Statement::Par(_) => "par",
 			Statement::Return(_) => "return",
+			Statement::Send(_) => "send",
 			Statement::While(_) => "while",
 		}
 		.to_owned()

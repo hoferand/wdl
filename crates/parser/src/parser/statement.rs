@@ -23,7 +23,7 @@ pub(crate) use let_::parse_let;
 mod function_declaration;
 pub(crate) use function_declaration::parse_function_declaration;
 
-use ast::{Declaration, Statement};
+use ast::{Assignment, Declaration, Expression, Node, Send, Span, Statement};
 
 use crate::{Parser, ParserError, TokenValue};
 
@@ -73,7 +73,55 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 
 		// expression
 		_ => {
-			let val = Statement::Expression(parse_expression(parser)?);
+			let expr = parse_expression(parser)?;
+
+			let Some(peek) = parser.tokens.peek() else {
+				return Err(ParserError::UnexpectedEoF);
+			};
+			let val;
+			if peek.value == TokenValue::Equal {
+				parser.tokens.expect(TokenValue::Equal)?;
+				if let Expression::Identifier(id) = expr {
+					if !id.val.scope.is_empty() {
+						// TODO: improve error message
+						return Err(ParserError::Fatal(
+							"It is not allowed to assign values to scoped identifiers!".to_owned(),
+						));
+					}
+
+					let value = parse_expression(parser)?;
+
+					val = Statement::Assignment(Node {
+						span: Span {
+							start: id.span.start.clone(),
+							end: value.get_span().end.clone(),
+						},
+						val: Assignment {
+							id: id.val.id,
+							value: Box::new(value),
+						},
+					})
+				} else {
+					val = Statement::Expression(expr);
+				}
+			} else if peek.value == TokenValue::ArrowLeft {
+				parser.tokens.expect(TokenValue::ArrowLeft)?;
+				let value = parse_expression(parser)?;
+
+				val = Statement::Send(Node {
+					span: Span {
+						start: expr.get_span().start.clone(),
+						end: value.get_span().end.clone(),
+					},
+					val: Send {
+						ch: Box::new(expr),
+						value: Box::new(value),
+					},
+				})
+			} else {
+				val = Statement::Expression(expr);
+			}
+
 			parser.tokens.expect(TokenValue::Semicolon)?;
 			val
 		}

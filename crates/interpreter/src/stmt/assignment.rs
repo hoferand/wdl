@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Assignment, Node};
 
-use crate::{Environment, Error, Value};
+use crate::{interrupt::Interrupt, Environment, Error};
 
 use super::interpret_expr;
 
@@ -13,10 +13,10 @@ pub async fn interpret_assignment(
 	expr: &Node<Assignment>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
-) -> Result<Value, Error> {
+) -> Result<Interrupt, Error> {
 	let value = interpret_expr(&expr.val.value, env, g_env).await?;
 	let id = expr.val.id.clone();
 	env.assign(id, value.clone()).await?;
 
-	Ok(value)
+	Ok(Interrupt::None)
 }
