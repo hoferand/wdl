@@ -411,6 +411,7 @@ impl<'c> Lexer<'c> {
 			"number" => TokenValue::TNumber,
 			"string" => TokenValue::TString,
 			"any" => TokenValue::TAny,
+			"spawn" => TokenValue::Spawn,
 			_ => TokenValue::Identifier(id.to_owned()),
 		}
 	}

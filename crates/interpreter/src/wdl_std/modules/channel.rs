@@ -15,6 +15,14 @@ pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
 }
 
 pub async fn new(buffer: f64) -> Result<Channel, Error> {
+	if buffer < 1.0 {
+		// TODO: improve error message
+		return Err(Error::Fatal(format!(
+			"The buffer size for a channel must be at least `1`, but `{}` given",
+			buffer
+		)));
+	}
+
 	Ok(Channel::new(buffer as usize)) // TODO: fix cast
 }
 

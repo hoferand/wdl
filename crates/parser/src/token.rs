@@ -72,6 +72,7 @@ pub enum TokenValue {
 	Continue,
 	Break,
 	Return,
+	Spawn,
 
 	// Types
 	TVoid,   // void

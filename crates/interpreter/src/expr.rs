@@ -20,6 +20,8 @@ mod member;
 use member::interpret_member;
 mod object;
 use object::interpret_object;
+mod spawn;
+use spawn::interpret_spawn;
 
 use std::sync::Arc;
 
@@ -46,6 +48,7 @@ pub async fn interpret_expr(
 		Expression::Member(expr) => interpret_member(expr, env, g_env).await,
 		Expression::Object(expr) => interpret_object(expr, env, g_env).await,
 		Expression::Offset(expr) => interpret_offset(expr, env, g_env).await,
+		Expression::Spawn(expr) => interpret_spawn(expr, env, g_env).await,
 		Expression::Unary(expr) => interpret_unary(expr, env, g_env).await,
 	}
 }
