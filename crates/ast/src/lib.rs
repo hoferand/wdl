@@ -6,8 +6,6 @@ pub mod expression;
 pub use expression::*;
 pub mod node;
 pub use node::Node;
-pub mod global_description;
-pub use global_description::GlobalDescription;
 pub mod identifier;
 pub use identifier::Identifier;
 pub mod function;

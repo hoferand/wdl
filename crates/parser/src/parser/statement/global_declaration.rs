@@ -41,7 +41,6 @@ pub(crate) fn parse_global_declaration(
 		val: GlobalDeclaration {
 			id: id_node,
 			value: Some(value),
-			description: None,
 		},
 	})
 }

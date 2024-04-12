@@ -24,16 +24,12 @@ pub enum TokenValue {
 	Star,             // *
 	Slash,            // /
 	Percent,          // %
-	Hash,             // #
-	At,               // @
-	Pipe,             // |
-	Point,            // .
-	Question,         // ?
 	QuestionQuestion, // ??
-	Bang,             // !
-	Comma,            // ,
+	Point,            // .
 	Colon,            // :
 	ColonColon,       // ::
+	Bang,             // !
+	Comma,            // ,
 	Semicolon,        // ;
 	Equal,            // =
 	EqualEqual,       // ==
@@ -42,7 +38,6 @@ pub enum TokenValue {
 	LessEqual,        // <=
 	Greater,          // >
 	GreaterEqual,     // >=
-	ArrowRight,       // ->
 	ArrowLeft,        // <-
 
 	// Brackets
@@ -54,32 +49,20 @@ pub enum TokenValue {
 	CurlyClose,   // }
 
 	// Keywords
-	Use,
-	Mod,
-	Import,
 	Global,
 	Actions,
 	Function,
 	Let,
-	Type,
 	Par,
 	LAnd, // and
 	LOr,  // or
 	If,
 	Else,
 	While,
-	For,
 	Continue,
 	Break,
 	Return,
 	Spawn,
-
-	// Types
-	TVoid,   // void
-	TBool,   // bool
-	TNumber, // number
-	TString, // string
-	TAny,    // any
 
 	EoF,
 }
