@@ -111,12 +111,21 @@ impl<'c> Lexer<'c> {
 		}
 	}
 
-	fn lex_whitespace(&mut self) -> Option<()> {
-		// TODO: detect empty lines, necessary for auto formatting
+	fn lex_whitespace(&mut self) -> Option<TokenValue> {
 		let mut ret = None;
-		while [Some(&' '), Some(&'\t'), Some(&'\n')].contains(&self.chars.peek()) {
+		let mut line_break_cnt = 0;
+		while let Some(ch) = self.chars.peek() {
+			if *ch == '\n' {
+				line_break_cnt += 1;
+			} else if ![' ', '\t'].contains(ch) {
+				break;
+			}
 			self.get_char();
-			ret = Some(());
+			ret = Some(TokenValue::Whitespace);
+		}
+
+		if line_break_cnt > 2 {
+			ret = Some(TokenValue::EmptyLine);
 		}
 
 		ret

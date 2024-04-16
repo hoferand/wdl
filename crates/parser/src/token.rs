@@ -65,4 +65,8 @@ pub enum TokenValue {
 	Spawn,
 
 	EoF,
+
+	// Needed for auto formatting
+	Whitespace,
+	EmptyLine,
 }
