@@ -92,7 +92,7 @@ impl<'t> TokenStream<'t> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
-			TokenValue::Star => BinaryOperator::Multiply,
+			TokenValue::Asterisk => BinaryOperator::Multiply,
 			TokenValue::Slash => BinaryOperator::Divide,
 			TokenValue::Percent => BinaryOperator::Modulo,
 

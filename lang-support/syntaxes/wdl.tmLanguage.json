@@ -29,9 +29,18 @@
 	],
 	"repository": {
 		"comments": {
-			"name": "comment.line.wdl",
-			"begin": "//",
-			"end": "\n"
+			"patterns": [
+				{
+					"name": "comment.line.wdl",
+					"begin": "//",
+					"end": "\n"
+				},
+				{
+					"name": "comment.block.wdl",
+					"begin": "\\/\\*",
+					"end": "\\*\\/"
+				}
+			]
 		},
 		"operators": {
 			"patterns": [

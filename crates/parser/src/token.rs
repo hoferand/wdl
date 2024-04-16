@@ -21,7 +21,7 @@ pub enum TokenValue {
 	// Symbols
 	Plus,             // +
 	Minus,            // -
-	Star,             // *
+	Asterisk,         // *
 	Slash,            // /
 	Percent,          // %
 	QuestionQuestion, // ??
@@ -69,4 +69,6 @@ pub enum TokenValue {
 	// Needed for auto formatting
 	Whitespace,
 	EmptyLine,
+	SingleLineComment(String),
+	MultiLineComment(String),
 }

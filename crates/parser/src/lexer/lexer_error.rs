@@ -4,6 +4,6 @@ use ast::{Location, Span};
 pub enum LexerError {
 	InvalidCharacter { char: char, loc: Location },
 	InvalidNumber { src: String, span: Span },
-	UnexpectedEndOfString { src: String, span: Span },
+	UnexpectedEndOfFile,
 	InvalidEscape { char: char, loc: Location },
 }

@@ -18,7 +18,7 @@ impl Channel {
 		let (tx, rx) = mpsc::channel(buffer);
 
 		Self {
-			tx: tx,
+			tx,
 			rx: Arc::new(Mutex::new(rx)),
 		}
 	}

@@ -58,20 +58,26 @@ impl<'c> Lexer<'c> {
 						invalid = false;
 					}
 					Ok(Some(value)) => {
-						tokens.push(Token {
+						if !matches!(
 							value,
-							span: Span {
-								start: Location {
-									line: self.start_line,
-									column: self.start_column,
+							TokenValue::SingleLineComment(_) | TokenValue::MultiLineComment(_)
+						) {
+							tokens.push(Token {
+								value,
+								span: Span {
+									start: Location {
+										line: self.start_line,
+										column: self.start_column,
+									},
+									end: Location {
+										line: self.line,
+										column: self.column,
+									},
 								},
-								end: Location {
-									line: self.line,
-									column: self.column,
-								},
-							},
-							src: self.curr_src.clone(),
-						});
+								src: self.curr_src.clone(),
+							});
+						}
+
 						invalid = false;
 						break;
 					}
@@ -243,19 +249,7 @@ impl<'c> Lexer<'c> {
 		}
 
 		if !terminated {
-			Err(LexerError::UnexpectedEndOfString {
-				src: self.curr_src.clone(),
-				span: Span {
-					start: Location {
-						line: self.start_line,
-						column: self.start_column,
-					},
-					end: Location {
-						line: self.line,
-						column: self.column,
-					},
-				},
-			})
+			Err(LexerError::UnexpectedEndOfFile)
 		} else {
 			Ok(Some(string))
 		}
@@ -268,7 +262,7 @@ impl<'c> Lexer<'c> {
 		let mut value = match ch1 {
 			'+' => TokenValue::Plus,
 			'-' => TokenValue::Minus,
-			'*' => TokenValue::Star,
+			'*' => TokenValue::Asterisk,
 			'/' => TokenValue::Slash,
 			'%' => TokenValue::Percent,
 			'.' => TokenValue::Point,
@@ -295,9 +289,44 @@ impl<'c> Lexer<'c> {
 			return Ok(Some(value));
 		};
 		value = match (ch1, ch2) {
+			('/', '/') => {
+				let mut comment = String::new();
+
+				while let Some(ch) = self.get_char() {
+					if ch == '\n' {
+						break;
+					}
+					comment.push(ch);
+				}
+
+				TokenValue::SingleLineComment(comment)
+			}
+			('/', '*') => {
+				let mut comment = String::new();
+
+				let mut terminated = false;
+				let mut asterisk = false;
+				while let Some(ch) = self.get_char() {
+					if ch == '*' {
+						asterisk = true;
+					} else if asterisk && ch == '/' {
+						terminated = true;
+						break;
+					} else {
+						asterisk = false;
+					}
+					comment.push(ch);
+				}
+
+				if !terminated {
+					return Err(LexerError::UnexpectedEndOfFile);
+				}
+
+				comment.pop(); // remove * at the end
+
+				TokenValue::MultiLineComment(comment)
+			}
 			('<', '-') => TokenValue::ArrowLeft,
-			('/', '/') => todo!("implement comments"),
-			('/', '*') => todo!("implement comments"),
 			(':', ':') => TokenValue::ColonColon,
 			('?', '?') => TokenValue::QuestionQuestion,
 			('=', '=') => TokenValue::EqualEqual,
@@ -307,7 +336,12 @@ impl<'c> Lexer<'c> {
 
 			_ => return Ok(Some(value)),
 		};
-		self.get_char();
+		if !matches!(
+			value,
+			TokenValue::SingleLineComment(_) | TokenValue::MultiLineComment(_)
+		) {
+			self.get_char();
+		}
 
 		Ok(Some(value))
 	}
