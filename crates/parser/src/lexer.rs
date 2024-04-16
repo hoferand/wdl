@@ -197,15 +197,40 @@ impl<'c> Lexer<'c> {
 		}
 		self.get_char();
 
-		// TODO: handle escaped characters: \n, \\, ...
 		let mut string = String::new();
 		let mut terminated = false;
-		while let Some(next_char) = self.get_char() {
-			if next_char == '"' {
+		let mut escape = false;
+		let mut invalid_escape = None;
+		while let Some(mut next_char) = self.get_char() {
+			if escape {
+				escape = false;
+				next_char = match next_char {
+					'"' => '"',
+					'\\' => '\\',
+					'n' => '\n',
+					ch => {
+						invalid_escape = Some(LexerError::InvalidEscape {
+							char: ch,
+							loc: Location {
+								line: self.line,
+								column: self.column,
+							},
+						});
+						next_char
+					}
+				}
+			} else if next_char == '\\' {
+				escape = true;
+				continue;
+			} else if next_char == '"' {
 				terminated = true;
 				break;
 			}
 			string.push(next_char);
+		}
+
+		if let Some(err) = invalid_escape {
+			return Err(err);
 		}
 
 		if !terminated {
