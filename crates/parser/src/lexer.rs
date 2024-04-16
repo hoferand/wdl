@@ -3,9 +3,6 @@ pub use lexer_error::LexerError;
 
 use std::{iter::Peekable, str::Chars};
 
-use regex::Regex;
-use reqwest::Url;
-
 use ast::{Location, Span};
 
 use crate::{Token, TokenValue};
@@ -176,88 +173,12 @@ impl<'c> Lexer<'c> {
 
 		self.get_char();
 
-		let mut semantic_string = false;
 		while let Some(next_char) = self.chars.peek() {
-			if *next_char == '"' {
-				semantic_string = true;
-			} else if next_char.is_ascii_alphanumeric() || *next_char == '_' {
+			if next_char.is_ascii_alphanumeric() || *next_char == '_' {
 				self.get_char();
 				continue;
 			}
 			break;
-		}
-
-		if semantic_string {
-			match self.curr_src.as_str() {
-				"r" => {
-					if let Some(string) = self.parse_string()? {
-						if let Err(err) = Regex::new(&string) {
-							return Err(LexerError::ExternalError {
-								src: self.curr_src.clone(),
-								msg: err.to_string(),
-								span: Span {
-									start: Location {
-										line: self.start_line,
-										column: self.start_column,
-									},
-									end: Location {
-										line: self.line,
-										column: self.column,
-									},
-								},
-							});
-						} else {
-							return Ok(Some(TokenValue::String(string)));
-						}
-					};
-				}
-				"u" => {
-					if let Some(string) = self.parse_string()? {
-						let url = match Url::parse(&string) {
-							Err(err) => {
-								return Err(LexerError::ExternalError {
-									src: self.curr_src.clone(),
-									msg: err.to_string(),
-									span: Span {
-										start: Location {
-											line: self.start_line,
-											column: self.start_column,
-										},
-										end: Location {
-											line: self.line,
-											column: self.column,
-										},
-									},
-								});
-							}
-							Ok(u) => u,
-						};
-
-						if !["http", "https"].contains(&url.scheme()) {
-							return Err(LexerError::ExternalError {
-								src: self.curr_src.clone(),
-								msg: "Only 'http://' and 'https://' schemas are allowed!"
-									.to_owned(),
-								span: Span {
-									start: Location {
-										line: self.start_line,
-										column: self.start_column,
-									},
-									end: Location {
-										line: self.line,
-										column: self.column,
-									},
-								},
-							});
-						}
-
-						return Ok(Some(TokenValue::String(string)));
-					};
-				}
-				"s" => todo!(),
-				"a" => todo!(),
-				_ => (),
-			}
 		}
 
 		Ok(Some(Lexer::get_keyword(&self.curr_src)))
