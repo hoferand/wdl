@@ -204,9 +204,6 @@ impl<'c> Lexer<'c> {
 			if next_char == '"' {
 				terminated = true;
 				break;
-			} else if next_char == '\n' {
-				// TODO: rethink if multiline strings should be allowed
-				break;
 			}
 			string.push(next_char);
 		}
