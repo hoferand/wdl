@@ -8,9 +8,9 @@ pub use parser::*;
 pub mod error;
 pub use error::Error;
 
-use ast::Workflow;
+use ast::{Span, Workflow};
 
-pub fn get_ast(src_code: &str) -> Result<Workflow, Error> {
+pub fn get_ast(src_code: &str) -> Result<Workflow<Span>, Error> {
 	let lexer = Lexer::new(src_code);
 	let tokens = lexer.get_tokens()?;
 

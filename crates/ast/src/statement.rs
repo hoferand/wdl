@@ -27,21 +27,21 @@ pub use send::Send;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Node, Span};
+use crate::{Expression, Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Declaration {
-	GlobalDeclaration(Node<GlobalDeclaration>),
-	Actions(Node<Actions>),
-	FunctionDeclaration(Node<FunctionDeclaration>),
+pub enum Declaration<S: Source> {
+	GlobalDeclaration(Node<S, GlobalDeclaration<S>>),
+	Actions(Node<S, Actions<S>>),
+	FunctionDeclaration(Node<S, FunctionDeclaration<S>>),
 }
 
-impl Declaration {
-	pub fn get_span(&self) -> &Span {
+impl<S: Source> Declaration<S> {
+	pub fn get_src(&self) -> &S {
 		match self {
-			Declaration::GlobalDeclaration(stmt) => &stmt.span,
-			Declaration::Actions(stmt) => &stmt.span,
-			Declaration::FunctionDeclaration(stmt) => &stmt.span,
+			Declaration::GlobalDeclaration(stmt) => &stmt.src,
+			Declaration::Actions(stmt) => &stmt.src,
+			Declaration::FunctionDeclaration(stmt) => &stmt.src,
 		}
 	}
 
@@ -56,34 +56,34 @@ impl Declaration {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Statement {
-	Assignment(Node<Assignment>),
-	Expression(Expression),
-	Block(Node<Block>),
-	Break(Node<Break>),
-	Continue(Node<Continue>),
-	If(Node<If>),
-	Let(Node<Let>),
-	Par(Node<Par>),
-	Return(Node<Return>),
-	Send(Node<Send>),
-	While(Node<While>),
+pub enum Statement<S: Source> {
+	Assignment(Node<S, Assignment<S>>),
+	Expression(Expression<S>),
+	Block(Node<S, Block<S>>),
+	Break(Node<S, Break>),
+	Continue(Node<S, Continue>),
+	If(Node<S, If<S>>),
+	Let(Node<S, Let<S>>),
+	Par(Node<S, Par<S>>),
+	Return(Node<S, Return<S>>),
+	Send(Node<S, Send<S>>),
+	While(Node<S, While<S>>),
 }
 
-impl Statement {
-	pub fn get_span(&self) -> &Span {
+impl<S: Source> Statement<S> {
+	pub fn get_src(&self) -> &S {
 		match self {
-			Statement::Assignment(stmt) => &stmt.span,
-			Statement::Expression(expr) => expr.get_span(),
-			Statement::Block(stmt) => &stmt.span,
-			Statement::Break(stmt) => &stmt.span,
-			Statement::Continue(stmt) => &stmt.span,
-			Statement::If(stmt) => &stmt.span,
-			Statement::Let(stmt) => &stmt.span,
-			Statement::Par(stmt) => &stmt.span,
-			Statement::Return(stmt) => &stmt.span,
-			Statement::Send(stmt) => &stmt.span,
-			Statement::While(stmt) => &stmt.span,
+			Statement::Assignment(stmt) => &stmt.src,
+			Statement::Expression(expr) => expr.get_src(),
+			Statement::Block(stmt) => &stmt.src,
+			Statement::Break(stmt) => &stmt.src,
+			Statement::Continue(stmt) => &stmt.src,
+			Statement::If(stmt) => &stmt.src,
+			Statement::Let(stmt) => &stmt.src,
+			Statement::Par(stmt) => &stmt.src,
+			Statement::Return(stmt) => &stmt.src,
+			Statement::Send(stmt) => &stmt.src,
+			Statement::While(stmt) => &stmt.src,
 		}
 	}
 

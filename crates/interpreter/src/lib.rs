@@ -16,11 +16,11 @@ pub use error::Error;
 
 use std::{collections::HashMap, sync::Arc};
 
-use ast::{Identifier, Workflow};
+use ast::{Identifier, Span, Workflow};
 
 pub async fn start_workflow(
-	ast: Workflow,
-	vars: HashMap<Identifier, serde_json::Value>,
+	ast: Workflow<Span>,
+	vars: HashMap<Identifier, serde_json::Value>, // TODO: replace serde Value with own Value type
 ) -> Result<Order, Error> {
 	let global_env = Arc::new(Environment::new());
 
@@ -52,10 +52,7 @@ pub async fn start_workflow(
 }
 
 pub async fn run_order(order: Order) -> Result<(), Error> {
-	let global_env = Arc::new(order.env);
-	let inner_env = Arc::new(Environment::with_parent(Arc::clone(&global_env)));
-
-	stmt::interpret_actions(&order.workflow.actions, &inner_env, &global_env).await?;
+	stmt::interpret_actions(&order.workflow.actions, &order.env, &order.env).await?;
 
 	Ok(())
 }
@@ -99,9 +96,9 @@ mod tests {
 
 	use crate::value::Value;
 
-	fn create_node<T: Clone + Debug>(val: T) -> Node<T> {
+	fn create_node<T: Clone + Debug>(val: T) -> Node<Span, T> {
 		Node {
-			span: Span::default(),
+			src: Span::default(),
 			val,
 		}
 	}

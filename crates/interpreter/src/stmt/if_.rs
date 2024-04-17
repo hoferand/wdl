@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Else, If, Node};
+use ast::{Else, If, Node, Span};
 
 use crate::{Environment, Error, Interrupt};
 
@@ -10,7 +10,7 @@ use super::{interpret_block, interpret_expr};
 
 #[async_recursion]
 pub async fn interpret_if(
-	stmt: &Node<If>,
+	stmt: &Node<Span, If<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {

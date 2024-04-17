@@ -4,7 +4,7 @@ use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValu
 
 pub(crate) fn parse_global_declaration(
 	parser: &mut Parser,
-) -> Result<Node<GlobalDeclaration>, ParserError> {
+) -> Result<Node<Span, GlobalDeclaration<Span>>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Global)?.span.start.clone();
 
 	let Some(id_token) = parser.tokens.next().cloned() else {
@@ -18,7 +18,7 @@ pub(crate) fn parse_global_declaration(
 	};
 
 	let id_node = Node {
-		span: id_token.span,
+		src: id_token.span,
 		val: Identifier(id.to_owned()),
 	};
 
@@ -37,7 +37,7 @@ pub(crate) fn parse_global_declaration(
 		.clone();
 
 	Ok(Node {
-		span: Span { start, end },
+		src: Span { start, end },
 		val: GlobalDeclaration {
 			id: id_node,
 			value: Some(value),

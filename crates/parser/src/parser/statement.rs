@@ -29,7 +29,9 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::expression::parse_expression;
 
-pub(crate) fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaration>, ParserError> {
+pub(crate) fn parse_declaration(
+	parser: &mut Parser,
+) -> Result<Option<Declaration<Span>>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {
 		return Ok(None);
 	};
@@ -53,7 +55,7 @@ pub(crate) fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaratio
 	}))
 }
 
-pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, ParserError> {
+pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Span>>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {
 		return Ok(None);
 	};
@@ -91,9 +93,9 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 					let value = parse_expression(parser)?;
 
 					val = Statement::Assignment(Node {
-						span: Span {
-							start: id.span.start.clone(),
-							end: value.get_span().end.clone(),
+						src: Span {
+							start: id.src.start.clone(),
+							end: value.get_src().end.clone(),
 						},
 						val: Assignment {
 							id: id.val.id,
@@ -108,9 +110,9 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 				let value = parse_expression(parser)?;
 
 				val = Statement::Send(Node {
-					span: Span {
-						start: expr.get_span().start.clone(),
-						end: value.get_span().end.clone(),
+					src: Span {
+						start: expr.get_src().start.clone(),
+						end: value.get_src().end.clone(),
 					},
 					val: Send {
 						ch: Box::new(expr),

@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Identifier, Node};
+use crate::{Expression, Identifier, Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Let {
-	pub id: Node<Identifier>,
-	pub value: Expression,
+pub struct Let<S: Source> {
+	pub id: Node<S, Identifier>,
+	pub value: Expression<S>,
 }

@@ -27,13 +27,13 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::Expression;
+use ast::{Expression, Span};
 
 use crate::{Environment, Error, Value};
 
 #[async_recursion]
 pub async fn interpret_expr(
-	expr: &Expression,
+	expr: &Expression<Span>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Member, Node};
+use ast::{Member, Node, Span};
 
 use crate::{Environment, Error, Value};
 
@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_member(
-	expr: &Node<Member>,
+	expr: &Node<Span, Member<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
@@ -23,7 +23,7 @@ pub async fn interpret_member(
 	} else {
 		Err(Error::InvalidType {
 			msg: format!("`{}`.{}", value.get_type(), id.val.0),
-			span: expr.span.clone(),
+			span: expr.src.clone(),
 		})
 	}
 }

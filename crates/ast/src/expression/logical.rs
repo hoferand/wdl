@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Node};
+use crate::{Expression, Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Logical {
-	pub left: Box<Expression>,
-	pub op: Node<LogicalOperator>,
-	pub right: Box<Expression>,
+pub struct Logical<S: Source> {
+	pub left: Box<Expression<S>>,
+	pub op: Node<S, LogicalOperator>,
+	pub right: Box<Expression<S>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

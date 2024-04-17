@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Node, While};
+use ast::{Node, Span, While};
 
 use crate::{Environment, Error, Interrupt};
 
@@ -10,7 +10,7 @@ use super::{interpret_block, interpret_expr};
 
 #[async_recursion]
 pub async fn interpret_while(
-	while_: &Node<While>,
+	while_: &Node<Span, While<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {

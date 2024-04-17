@@ -3,7 +3,7 @@ use std::sync::Arc;
 use async_recursion::async_recursion;
 use futures::future::try_join_all;
 
-use ast::{Node, Par};
+use ast::{Node, Par, Span};
 
 use crate::{Environment, Error, Interrupt};
 
@@ -11,7 +11,7 @@ use super::interpret_block;
 
 #[async_recursion]
 pub async fn interpret_par(
-	stmt: &Node<Par>,
+	stmt: &Node<Span, Par<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<(), Error> {

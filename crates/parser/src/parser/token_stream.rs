@@ -1,4 +1,4 @@
-use ast::{BinaryOperator, Node, UnaryOperator};
+use ast::{BinaryOperator, Node, Span, UnaryOperator};
 
 use crate::{ParserError, Token, TokenValue};
 
@@ -48,7 +48,7 @@ impl<'t> TokenStream<'t> {
 		None
 	}
 
-	pub fn next_comp_op(&mut self) -> Option<Node<BinaryOperator>> {
+	pub fn next_comp_op(&mut self) -> Option<Node<Span, BinaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -65,12 +65,12 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: op,
 		})
 	}
 
-	pub fn next_add_op(&mut self) -> Option<Node<BinaryOperator>> {
+	pub fn next_add_op(&mut self) -> Option<Node<Span, BinaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -83,12 +83,12 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: op,
 		})
 	}
 
-	pub fn next_mul_op(&mut self) -> Option<Node<BinaryOperator>> {
+	pub fn next_mul_op(&mut self) -> Option<Node<Span, BinaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -102,12 +102,12 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: op,
 		})
 	}
 
-	pub fn next_unary_op(&mut self) -> Option<Node<UnaryOperator>> {
+	pub fn next_unary_op(&mut self) -> Option<Node<Span, UnaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -121,12 +121,12 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: op,
 		})
 	}
 
-	pub fn next_null_op(&mut self) -> Option<Node<BinaryOperator>> {
+	pub fn next_null_op(&mut self) -> Option<Node<Span, BinaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -138,7 +138,7 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: op,
 		})
 	}

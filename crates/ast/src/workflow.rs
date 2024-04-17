@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Actions, FunctionDeclaration, GlobalDeclaration, Node};
+use crate::{Actions, FunctionDeclaration, GlobalDeclaration, Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Workflow {
-	pub globals: Vec<Node<GlobalDeclaration>>,
-	pub actions: Node<Actions>,
-	pub functions: Vec<Node<FunctionDeclaration>>,
+pub struct Workflow<S: Source> {
+	pub globals: Vec<Node<S, GlobalDeclaration<S>>>,
+	pub actions: Node<S, Actions<S>>,
+	pub functions: Vec<Node<S, FunctionDeclaration<S>>>,
 }

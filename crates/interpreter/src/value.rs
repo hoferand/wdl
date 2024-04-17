@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt::Debug, sync::Arc};
 
-use ast::Function;
+use ast::{Function, Span};
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::{channel::Channel, wdl_std::StdFunction};
@@ -19,7 +19,7 @@ pub enum Value {
 
 #[derive(Clone)]
 pub enum FunctionValue {
-	Custom(Function),
+	Custom(Function<Span>),
 	Std(Arc<dyn StdFunction + Send + Sync>),
 }
 

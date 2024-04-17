@@ -2,7 +2,7 @@ use ast::{Identifier, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_identifier(parser: &mut Parser) -> Result<Node<Identifier>, ParserError> {
+pub(crate) fn parse_identifier(parser: &mut Parser) -> Result<Node<Span, Identifier>, ParserError> {
 	let Some(id_token) = parser.tokens.next() else {
 		return Err(ParserError::UnexpectedEoF); // TODO: improve error message
 	};
@@ -14,7 +14,7 @@ pub(crate) fn parse_identifier(parser: &mut Parser) -> Result<Node<Identifier>, 
 	};
 
 	Ok(Node {
-		span: Span {
+		src: Span {
 			start: id_token.span.start.clone(),
 			end: id_token.span.end.clone(),
 		},

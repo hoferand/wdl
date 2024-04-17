@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use crate::Expression;
+use crate::{Expression, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Return {
-	pub value: Expression,
+pub struct Return<S: Source> {
+	pub value: Expression<S>,
 }

@@ -6,26 +6,26 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::parse_expression;
 
-pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, ParserError> {
 	let Some(token) = parser.tokens.next() else {
 		return Err(ParserError::UnexpectedEoF);
 	};
 
 	let expr = match &token.value {
 		TokenValue::Null => Expression::Literal(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: Literal::Null,
 		}),
 		TokenValue::Bool(b) => Expression::Literal(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: Literal::Bool(*b),
 		}),
 		TokenValue::Number(n) => Expression::Literal(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: Literal::Number(*n),
 		}),
 		TokenValue::String(s) => Expression::Literal(Node {
-			span: token.span.clone(),
+			src: token.span.clone(),
 			val: Literal::String(s.to_owned()),
 		}),
 		TokenValue::ParenOpen => {
@@ -39,7 +39,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 				.clone();
 
 			Expression::Group(Node {
-				span: Span { start, end },
+				src: Span { start, end },
 				val: Group {
 					expression: Box::new(expr),
 				},
@@ -48,7 +48,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 		TokenValue::Identifier(id) => {
 			let mut scope = Vec::new();
 			scope.push(Node {
-				span: token.span.clone(),
+				src: token.span.clone(),
 				val: Identifier(id.to_owned()),
 			});
 
@@ -64,7 +64,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 
 				if let TokenValue::Identifier(id_str) = &id.value {
 					scope.push(Node {
-						span: id.span.clone(),
+						src: id.span.clone(),
 						val: Identifier(id_str.to_owned()),
 					});
 				}
@@ -72,16 +72,16 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 
 			let id = scope.pop().unwrap(); // can not fail
 
-			let start = id.span.start.clone();
+			let start = id.src.start.clone();
 			let end;
 			if let Some(s) = scope.first() {
-				end = s.span.end.clone();
+				end = s.src.end.clone();
 			} else {
-				end = id.span.end.clone();
+				end = id.src.end.clone();
 			}
 
 			Expression::Identifier(Node {
-				span: Span { start, end },
+				src: Span { start, end },
 				val: ScopedIdentifier { id, scope },
 			})
 		}
@@ -110,7 +110,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 				.clone();
 
 			Expression::Array(Node {
-				span: Span { start, end },
+				src: Span { start, end },
 				val: Array { values },
 			})
 		}
@@ -156,7 +156,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 				.clone();
 
 			Expression::Object(Node {
-				span: Span { start, end },
+				src: Span { start, end },
 				val: Object { values },
 			})
 		}

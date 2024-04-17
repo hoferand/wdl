@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{FunctionCall, Node};
+use ast::{FunctionCall, Node, Span};
 
 use crate::{
 	stmt,
@@ -14,7 +14,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_function_call(
-	expr: &Node<FunctionCall>,
+	expr: &Node<Span, FunctionCall<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
@@ -23,7 +23,7 @@ pub async fn interpret_function_call(
 		v => {
 			return Err(Error::InvalidType {
 				msg: format!("`{}`()", v.get_type()),
-				span: expr.val.function.get_span().clone(),
+				span: expr.val.function.get_src().clone(),
 			})
 		}
 	};
@@ -41,7 +41,7 @@ pub async fn interpret_function_call(
 						return Err(Error::ArityMismatch {
 							expected: function.parameter.len(),
 							given: expr.val.parameter.val.len(),
-							span: expr.val.parameter.span.clone(),
+							span: expr.val.parameter.src.clone(),
 						});
 					}
 					(Some(id_node), Some(val_expr)) => {
@@ -69,7 +69,7 @@ pub async fn interpret_function_call(
 			for (idx, arg) in expr.val.parameter.val.iter().enumerate() {
 				args.push(ArgumentValue {
 					idx: idx + 1,
-					span: arg.get_span().clone(),
+					span: arg.get_src().clone(),
 					val: interpret_expr(arg, env, g_env).await?,
 				});
 			}
@@ -77,7 +77,7 @@ pub async fn interpret_function_call(
 			let args = args.into_iter();
 			val = std_fn
 				.call_with_args(Arguments {
-					fn_span: expr.val.function.get_span().clone(),
+					fn_span: expr.val.function.get_src().clone(),
 					args,
 				})
 				.await?;

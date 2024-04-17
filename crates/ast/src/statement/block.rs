@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use crate::Statement;
+use crate::{Source, Statement};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Block {
-	pub stmts: Vec<Statement>,
+pub struct Block<S: Source> {
+	pub stmts: Vec<Statement<S>>,
 }

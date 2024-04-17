@@ -29,7 +29,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::Statement;
+use ast::{Span, Statement};
 
 use crate::{Environment, Error, Interrupt};
 
@@ -37,7 +37,7 @@ use super::expr::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_stmt(
-	stmt: &Statement,
+	stmt: &Statement<Span>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {

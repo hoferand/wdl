@@ -8,7 +8,7 @@ pub enum Error {
 		span: Span,
 	},
 	VariableNotFound {
-		id: ScopedIdentifier,
+		id: ScopedIdentifier<Span>,
 		span: Span,
 	},
 	InvalidType {

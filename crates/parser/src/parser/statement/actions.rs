@@ -4,7 +4,7 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::parse_block;
 
-pub(crate) fn parse_actions(parser: &mut Parser) -> Result<Node<Actions>, ParserError> {
+pub(crate) fn parse_actions(parser: &mut Parser) -> Result<Node<Span, Actions<Span>>, ParserError> {
 	let start = parser
 		.tokens
 		.expect(TokenValue::Actions)?
@@ -16,9 +16,9 @@ pub(crate) fn parse_actions(parser: &mut Parser) -> Result<Node<Actions>, Parser
 	parser.state.in_actions -= 1;
 
 	Ok(Node {
-		span: Span {
+		src: Span {
 			start,
-			end: block.span.end.clone(),
+			end: block.src.end.clone(),
 		},
 		val: Actions { block },
 	})

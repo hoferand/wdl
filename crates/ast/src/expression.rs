@@ -25,39 +25,39 @@ pub use spawn::Spawn;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{Node, Span};
+use crate::{Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Expression {
-	Array(Node<Array>),
-	Binary(Node<Binary>),
-	FunctionCall(Node<FunctionCall>),
-	Group(Node<Group>),
-	Identifier(Node<ScopedIdentifier>),
-	Literal(Node<Literal>),
-	Logical(Node<Logical>),
-	Member(Node<Member>),
-	Object(Node<Object>),
-	Offset(Node<Offset>),
-	Spawn(Node<Spawn>),
-	Unary(Node<Unary>),
+pub enum Expression<S: Source> {
+	Array(Node<S, Array<S>>),
+	Binary(Node<S, Binary<S>>),
+	FunctionCall(Node<S, FunctionCall<S>>),
+	Group(Node<S, Group<S>>),
+	Identifier(Node<S, ScopedIdentifier<S>>),
+	Literal(Node<S, Literal>),
+	Logical(Node<S, Logical<S>>),
+	Member(Node<S, Member<S>>),
+	Object(Node<S, Object<S>>),
+	Offset(Node<S, Offset<S>>),
+	Spawn(Node<S, Spawn<S>>),
+	Unary(Node<S, Unary<S>>),
 }
 
-impl Expression {
-	pub fn get_span(&self) -> &Span {
+impl<S: Source> Expression<S> {
+	pub fn get_src(&self) -> &S {
 		match self {
-			Self::Array(expr) => &expr.span,
-			Self::Binary(expr) => &expr.span,
-			Self::FunctionCall(expr) => &expr.span,
-			Self::Group(expr) => &expr.span,
-			Self::Identifier(expr) => &expr.span,
-			Self::Literal(expr) => &expr.span,
-			Self::Logical(expr) => &expr.span,
-			Self::Member(expr) => &expr.span,
-			Self::Object(expr) => &expr.span,
-			Self::Offset(expr) => &expr.span,
-			Self::Spawn(expr) => &expr.span,
-			Self::Unary(expr) => &expr.span,
+			Self::Array(expr) => &expr.src,
+			Self::Binary(expr) => &expr.src,
+			Self::FunctionCall(expr) => &expr.src,
+			Self::Group(expr) => &expr.src,
+			Self::Identifier(expr) => &expr.src,
+			Self::Literal(expr) => &expr.src,
+			Self::Logical(expr) => &expr.src,
+			Self::Member(expr) => &expr.src,
+			Self::Object(expr) => &expr.src,
+			Self::Offset(expr) => &expr.src,
+			Self::Spawn(expr) => &expr.src,
+			Self::Unary(expr) => &expr.src,
 		}
 	}
 }

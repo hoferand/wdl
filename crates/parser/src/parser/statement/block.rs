@@ -4,7 +4,7 @@ use crate::{Parser, ParserError, Token, TokenValue};
 
 use super::parse_statement;
 
-pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Block>, ParserError> {
+pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Span, Block<Span>>, ParserError> {
 	let start = parser
 		.tokens
 		.expect(TokenValue::CurlyOpen)?
@@ -39,7 +39,7 @@ pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Block>, ParserErro
 		.clone();
 
 	Ok(Node {
-		span: Span { start, end },
+		src: Span { start, end },
 		val: Block { stmts },
 	})
 }

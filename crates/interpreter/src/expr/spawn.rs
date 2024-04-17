@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Node, Spawn};
+use ast::{Node, Span, Spawn};
 
 use crate::{channel::Channel, Environment, Error, Value};
 
@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_spawn(
-	expr: &Node<Spawn>,
+	expr: &Node<Span, Spawn<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {

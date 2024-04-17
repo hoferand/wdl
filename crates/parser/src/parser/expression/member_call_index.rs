@@ -4,7 +4,9 @@ use crate::{parser::identifier::parse_identifier, Parser, ParserError, TokenValu
 
 use super::{parse_atomic, parse_expression};
 
-pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub(crate) fn parse_member_call_index(
+	parser: &mut Parser,
+) -> Result<Expression<Span>, ParserError> {
 	let mut expr = parse_atomic(parser)?;
 
 	loop {
@@ -29,14 +31,14 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 				.clone();
 
 			expr = Expression::FunctionCall(Node {
-				span: Span {
-					start: expr.get_span().start.clone(),
+				src: Span {
+					start: expr.get_src().start.clone(),
 					end: end.clone(),
 				},
 				val: FunctionCall {
 					function: Box::new(expr),
 					parameter: Node {
-						span: Span { start, end },
+						src: Span { start, end },
 						val: parameter,
 					},
 				},
@@ -55,7 +57,7 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 				.clone();
 
 			expr = Expression::Offset(Node {
-				span: Span { start, end },
+				src: Span { start, end },
 				val: Offset {
 					value: Box::new(expr),
 					offset: Box::new(offset),
@@ -68,9 +70,9 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 			let id = parse_identifier(parser)?;
 
 			expr = Expression::Member(Node {
-				span: Span {
+				src: Span {
 					start,
-					end: id.span.end.clone(),
+					end: id.src.end.clone(),
 				},
 				val: Member {
 					object: Box::new(expr),

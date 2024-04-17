@@ -21,16 +21,16 @@ use ast::{Expression, Node, Span, Spawn};
 
 use crate::{Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_expression(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub(crate) fn parse_expression(parser: &mut Parser) -> Result<Expression<Span>, ParserError> {
 	let spawn_option = parser.tokens.want(TokenValue::Spawn).cloned();
 
 	let expr = parse_or(parser)?;
 
 	if let Some(spawn) = spawn_option {
 		Ok(Expression::Spawn(Node {
-			span: Span {
+			src: Span {
 				start: spawn.span.start.clone(),
-				end: expr.get_span().end.clone(),
+				end: expr.get_src().end.clone(),
 			},
 			val: Spawn {
 				expr: Box::new(expr),

@@ -7,7 +7,7 @@ use crate::{
 
 pub(crate) fn parse_function_declaration(
 	parser: &mut Parser,
-) -> Result<Node<FunctionDeclaration>, ParserError> {
+) -> Result<Node<Span, FunctionDeclaration<Span>>, ParserError> {
 	let start = parser
 		.tokens
 		.expect(TokenValue::Function)?
@@ -20,9 +20,9 @@ pub(crate) fn parse_function_declaration(
 	let function = parse_function(parser)?;
 
 	Ok(Node {
-		span: Span {
+		src: Span {
 			start,
-			end: function.span.end.clone(),
+			end: function.src.end.clone(),
 		},
 		val: FunctionDeclaration { id, function },
 	})

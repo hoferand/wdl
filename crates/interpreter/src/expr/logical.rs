@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Logical, LogicalOperator, Node};
+use ast::{Logical, LogicalOperator, Node, Span};
 
 use crate::{Environment, Error, Value};
 
@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_logical(
-	expr: &Node<Logical>,
+	expr: &Node<Span, Logical<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {

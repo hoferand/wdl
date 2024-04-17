@@ -11,7 +11,7 @@ use statement::*;
 mod function;
 mod identifier;
 
-use ast::{Actions, Declaration, Node, Workflow};
+use ast::{Actions, Declaration, Node, Span, Workflow};
 
 use crate::Token;
 
@@ -28,9 +28,9 @@ impl<'t> Parser<'t> {
 		}
 	}
 
-	pub fn parse(mut self) -> Result<Workflow, ParserError> {
+	pub fn parse(mut self) -> Result<Workflow<Span>, ParserError> {
 		let mut globals = Vec::new();
-		let mut wf_actions: Option<Node<Actions>> = None;
+		let mut wf_actions: Option<Node<Span, Actions<Span>>> = None;
 		let mut functions = Vec::new();
 
 		while let Some(stmt) = parse_declaration(&mut self)? {
@@ -39,8 +39,8 @@ impl<'t> Parser<'t> {
 				Declaration::Actions(actions) => {
 					if let Some(actions1) = wf_actions {
 						return Err(ParserError::SecondActions {
-							actions1: actions1.span.clone(),
-							actions2: actions.span,
+							actions1: actions1.src.clone(),
+							actions2: actions.src,
 						});
 					} else {
 						wf_actions = Some(actions);

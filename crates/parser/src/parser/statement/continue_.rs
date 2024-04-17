@@ -2,7 +2,7 @@ use ast::{Continue, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_continue(parser: &mut Parser) -> Result<Node<Continue>, ParserError> {
+pub(crate) fn parse_continue(parser: &mut Parser) -> Result<Node<Span, Continue>, ParserError> {
 	let token = parser.tokens.expect(TokenValue::Continue)?;
 
 	if parser.state.in_par > 0 || parser.state.in_loop < 1 {
@@ -22,7 +22,7 @@ pub(crate) fn parse_continue(parser: &mut Parser) -> Result<Node<Continue>, Pars
 		.clone();
 
 	Ok(Node {
-		span: Span { start, end },
+		src: Span { start, end },
 		val: Continue,
 	})
 }

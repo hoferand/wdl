@@ -1,3 +1,4 @@
+use ast::Span;
 use serde::Deserialize;
 
 use logger::log;
@@ -7,7 +8,7 @@ use ast::ScopedIdentifier;
 
 use crate::{wdl_std::get_handler, Error, Value};
 
-pub fn resolve_id(id: &ScopedIdentifier) -> Option<Value> {
+pub fn resolve_id(id: &ScopedIdentifier<Span>) -> Option<Value> {
 	if id.scope.len() > 1 {
 		return None;
 	}

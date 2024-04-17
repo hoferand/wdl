@@ -4,7 +4,9 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::{identifier::parse_identifier, statement::parse_block};
 
-pub(crate) fn parse_function(parser: &mut Parser) -> Result<Node<Function>, ParserError> {
+pub(crate) fn parse_function(
+	parser: &mut Parser,
+) -> Result<Node<Span, Function<Span>>, ParserError> {
 	let start = parser
 		.tokens
 		.expect(TokenValue::ParenOpen)?
@@ -20,7 +22,7 @@ pub(crate) fn parse_function(parser: &mut Parser) -> Result<Node<Function>, Pars
 		}
 		let id = parse_identifier(parser)?;
 		parameter.push(Node {
-			span: id.span.clone(),
+			src: id.src.clone(),
 			val: Parameter { id },
 		});
 		parser.tokens.want(TokenValue::Comma);
@@ -34,9 +36,9 @@ pub(crate) fn parse_function(parser: &mut Parser) -> Result<Node<Function>, Pars
 	parser.state.in_function -= 1;
 
 	Ok(Node {
-		span: Span {
+		src: Span {
 			start,
-			end: body.span.end.clone(),
+			end: body.src.end.clone(),
 		},
 		val: Function { parameter, body },
 	})

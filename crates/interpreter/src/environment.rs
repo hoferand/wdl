@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use async_recursion::async_recursion;
 use tokio::sync::RwLock;
 
-use ast::{Identifier, Node, ScopedIdentifier};
+use ast::{Identifier, Node, ScopedIdentifier, Span};
 
 use crate::{Error, Value};
 
@@ -33,13 +33,13 @@ impl Environment {
 		}
 	}
 
-	pub async fn declare(&self, id: Node<Identifier>, val: Value) -> Result<(), Error> {
+	pub async fn declare(&self, id: Node<Span, Identifier>, val: Value) -> Result<(), Error> {
 		// TODO: check if variable shadowing should be allowed
 		let mut lock = self.variables.write().await;
 		if lock.contains_key(&id.val) {
 			return Err(Error::VariableAlreadyInUse {
 				id: id.val,
-				span: id.span,
+				span: id.src,
 			});
 		}
 		lock.insert(id.val, val);
@@ -47,14 +47,14 @@ impl Environment {
 		Ok(())
 	}
 
-	pub async fn assign(&self, id: Node<Identifier>, val: Value) -> Result<(), Error> {
+	pub async fn assign(&self, id: Node<Span, Identifier>, val: Value) -> Result<(), Error> {
 		let Some(env) = self.resolve(&id.val).await else {
 			return Err(Error::VariableNotFound {
 				id: ScopedIdentifier {
 					id: id.clone(),
 					scope: Vec::new(),
 				},
-				span: id.span,
+				span: id.src,
 			});
 		};
 		env.write().await.insert(id.val, val);
@@ -62,7 +62,7 @@ impl Environment {
 		Ok(())
 	}
 
-	pub async fn get(&self, id: &Node<Identifier>) -> Option<Value> {
+	pub async fn get(&self, id: &Node<Span, Identifier>) -> Option<Value> {
 		if let Some(env) = self.resolve(&id.val).await {
 			if let Some(value) = env.read().await.get(&id.val) {
 				return Some(value.clone());

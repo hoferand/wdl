@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Block, Node};
+use ast::{Block, Node, Span};
 
 use crate::{Environment, Error, Interrupt};
 
@@ -10,7 +10,7 @@ use super::interpret_stmt;
 
 #[async_recursion]
 pub async fn interpret_block(
-	stmt: &Node<Block>,
+	stmt: &Node<Span, Block<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {

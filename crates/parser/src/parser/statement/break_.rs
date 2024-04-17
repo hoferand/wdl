@@ -2,7 +2,7 @@ use ast::{Break, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_break(parser: &mut Parser) -> Result<Node<Break>, ParserError> {
+pub(crate) fn parse_break(parser: &mut Parser) -> Result<Node<Span, Break>, ParserError> {
 	let token = parser.tokens.expect(TokenValue::Break)?;
 
 	if parser.state.in_par > 0 || parser.state.in_loop < 1 {
@@ -22,7 +22,7 @@ pub(crate) fn parse_break(parser: &mut Parser) -> Result<Node<Break>, ParserErro
 		.clone();
 
 	Ok(Node {
-		span: Span { start, end },
+		src: Span { start, end },
 		val: Break,
 	})
 }

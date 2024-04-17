@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Node};
+use crate::{Expression, Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Binary {
-	pub left: Box<Expression>,
-	pub op: Node<BinaryOperator>,
-	pub right: Box<Expression>,
+pub struct Binary<S: Source> {
+	pub left: Box<Expression<S>>,
+	pub op: Node<S, BinaryOperator>,
+	pub right: Box<Expression<S>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

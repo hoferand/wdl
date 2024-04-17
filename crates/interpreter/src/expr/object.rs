@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use async_recursion::async_recursion;
 
-use ast::{Node, Object};
+use ast::{Node, Object, Span};
 
 use crate::{Environment, Error, Value};
 
@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_object(
-	expr: &Node<Object>,
+	expr: &Node<Span, Object<Span>>,
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
