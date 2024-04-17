@@ -16,7 +16,7 @@ pub async fn interpret_actions(
 ) -> Result<Interrupt, Error> {
 	let ret = interpret_block(&stmt.val.block, env, g_env).await?;
 	if !ret.is_none() {
-		return Err(Error::Fatal(format!(
+		return Err(Error::fatal(format!(
 			"AST invalid, `{}` in actions block found",
 			ret.get_type()
 		)));

@@ -7,7 +7,7 @@ use ast::{FunctionCall, Node, Span};
 use crate::{
 	stmt,
 	wdl_std::{ArgumentValue, Arguments},
-	Environment, Error, FunctionValue, Interrupt, Value,
+	Environment, Error, ErrorKind, FunctionValue, Interrupt, Value,
 };
 
 use super::interpret_expr;
@@ -21,10 +21,12 @@ pub async fn interpret_function_call(
 	let function_val = match interpret_expr(&expr.val.function, env, g_env).await? {
 		Value::Function(f) => f,
 		v => {
-			return Err(Error::InvalidType {
-				msg: format!("`{}`()", v.get_type()),
-				span: expr.val.function.get_src().clone(),
-			})
+			return Err(Error {
+				kind: ErrorKind::InvalidType {
+					msg: format!("`{}`()", v.get_type()),
+				},
+				src: Some(expr.val.function.get_src().clone()),
+			});
 		}
 	};
 
@@ -38,10 +40,12 @@ pub async fn interpret_function_call(
 			loop {
 				match (ids.next(), vals.next()) {
 					(None, Some(_)) | (Some(_), None) => {
-						return Err(Error::ArityMismatch {
-							expected: function.parameter.len(),
-							given: expr.val.parameter.val.len(),
-							span: expr.val.parameter.src.clone(),
+						return Err(Error {
+							kind: ErrorKind::ArityMismatch {
+								expected: function.parameter.len(),
+								given: expr.val.parameter.val.len(),
+							},
+							src: Some(expr.val.parameter.src.clone()),
 						});
 					}
 					(Some(id_node), Some(val_expr)) => {
@@ -57,7 +61,7 @@ pub async fn interpret_function_call(
 				Interrupt::None => val = Value::Null,
 				Interrupt::Return(ret_val) => val = ret_val,
 				int @ (Interrupt::Continue | Interrupt::Break) => {
-					return Err(Error::Fatal(format!(
+					return Err(Error::fatal(format!(
 						"AST invalid, {} inside of function found",
 						int.get_type()
 					)));

@@ -121,39 +121,33 @@ async fn compile(file: &str) -> ExitCode {
 }
 
 fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
-	match error {
-		interpreter::Error::Fatal(msg) => error!("{}!", msg),
-		interpreter::Error::VariableAlreadyInUse { id, span } => {
+	match &error.kind {
+		interpreter::ErrorKind::Fatal(msg) => error!("{}!", msg),
+		interpreter::ErrorKind::VariableAlreadyInUse { id } => {
 			error!("Variable `{}` already in use!", id.0);
-			print_error_location(&span.start, &span.end, src_code);
 		}
-		interpreter::Error::VariableNotFound { id, span } => {
+		interpreter::ErrorKind::VariableNotFound { id } => {
 			error!("Variable `{}` not found!", id.to_string());
-			print_error_location(&span.start, &span.end, src_code);
 		}
-		interpreter::Error::InvalidType { msg, span } => {
+		interpreter::ErrorKind::InvalidType { msg } => {
 			error!("Invalid types, {}!", msg);
-			print_error_location(&span.start, &span.end, src_code);
 		}
-		interpreter::Error::DivisionByZero { span } => {
+		interpreter::ErrorKind::DivisionByZero => {
 			error!("Division by zero!");
-			print_error_location(&span.start, &span.end, src_code);
 		}
-		interpreter::Error::ArityMismatch {
-			expected,
-			given,
-			span,
-		} => {
+		interpreter::ErrorKind::ArityMismatch { expected, given } => {
 			error!(
 				"Invalid count of function call parameter, expected `{}`, given `{}`!",
 				expected, given
 			);
-			print_error_location(&span.start, &span.end, src_code);
 		}
-		interpreter::Error::TooFewArguments { span } => {
+		interpreter::ErrorKind::TooFewArguments => {
 			error!("Too few arguments given for function call!");
-			print_error_location(&span.start, &span.end, src_code);
 		}
+	}
+
+	if let Some(ref span) = error.src {
+		print_error_location(&span.start, &span.end, src_code);
 	}
 }
 

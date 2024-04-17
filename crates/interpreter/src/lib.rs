@@ -5,6 +5,7 @@ use interrupt::Interrupt;
 mod value;
 use value::*;
 mod channel;
+use channel::Channel;
 mod expr;
 mod stmt;
 mod wdl_std;
@@ -12,7 +13,7 @@ mod wdl_std;
 pub mod order;
 pub use order::Order;
 pub mod error;
-pub use error::Error;
+pub use error::*;
 
 use std::{collections::HashMap, sync::Arc};
 
@@ -29,7 +30,7 @@ pub async fn start_workflow(
 		let mut default = None;
 		if let Some(json_val) = vars.get(&global_decl.val.id.val) {
 			let Some(val) = convert_json_to_value(json_val.clone()) else {
-				return Err(Error::Fatal(format!(
+				return Err(Error::fatal(format!(
 					"Invalid value for variable `{}` given",
 					&global_decl.val.id.val.0
 				)));

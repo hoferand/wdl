@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Node, ScopedIdentifier, Span};
 
-use crate::{wdl_std::resolve_id, Environment, Error, Value};
+use crate::{wdl_std::resolve_id, Environment, Error, ErrorKind, Value};
 
 #[async_recursion]
 pub async fn interpret_identifier(
@@ -19,9 +19,11 @@ pub async fn interpret_identifier(
 	if let Some(std_fn) = resolve_id(&expr.val) {
 		Ok(std_fn)
 	} else {
-		Err(Error::VariableNotFound {
-			id: expr.val.clone(),
-			span: expr.val.id.src.clone(),
+		Err(Error {
+			kind: ErrorKind::VariableNotFound {
+				id: expr.val.clone(),
+			},
+			src: Some(expr.val.id.src.clone()),
 		})
 	}
 }

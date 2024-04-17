@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Member, Node, Span};
 
-use crate::{Environment, Error, Value};
+use crate::{Environment, Error, ErrorKind, Value};
 
 use super::interpret_expr;
 
@@ -21,9 +21,11 @@ pub async fn interpret_member(
 	if let Value::Object(o) = value {
 		Ok(o.get(&id.val.0).unwrap_or(&Value::Null).clone())
 	} else {
-		Err(Error::InvalidType {
-			msg: format!("`{}`.{}", value.get_type(), id.val.0),
-			span: expr.src.clone(),
+		Err(Error {
+			kind: ErrorKind::InvalidType {
+				msg: format!("`{}`.{}", value.get_type(), id.val.0),
+			},
+			src: Some(expr.src.clone()),
 		})
 	}
 }

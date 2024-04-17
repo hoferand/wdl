@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::{channel::Channel, Error, Value};
+use crate::{Channel, Error, ErrorKind, Value};
 
 use super::Arguments;
 
@@ -17,9 +17,11 @@ where
 			let json_val = match serde_json::to_value(arg.val) {
 				Ok(val) => val,
 				Err(err) => {
-					return Err(Error::InvalidType {
-						msg: err.to_string(),
-						span: arg.span,
+					return Err(Error {
+						kind: ErrorKind::InvalidType {
+							msg: err.to_string(),
+						},
+						src: Some(arg.span),
 					});
 				}
 			};
@@ -27,16 +29,19 @@ where
 			let rust_val = match serde_json::from_value(json_val) {
 				Ok(val) => val,
 				Err(err) => {
-					return Err(Error::InvalidType {
-						msg: err.to_string(),
-						span: arg.span,
+					return Err(Error {
+						kind: ErrorKind::InvalidType {
+							msg: err.to_string(),
+						},
+						src: Some(arg.span),
 					});
 				}
 			};
 			Ok(rust_val)
 		} else {
-			Err(Error::TooFewArguments {
-				span: args.fn_span.clone(),
+			Err(Error {
+				kind: ErrorKind::TooFewArguments,
+				src: Some(args.fn_span.clone()),
 			})
 		}
 	}
@@ -48,14 +53,17 @@ impl FromArguments for Channel {
 			if let Value::Channel(ch) = arg.val {
 				Ok(ch)
 			} else {
-				Err(Error::InvalidType {
-					msg: format!("Expected channel but got `{}`", arg.val.get_type()),
-					span: arg.span,
+				Err(Error {
+					kind: ErrorKind::InvalidType {
+						msg: format!("Expected channel but got `{}`", arg.val.get_type()),
+					},
+					src: Some(arg.span),
 				})
 			}
 		} else {
-			Err(Error::TooFewArguments {
-				span: args.fn_span.clone(),
+			Err(Error {
+				kind: ErrorKind::TooFewArguments,
+				src: Some(args.fn_span.clone()),
 			})
 		}
 	}

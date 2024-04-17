@@ -1,6 +1,6 @@
 use ast::{ScopedIdentifier, Span};
 
-use crate::{channel::Channel, wdl_std::get_handler, Error, Value};
+use crate::{wdl_std::get_handler, Channel, Error, Value};
 
 pub fn resolve_id(id: &ScopedIdentifier<Span>) -> Option<Value> {
 	if id.scope.len() > 1 {
@@ -17,7 +17,7 @@ pub fn resolve_id(id: &ScopedIdentifier<Span>) -> Option<Value> {
 pub async fn new(buffer: f64) -> Result<Channel, Error> {
 	if buffer < 1.0 {
 		// TODO: improve error message
-		return Err(Error::Fatal(format!(
+		return Err(Error::fatal(format!(
 			"The buffer size for a channel must be at least `1`, but `{}` given",
 			buffer
 		)));

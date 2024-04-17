@@ -19,7 +19,7 @@ pub fn resolve_id(id: &ScopedIdentifier<Span>) -> Option<Value> {
 
 async fn match_(regex: String, haystack: String) -> Result<bool, Error> {
 	let Ok(regex) = Regex::new(&regex) else {
-		return Err(Error::Fatal(format!("Invalid regex pattern `{}`", regex)));
+		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
 	};
 
 	Ok(regex.is_match(&haystack))
@@ -27,7 +27,7 @@ async fn match_(regex: String, haystack: String) -> Result<bool, Error> {
 
 async fn find(regex: String, haystack: String) -> Result<Vec<String>, Error> {
 	let Ok(regex) = Regex::new(&regex) else {
-		return Err(Error::Fatal(format!("Invalid regex pattern `{}`", regex)));
+		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
 	};
 
 	Ok(regex
@@ -38,7 +38,7 @@ async fn find(regex: String, haystack: String) -> Result<Vec<String>, Error> {
 
 async fn replace(regex: String, haystack: String, replace: String) -> Result<String, Error> {
 	let Ok(regex) = Regex::new(&regex) else {
-		return Err(Error::Fatal(format!("Invalid regex pattern `{}`", regex)));
+		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
 	};
 
 	Ok(regex.replace_all(&haystack, &replace).to_string())

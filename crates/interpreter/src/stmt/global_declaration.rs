@@ -20,7 +20,7 @@ pub async fn interpret_global_declaration(
 	} else if let Some(expr) = &stmt.val.value {
 		value = interpret_expr(expr, g_env, g_env).await?;
 	} else {
-		return Err(Error::Fatal(format!(
+		return Err(Error::fatal(format!(
 			"Missing value for global variable `{}`",
 			id.val.0
 		)));

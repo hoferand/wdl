@@ -3,7 +3,7 @@ use std::{collections::HashMap, fmt::Debug, sync::Arc};
 use ast::{Function, Span};
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::{channel::Channel, wdl_std::StdFunction};
+use crate::{wdl_std::StdFunction, Channel};
 
 #[derive(Debug, Clone)]
 pub enum Value {

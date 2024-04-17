@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Span, Spawn};
 
-use crate::{channel::Channel, Environment, Error, Value};
+use crate::{Channel, Environment, Error, Value};
 
 use super::interpret_expr;
 

@@ -24,7 +24,7 @@ pub async fn interpret_par(
 		match ret {
 			Interrupt::None | Interrupt::Break => {}
 			_ => {
-				return Err(Error::Fatal(format!(
+				return Err(Error::fatal(format!(
 					"AST invalid, `{}` in par block found",
 					ret.get_type()
 				)));

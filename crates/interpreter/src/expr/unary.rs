@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Span, Unary, UnaryOperator};
 
-use crate::{Environment, Error, Value};
+use crate::{Environment, Error, ErrorKind, Value};
 
 use super::interpret_expr;
 
@@ -26,9 +26,11 @@ pub async fn interpret_unary(
 fn negate(val: &Value, span: &Span) -> Result<Value, Error> {
 	match val {
 		Value::Number(n) => Ok(Value::Number(-(*n))),
-		_ => Err(Error::InvalidType {
-			msg: format!("-`{}`", val.get_type()),
-			span: span.clone(),
+		_ => Err(Error {
+			kind: ErrorKind::InvalidType {
+				msg: format!("-`{}`", val.get_type()),
+			},
+			src: Some(span.clone()),
 		}),
 	}
 }
@@ -40,10 +42,10 @@ pub async fn receive(ch: Value, _span: &Span) -> Result<Value, Error> {
 			if let Some(v) = ch.receive().await {
 				Ok(v)
 			} else {
-				Err(Error::Fatal("Cannot receive on closed channel".to_owned()))
+				Err(Error::fatal("Cannot receive on closed channel".to_owned()))
 			}
 		}
-		val => Err(Error::Fatal(format!(
+		val => Err(Error::fatal(format!(
 			"Cannot receive on type `{}`",
 			val.get_type()
 		))),

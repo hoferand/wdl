@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Offset, Span};
 
-use crate::{Environment, Error, Value};
+use crate::{Environment, Error, ErrorKind, Value};
 
 use super::interpret_expr;
 
@@ -23,9 +23,11 @@ pub async fn interpret_offset(
 		// TODO: (Value::String(s), Value::Number(n)) => todo!(),
 		(Value::Object(o), Value::String(s)) => o.get(s).unwrap_or(&Value::Null).clone(),
 		_ => {
-			return Err(Error::InvalidType {
-				msg: format!("`{}`[`{}`]", value.get_type(), offset.get_type()),
-				span: expr.src.clone(),
+			return Err(Error {
+				kind: ErrorKind::InvalidType {
+					msg: format!("`{}`[`{}`]", value.get_type(), offset.get_type()),
+				},
+				src: Some(expr.src.clone()),
 			});
 		}
 	};

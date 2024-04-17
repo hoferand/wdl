@@ -1,29 +1,27 @@
 use ast::{Identifier, ScopedIdentifier, Span};
 
 #[derive(Debug)]
-pub enum Error {
+pub struct Error {
+	pub kind: ErrorKind,
+	pub src: Option<Span>, // TODO: replace by generic Source type
+}
+
+impl Error {
+	pub fn fatal(msg: String) -> Self {
+		Error {
+			kind: ErrorKind::Fatal(msg),
+			src: None,
+		}
+	}
+}
+
+#[derive(Debug)]
+pub enum ErrorKind {
 	Fatal(String),
-	VariableAlreadyInUse {
-		id: Identifier,
-		span: Span,
-	},
-	VariableNotFound {
-		id: ScopedIdentifier<Span>,
-		span: Span,
-	},
-	InvalidType {
-		msg: String,
-		span: Span,
-	},
-	DivisionByZero {
-		span: Span,
-	},
-	ArityMismatch {
-		expected: usize,
-		given: usize,
-		span: Span,
-	},
-	TooFewArguments {
-		span: Span,
-	},
+	VariableAlreadyInUse { id: Identifier },
+	VariableNotFound { id: ScopedIdentifier<Span> },
+	InvalidType { msg: String },
+	DivisionByZero,
+	ArityMismatch { expected: usize, given: usize },
+	TooFewArguments,
 }

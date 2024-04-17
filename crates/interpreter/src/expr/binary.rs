@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Binary, BinaryOperator, Node, Span};
 
-use crate::{Environment, Error, Value};
+use crate::{Environment, Error, ErrorKind, Value};
 
 use super::interpret_expr;
 
@@ -41,9 +41,11 @@ fn add(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(*n1 + *n2)),
 		(Value::String(s1), v) => Ok(Value::String(s1.to_owned() + &v.to_string())),
-		_ => Err(Error::InvalidType {
-			msg: format!("`{}` + `{}`", left.get_type(), right.get_type()),
-			span: span.clone(),
+		_ => Err(Error {
+			kind: ErrorKind::InvalidType {
+				msg: format!("`{}` + `{}`", left.get_type(), right.get_type()),
+			},
+			src: Some(span.clone()),
 		}),
 	}
 }
@@ -51,9 +53,11 @@ fn add(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 fn sub(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(*n1 - *n2)),
-		_ => Err(Error::InvalidType {
-			msg: format!("`{}` - `{}`", left.get_type(), right.get_type()),
-			span: span.clone(),
+		_ => Err(Error {
+			kind: ErrorKind::InvalidType {
+				msg: format!("`{}` - `{}`", left.get_type(), right.get_type()),
+			},
+			src: Some(span.clone()),
 		}),
 	}
 }
@@ -61,9 +65,11 @@ fn sub(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 fn mul(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(*n1 * *n2)),
-		_ => Err(Error::InvalidType {
-			msg: format!("`{}` * `{}`", left.get_type(), right.get_type()),
-			span: span.clone(),
+		_ => Err(Error {
+			kind: ErrorKind::InvalidType {
+				msg: format!("`{}` * `{}`", left.get_type(), right.get_type()),
+			},
+			src: Some(span.clone()),
 		}),
 	}
 }
@@ -72,13 +78,18 @@ fn div(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => {
 			if *n2 == 0.0 {
-				return Err(Error::DivisionByZero { span: span.clone() });
+				return Err(Error {
+					kind: ErrorKind::DivisionByZero,
+					src: Some(span.clone()),
+				});
 			}
 			Ok(Value::Number(*n1 / *n2))
 		}
-		_ => Err(Error::InvalidType {
-			msg: format!("`{}` / `{}`", left.get_type(), right.get_type()),
-			span: span.clone(),
+		_ => Err(Error {
+			kind: ErrorKind::InvalidType {
+				msg: format!("`{}` / `{}`", left.get_type(), right.get_type()),
+			},
+			src: Some(span.clone()),
 		}),
 	}
 }
@@ -87,13 +98,18 @@ fn mod_(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 	match (left, right) {
 		(Value::Number(n1), Value::Number(n2)) => {
 			if *n2 == 0.0 {
-				return Err(Error::DivisionByZero { span: span.clone() });
+				return Err(Error {
+					kind: ErrorKind::DivisionByZero,
+					src: Some(span.clone()),
+				});
 			}
 			Ok(Value::Number(*n1 % *n2))
 		}
-		_ => Err(Error::InvalidType {
-			msg: format!("`{}` % `{}`", left.get_type(), right.get_type()),
-			span: span.clone(),
+		_ => Err(Error {
+			kind: ErrorKind::InvalidType {
+				msg: format!("`{}` % `{}`", left.get_type(), right.get_type()),
+			},
+			src: Some(span.clone()),
 		}),
 	}
 }

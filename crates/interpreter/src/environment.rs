@@ -5,7 +5,7 @@ use tokio::sync::RwLock;
 
 use ast::{Identifier, Node, ScopedIdentifier, Span};
 
-use crate::{Error, Value};
+use crate::{Error, ErrorKind, Value};
 
 pub struct Environment {
 	parent: Option<Arc<Environment>>,
@@ -37,9 +37,9 @@ impl Environment {
 		// TODO: check if variable shadowing should be allowed
 		let mut lock = self.variables.write().await;
 		if lock.contains_key(&id.val) {
-			return Err(Error::VariableAlreadyInUse {
-				id: id.val,
-				span: id.src,
+			return Err(Error {
+				kind: ErrorKind::VariableAlreadyInUse { id: id.val },
+				src: Some(id.src),
 			});
 		}
 		lock.insert(id.val, val);
@@ -49,12 +49,14 @@ impl Environment {
 
 	pub async fn assign(&self, id: Node<Span, Identifier>, val: Value) -> Result<(), Error> {
 		let Some(env) = self.resolve(&id.val).await else {
-			return Err(Error::VariableNotFound {
-				id: ScopedIdentifier {
-					id: id.clone(),
-					scope: Vec::new(),
+			return Err(Error {
+				kind: ErrorKind::VariableNotFound {
+					id: ScopedIdentifier {
+						id: id.clone(),
+						scope: Vec::new(),
+					},
 				},
-				span: id.src,
+				src: Some(id.src),
 			});
 		};
 		env.write().await.insert(id.val, val);

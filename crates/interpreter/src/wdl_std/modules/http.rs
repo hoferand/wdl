@@ -55,7 +55,7 @@ async fn delete() -> Result<(), Error> {
 fn parse_url(url: &str) -> Result<Url, Error> {
 	match Url::parse(url) {
 		Ok(u) => Ok(u),
-		Err(err) => Err(Error::Fatal(err.to_string())),
+		Err(err) => Err(Error::fatal(err.to_string())),
 	}
 }
 
