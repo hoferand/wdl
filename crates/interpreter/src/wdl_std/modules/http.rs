@@ -6,9 +6,10 @@ use logger::error;
 use logger::Colorize;
 use serde::Serialize;
 
-use crate::wdl_std::result_type::ResultType;
-use crate::wdl_std::Arg;
-use crate::{wdl_std::get_handler, Error, FunctionId, FunctionValue};
+use crate::{
+	wdl_std::{get_handler, Arg, ResultType},
+	Error, FunctionId, FunctionValue,
+};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -55,6 +56,7 @@ async fn delete() -> Result<(), Error> {
 }
 
 fn parse_url(url: &str) -> Result<Url, Error> {
+	// TODO: improve error handling
 	match Url::parse(url) {
 		Ok(u) => Ok(u),
 		Err(err) => Err(Error::fatal(err.to_string())),

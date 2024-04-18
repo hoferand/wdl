@@ -1,6 +1,6 @@
 use crate::{
 	wdl_std::{get_handler, Arg, Env},
-	ChannelId, Error, FunctionId, FunctionValue,
+	ChannelId, Error, ErrorKind, FunctionId, FunctionValue,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -17,11 +17,13 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 
 pub async fn new(Env(env): Env, buffer: Arg<f64>) -> Result<ChannelId, Error> {
 	if buffer.val < 1.0 {
-		// TODO: improve error message
-		return Err(Error::fatal(format!(
-			"The buffer size for a channel must be at least `1`, but `{}` given",
-			buffer.val
-		)));
+		return Err(Error {
+			kind: ErrorKind::Fatal(format!(
+				"The buffer size for a channel must be >1, but `{}` given",
+				buffer.val
+			)),
+			src: Some(buffer.span),
+		});
 	}
 
 	let (ch_id, _) = env.create_ch(buffer.val as usize).await; // TODO: fix cast
