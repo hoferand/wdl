@@ -5,13 +5,11 @@ mod http;
 mod regex;
 mod time;
 
-use ast::{ScopedIdentifier, Span};
+use crate::{FunctionId, FunctionValue};
 
-use crate::Value;
-
-pub fn resolve_id(id: &ScopedIdentifier<Span>) -> Option<Value> {
+pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if let Some(module) = id.scope.first() {
-		return match module.val.0.as_str() {
+		return match module.0.as_str() {
 			"action" => action::resolve_id(id),
 			"debug" => debug::resolve_id(id),
 			"http" => http::resolve_id(id),

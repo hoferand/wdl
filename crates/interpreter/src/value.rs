@@ -1,9 +1,13 @@
-use std::{collections::HashMap, fmt::Debug, sync::Arc};
+pub mod type_;
+pub use type_::*;
+pub mod channel_id;
+pub use channel_id::ChannelId;
+pub mod function_id;
+pub use function_id::FunctionId;
 
-use ast::{Function, Span};
+use std::{collections::HashMap, fmt::Debug};
+
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-
-use crate::{wdl_std::StdFunction, Channel};
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -13,29 +17,8 @@ pub enum Value {
 	String(String),
 	Array(Vec<Value>),
 	Object(HashMap<String, Value>),
-	Function(FunctionValue), // TODO: just save identifier
-	Channel(Channel),        // TODO: just save identifier
-}
-
-#[derive(Clone)]
-pub enum FunctionValue {
-	Custom(Function<Span>),
-	Std(Arc<dyn StdFunction + Send + Sync>),
-}
-
-impl PartialEq for FunctionValue {
-	fn eq(&self, _: &Self) -> bool {
-		false
-	}
-}
-
-impl Debug for FunctionValue {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		match self {
-			FunctionValue::Custom(_) => write!(f, "CustomFunction"),
-			FunctionValue::Std(_) => write!(f, "StdFunction"),
-		}
-	}
+	Function(FunctionId),
+	Channel(ChannelId),
 }
 
 impl Value {
@@ -52,18 +35,17 @@ impl Value {
 		}
 	}
 
-	pub fn get_type(&self) -> String {
+	pub fn get_type(&self) -> ValueType {
 		match self {
-			Self::Null => "null",
-			Self::Bool(_) => "bool",
-			Self::Number(_) => "number",
-			Self::String(_) => "string",
-			Self::Array(_) => "array",
-			Self::Object(_) => "object",
-			Self::Function(_) => "function",
-			Self::Channel(_) => "channel",
+			Self::Null => ValueType::Null,
+			Self::Bool(_) => ValueType::Bool,
+			Self::Number(_) => ValueType::Number,
+			Self::String(_) => ValueType::String,
+			Self::Array(_) => ValueType::String,
+			Self::Object(_) => ValueType::Object,
+			Self::Function(_) => ValueType::Function,
+			Self::Channel(_) => ValueType::Channel,
 		}
-		.to_owned()
 	}
 }
 

@@ -3,8 +3,10 @@ use std::sync::Arc;
 use async_recursion::async_recursion;
 
 use ast::{Node, Span, Spawn};
+use logger::error;
+use logger::Colorize;
 
-use crate::{Channel, Environment, Error, Value};
+use crate::{Environment, Error, Value};
 
 use super::interpret_expr;
 
@@ -14,7 +16,7 @@ pub async fn interpret_spawn(
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let ch = Channel::new(1);
+	let (ch_id, ch) = g_env.create_ch(1).await;
 
 	let ch_async = ch.clone();
 	let expr_async = expr.val.expr.clone();
@@ -23,9 +25,12 @@ pub async fn interpret_spawn(
 	tokio::spawn(async move {
 		match interpret_expr(&expr_async, &env_async, &g_env_async).await {
 			Ok(value) => ch_async.send(value).await,
-			Err(err) => panic!("{:?}", err), // TODO: remove panic (maybe use global error channel)
-		}
+			Err(err) => {
+				error!("{:?}", err);
+				ch_async.send(Value::Null).await
+			}
+		};
 	});
 
-	Ok(Value::Channel(ch))
+	Ok(Value::Channel(ch_id))
 }

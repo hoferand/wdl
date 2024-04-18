@@ -1,13 +1,11 @@
-use ast::{ScopedIdentifier, Span};
+use crate::{wdl_std::get_handler, Error, FunctionId, FunctionValue, Value};
 
-use crate::{wdl_std::get_handler, Error, Value};
-
-pub fn resolve_id(id: &ScopedIdentifier<Span>) -> Option<Value> {
+pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
 		return None;
 	}
 
-	match id.id.val.0.as_str() {
+	match id.id.0.as_str() {
 		"print" => Some(get_handler(print)),
 		_ => None,
 	}

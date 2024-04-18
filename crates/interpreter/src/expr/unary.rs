@@ -19,7 +19,7 @@ pub async fn interpret_unary(
 	match expr.val.op.val {
 		UnaryOperator::Negate => negate(&right, &expr.src),
 		UnaryOperator::Flip => Ok(Value::Bool(!right.boolify())),
-		UnaryOperator::Receive => receive(right, &expr.src).await,
+		UnaryOperator::Receive => receive(right, &expr.src, g_env).await,
 	}
 }
 
@@ -35,10 +35,13 @@ fn negate(val: &Value, span: &Span) -> Result<Value, Error> {
 	}
 }
 
-pub async fn receive(ch: Value, _span: &Span) -> Result<Value, Error> {
+pub async fn receive(ch: Value, _span: &Span, g_env: &Arc<Environment>) -> Result<Value, Error> {
 	// TODO: improve error messages
 	match ch {
-		Value::Channel(ch) => {
+		Value::Channel(ch_id) => {
+			let Some(ch) = g_env.get_ch(&ch_id).await else {
+				return Err(Error::fatal(format!("Channel `{}` not found", ch_id.0)));
+			};
 			if let Some(v) = ch.receive().await {
 				Ok(v)
 			} else {

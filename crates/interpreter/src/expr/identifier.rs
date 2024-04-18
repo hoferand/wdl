@@ -16,8 +16,8 @@ pub async fn interpret_identifier(
 			return Ok(value);
 		}
 	}
-	if let Some(std_fn) = resolve_id(&expr.val) {
-		Ok(std_fn)
+	if resolve_id(&expr.val.clone().into()).is_some() {
+		Ok(Value::Function(expr.val.clone().into()))
 	} else {
 		Err(Error {
 			kind: ErrorKind::VariableNotFound {

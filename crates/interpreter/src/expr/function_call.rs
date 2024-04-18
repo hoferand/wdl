@@ -18,7 +18,7 @@ pub async fn interpret_function_call(
 	env: &Arc<Environment>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let function_val = match interpret_expr(&expr.val.function, env, g_env).await? {
+	let function_id = match interpret_expr(&expr.val.function, env, g_env).await? {
 		Value::Function(f) => f,
 		v => {
 			return Err(Error {
@@ -28,6 +28,13 @@ pub async fn interpret_function_call(
 				src: Some(expr.val.function.get_src().clone()),
 			});
 		}
+	};
+
+	let Some(function_val) = g_env.get_fn(&function_id).await else {
+		return Err(Error::fatal(format!(
+			"Function `{}` not found",
+			function_id
+		)));
 	};
 
 	let val;

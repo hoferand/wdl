@@ -16,9 +16,9 @@ pub(crate) use std_function::StdFunction;
 
 use std::sync::Arc;
 
-use crate::{FunctionValue, Value};
+use crate::FunctionValue;
 
-fn get_handler<H, T>(fun: H) -> Value
+fn get_handler<H, T>(fun: H) -> FunctionValue
 where
 	H: Handler<T> + Clone + 'static + Sync,
 	T: 'static,
@@ -28,5 +28,5 @@ where
 		call: |h, ctx| h.call(ctx),
 	};
 
-	Value::Function(FunctionValue::Std(Arc::new(hf)))
+	FunctionValue::Std(Arc::new(hf))
 }

@@ -1,15 +1,28 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{
+	collections::HashMap,
+	sync::{
+		atomic::{AtomicU32, Ordering},
+		Arc,
+	},
+};
 
 use async_recursion::async_recursion;
 use tokio::sync::RwLock;
 
 use ast::{Identifier, Node, ScopedIdentifier, Span};
 
-use crate::{Error, ErrorKind, Value};
+use crate::{
+	channel::Channel, function_value::FunctionValue, wdl_std::resolve_id, ChannelId, Error,
+	ErrorKind, FunctionId, Value,
+};
 
+// TODO: split into env and scope
 pub struct Environment {
 	parent: Option<Arc<Environment>>,
 	variables: Arc<RwLock<HashMap<Identifier, Value>>>,
+	functions: Arc<RwLock<HashMap<Identifier, FunctionValue>>>,
+	channels: Arc<RwLock<HashMap<ChannelId, Channel>>>,
+	channel_id: AtomicU32,
 }
 
 impl Default for Environment {
@@ -23,6 +36,9 @@ impl Environment {
 		Environment {
 			parent: None,
 			variables: Arc::new(RwLock::new(HashMap::new())),
+			functions: Arc::new(RwLock::new(HashMap::new())),
+			channels: Arc::new(RwLock::new(HashMap::new())),
+			channel_id: AtomicU32::new(0),
 		}
 	}
 
@@ -30,6 +46,9 @@ impl Environment {
 		Environment {
 			parent: Some(parent),
 			variables: Arc::new(RwLock::new(HashMap::new())),
+			functions: Arc::new(RwLock::new(HashMap::new())),
+			channels: Arc::new(RwLock::new(HashMap::new())),
+			channel_id: AtomicU32::new(0),
 		}
 	}
 
@@ -83,5 +102,47 @@ impl Environment {
 		} else {
 			None
 		}
+	}
+
+	pub async fn declare_fn(
+		&self,
+		id: Node<Span, Identifier>,
+		val: FunctionValue,
+	) -> Result<(), Error> {
+		self.declare(id.clone(), Value::Function(id.val.clone().into()))
+			.await?;
+
+		let mut lock = self.functions.write().await;
+		if lock.contains_key(&id.val) {
+			return Err(Error {
+				kind: ErrorKind::VariableAlreadyInUse { id: id.val },
+				src: Some(id.src),
+			});
+		}
+		lock.insert(id.val, val);
+
+		Ok(())
+	}
+
+	pub async fn get_fn(&self, id: &FunctionId) -> Option<FunctionValue> {
+		if let Some(value) = self.functions.read().await.get(&id.id) {
+			return Some(value.clone());
+		}
+
+		resolve_id(id)
+	}
+
+	pub async fn create_ch(&self, buffer: usize) -> (ChannelId, Channel) {
+		let ch = Channel::new(buffer);
+		let id = ChannelId(self.channel_id.fetch_add(1, Ordering::Relaxed));
+
+		let mut lock = self.channels.write().await;
+		lock.insert(id.clone(), ch.clone());
+
+		(id, ch)
+	}
+
+	pub async fn get_ch(&self, id: &ChannelId) -> Option<Channel> {
+		self.channels.read().await.get(id).cloned()
 	}
 }

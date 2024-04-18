@@ -7,8 +7,10 @@ use value::*;
 mod channel;
 use channel::Channel;
 mod expr;
+mod function_value;
 mod stmt;
 mod wdl_std;
+use function_value::FunctionValue;
 
 pub mod order;
 pub use order::Order;
