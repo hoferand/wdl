@@ -1,6 +1,6 @@
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 
-use crate::{wdl_std::get_handler, Error, FunctionId, FunctionValue};
+use crate::{wdl_std::get_handler, Environment, Error, FunctionId, FunctionValue};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -13,7 +13,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-pub async fn sleep(millis: u64) -> Result<(), Error> {
-	tokio::time::sleep(Duration::from_millis(millis)).await;
+pub async fn sleep(_env: Arc<Environment>, millis: f64) -> Result<(), Error> {
+	tokio::time::sleep(Duration::from_millis(millis as u64)).await; // TODO: fix cast
 	Ok(())
 }

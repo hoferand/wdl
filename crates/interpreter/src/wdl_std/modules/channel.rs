@@ -1,4 +1,6 @@
-use crate::{FunctionId, FunctionValue};
+use std::sync::Arc;
+
+use crate::{wdl_std::get_handler, ChannelId, Environment, Error, FunctionId, FunctionValue};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -6,13 +8,13 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 
 	match id.id.0.as_str() {
-		//"new" => Some(get_handler(new)),
-		//"close" => Some(get_handler(close)),
+		"new" => Some(get_handler(new)),
+		"close" => Some(get_handler(close)),
 		_ => None,
 	}
 }
-/*
-pub async fn new(buffer: f64) -> Result<Channel, Error> {
+
+pub async fn new(env: Arc<Environment>, buffer: f64) -> Result<ChannelId, Error> {
 	if buffer < 1.0 {
 		// TODO: improve error message
 		return Err(Error::fatal(format!(
@@ -21,12 +23,17 @@ pub async fn new(buffer: f64) -> Result<Channel, Error> {
 		)));
 	}
 
-	Ok(Channel::new(buffer as usize)) // TODO: fix cast
+	let (ch_id, _) = env.create_ch(buffer as usize).await; // TODO: fix cast
+
+	Ok(ch_id)
 }
 
-pub async fn close(ch: Channel) -> Result<(), Error> {
+pub async fn close(env: Arc<Environment>, ch_id: ChannelId) -> Result<(), Error> {
+	let Some(ch) = env.get_ch(&ch_id).await else {
+		return Err(Error::fatal(format!("Channel `{}` not found", ch_id.0)));
+	};
+
 	ch.close().await;
 
 	Ok(())
 }
-*/

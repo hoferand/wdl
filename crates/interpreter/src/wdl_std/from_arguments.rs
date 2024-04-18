@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::{Error, ErrorKind};
+use crate::{ChannelId, Error, ErrorKind, Value};
 
 use super::Arguments;
 
@@ -47,11 +47,11 @@ where
 	}
 }
 
-/*impl FromArguments for Channel {
+impl FromArguments for ChannelId {
 	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
 		if let Some(arg) = args.args.next() {
-			if let Value::Channel(ch) = arg.val {
-				Ok(ch)
+			if let Value::Channel(ch_id) = arg.val {
+				Ok(ch_id)
 			} else {
 				Err(Error {
 					kind: ErrorKind::InvalidType {
@@ -67,4 +67,4 @@ where
 			})
 		}
 	}
-}*/
+}

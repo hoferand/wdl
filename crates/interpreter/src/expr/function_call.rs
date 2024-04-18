@@ -87,10 +87,13 @@ pub async fn interpret_function_call(
 
 			let args = args.into_iter();
 			val = std_fn
-				.call_with_args(Arguments {
-					fn_span: expr.val.function.get_src().clone(),
-					args,
-				})
+				.call_with_args(
+					Arc::clone(g_env),
+					Arguments {
+						fn_span: expr.val.function.get_src().clone(),
+						args,
+					},
+				)
 				.await?;
 		}
 	}

@@ -1,10 +1,11 @@
+use std::sync::Arc;
+
 use serde::Deserialize;
 
 use logger::log;
 use logger::Colorize;
 
-use crate::FunctionId;
-use crate::{wdl_std::get_handler, Error, FunctionValue};
+use crate::{wdl_std::get_handler, Environment, Error, FunctionId, FunctionValue};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -46,17 +47,17 @@ struct Coordinate {
 	y: u32,
 }
 
-async fn pickup(target: Target) -> Result<(), Error> {
+async fn pickup(_env: Arc<Environment>, target: Target) -> Result<(), Error> {
 	log!("pickup from {:?}", target);
 	Ok(())
 }
 
-async fn drop(target: Target) -> Result<(), Error> {
+async fn drop(_env: Arc<Environment>, target: Target) -> Result<(), Error> {
 	log!("drop to {:?}", target);
 	Ok(())
 }
 
-async fn drive(target: Target) -> Result<(), Error> {
+async fn drive(_env: Arc<Environment>, target: Target) -> Result<(), Error> {
 	log!("drive to {:?}", target);
 	Ok(())
 }

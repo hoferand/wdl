@@ -1,4 +1,6 @@
-use crate::{wdl_std::get_handler, Error, FunctionId, FunctionValue, Value};
+use std::sync::Arc;
+
+use crate::{wdl_std::get_handler, Environment, Error, FunctionId, FunctionValue, Value};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -11,7 +13,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-pub async fn print(val: Value) -> Result<(), Error> {
+pub async fn print(_env: Arc<Environment>, val: Value) -> Result<(), Error> {
 	println!("{}", val.to_string());
 	Ok(())
 }

@@ -6,6 +6,8 @@ mod handler;
 use handler::Handler;
 mod into_result;
 use into_result::IntoResult;
+mod arg_type;
+mod result_type;
 
 pub(crate) mod arguments;
 pub(crate) use arguments::*;
@@ -25,7 +27,7 @@ where
 {
 	let hf = HandlerFunction {
 		handler: fun,
-		call: |h, ctx| h.call(ctx),
+		call: |h, env, ctx| h.call(env, ctx),
 	};
 
 	FunctionValue::Std(Arc::new(hf))

@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use reqwest::{header::CONTENT_TYPE, Response, Url};
 
@@ -6,8 +7,7 @@ use logger::error;
 use logger::Colorize;
 use serde::Serialize;
 
-use crate::FunctionId;
-use crate::{wdl_std::get_handler, Error, FunctionValue};
+use crate::{wdl_std::get_handler, Environment, Error, FunctionId, FunctionValue};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -31,23 +31,23 @@ struct HttpResponse {
 	body: serde_json::Value,
 }
 
-async fn get(url: String) -> Result<Option<HttpResponse>, Error> {
+async fn get(_env: Arc<Environment>, url: String) -> Result<Option<HttpResponse>, Error> {
 	process_response(reqwest::get(parse_url(&url)?).await).await
 }
 
-async fn post() -> Result<(), Error> {
+async fn post(_env: Arc<Environment>) -> Result<(), Error> {
 	todo!()
 }
 
-async fn put() -> Result<(), Error> {
+async fn put(_env: Arc<Environment>) -> Result<(), Error> {
 	todo!()
 }
 
-async fn patch() -> Result<(), Error> {
+async fn patch(_env: Arc<Environment>) -> Result<(), Error> {
 	todo!()
 }
 
-async fn delete() -> Result<(), Error> {
+async fn delete(_env: Arc<Environment>) -> Result<(), Error> {
 	todo!()
 }
 

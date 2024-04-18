@@ -1,6 +1,8 @@
+use std::sync::Arc;
+
 use regex::Regex;
 
-use crate::{wdl_std::get_handler, Error, FunctionId, FunctionValue};
+use crate::{wdl_std::get_handler, Environment, Error, FunctionId, FunctionValue};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -15,7 +17,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-async fn match_(regex: String, haystack: String) -> Result<bool, Error> {
+async fn match_(_env: Arc<Environment>, regex: String, haystack: String) -> Result<bool, Error> {
 	let Ok(regex) = Regex::new(&regex) else {
 		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
 	};
@@ -23,7 +25,11 @@ async fn match_(regex: String, haystack: String) -> Result<bool, Error> {
 	Ok(regex.is_match(&haystack))
 }
 
-async fn find(regex: String, haystack: String) -> Result<Vec<String>, Error> {
+async fn find(
+	_env: Arc<Environment>,
+	regex: String,
+	haystack: String,
+) -> Result<Vec<String>, Error> {
 	let Ok(regex) = Regex::new(&regex) else {
 		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
 	};
@@ -34,7 +40,12 @@ async fn find(regex: String, haystack: String) -> Result<Vec<String>, Error> {
 		.collect())
 }
 
-async fn replace(regex: String, haystack: String, replace: String) -> Result<String, Error> {
+async fn replace(
+	_env: Arc<Environment>,
+	regex: String,
+	haystack: String,
+	replace: String,
+) -> Result<String, Error> {
 	let Ok(regex) = Regex::new(&regex) else {
 		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
 	};
