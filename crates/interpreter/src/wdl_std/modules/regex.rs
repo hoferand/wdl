@@ -1,8 +1,10 @@
-use std::sync::Arc;
-
 use regex::Regex;
 
-use crate::{wdl_std::get_handler, Environment, Error, FunctionId, FunctionValue};
+use crate::{
+	function_value::FunctionValue,
+	wdl_std::{get_handler, Arg},
+	Error, FunctionId,
+};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -17,38 +19,42 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-async fn match_(_env: Arc<Environment>, regex: String, haystack: String) -> Result<bool, Error> {
-	let Ok(regex) = Regex::new(&regex) else {
-		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
+async fn match_(regex: Arg<String>, haystack: Arg<String>) -> Result<bool, Error> {
+	let Ok(regex) = Regex::new(&regex.val) else {
+		return Err(Error::fatal(format!(
+			"Invalid regex pattern `{}`",
+			regex.val
+		)));
 	};
 
-	Ok(regex.is_match(&haystack))
+	Ok(regex.is_match(&haystack.val))
 }
 
-async fn find(
-	_env: Arc<Environment>,
-	regex: String,
-	haystack: String,
-) -> Result<Vec<String>, Error> {
-	let Ok(regex) = Regex::new(&regex) else {
-		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
+async fn find(regex: Arg<String>, haystack: Arg<String>) -> Result<Vec<String>, Error> {
+	let Ok(regex) = Regex::new(&regex.val) else {
+		return Err(Error::fatal(format!(
+			"Invalid regex pattern `{}`",
+			regex.val
+		)));
 	};
 
 	Ok(regex
-		.find_iter(&haystack)
+		.find_iter(&haystack.val)
 		.map(|m| m.as_str().to_owned())
 		.collect())
 }
 
 async fn replace(
-	_env: Arc<Environment>,
-	regex: String,
-	haystack: String,
-	replace: String,
+	regex: Arg<String>,
+	haystack: Arg<String>,
+	replace: Arg<String>,
 ) -> Result<String, Error> {
-	let Ok(regex) = Regex::new(&regex) else {
-		return Err(Error::fatal(format!("Invalid regex pattern `{}`", regex)));
+	let Ok(regex) = Regex::new(&regex.val) else {
+		return Err(Error::fatal(format!(
+			"Invalid regex pattern `{}`",
+			regex.val
+		)));
 	};
 
-	Ok(regex.replace_all(&haystack, &replace).to_string())
+	Ok(regex.replace_all(&haystack.val, &replace.val).to_string())
 }

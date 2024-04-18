@@ -12,8 +12,7 @@ use tokio::sync::RwLock;
 use ast::{Identifier, Node, ScopedIdentifier, Span};
 
 use crate::{
-	channel::Channel, function_value::FunctionValue, wdl_std::resolve_id, ChannelId, Error,
-	ErrorKind, FunctionId, Value,
+	wdl_std::resolve_id, Channel, ChannelId, Error, ErrorKind, FunctionId, FunctionValue, Value,
 };
 
 // TODO: split into env and scope

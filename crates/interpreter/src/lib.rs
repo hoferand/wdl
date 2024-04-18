@@ -5,6 +5,7 @@ use interrupt::Interrupt;
 mod value;
 use value::*;
 mod channel;
+use channel::Channel;
 mod expr;
 mod function_value;
 mod stmt;

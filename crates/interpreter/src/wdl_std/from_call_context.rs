@@ -1,70 +1,38 @@
-use serde::Deserialize;
+use std::sync::Arc;
 
-use crate::{ChannelId, Error, ErrorKind, Value};
+use crate::{Error, ErrorKind};
 
-use super::CallContext;
+use super::{CallContext, Env, FromArgument};
 
 pub(crate) trait FromCallContext: Sized {
-	fn from_ctx(args: &mut CallContext) -> Result<Self, Error>;
+	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error>;
 }
 
-impl<T> FromCallContext for T
-where
-	T: for<'de> Deserialize<'de>,
-{
-	fn from_ctx(args: &mut CallContext) -> Result<Self, Error> {
-		if let Some(arg) = args.args.next() {
-			let json_val = match serde_json::to_value(arg.val) {
-				Ok(val) => val,
-				Err(err) => {
-					return Err(Error {
-						kind: ErrorKind::InvalidType {
-							msg: err.to_string(),
-						},
-						src: Some(arg.span),
-					});
-				}
-			};
-
-			let rust_val = match serde_json::from_value(json_val) {
-				Ok(val) => val,
-				Err(err) => {
-					return Err(Error {
-						kind: ErrorKind::InvalidType {
-							msg: err.to_string(),
-						},
-						src: Some(arg.span),
-					});
-				}
-			};
-			Ok(rust_val)
+impl<T: FromArgument> FromCallContext for T {
+	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
+		if let Some(arg) = ctx.args.next() {
+			Ok(T::from_arg(arg)?)
 		} else {
 			Err(Error {
 				kind: ErrorKind::TooFewArguments,
-				src: Some(args.fn_span.clone()),
+				src: Some(ctx.fn_span.clone()),
 			})
 		}
 	}
 }
 
-impl FromCallContext for ChannelId {
-	fn from_ctx(args: &mut CallContext) -> Result<Self, Error> {
-		if let Some(arg) = args.args.next() {
-			if let Value::Channel(ch_id) = arg.val {
-				Ok(ch_id)
-			} else {
-				Err(Error {
-					kind: ErrorKind::InvalidType {
-						msg: format!("Expected channel but got `{}`", arg.val.get_type()),
-					},
-					src: Some(arg.span),
-				})
-			}
+impl<T: FromArgument> FromCallContext for Option<T> {
+	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
+		if let Some(arg) = ctx.args.next() {
+			Ok(Some(T::from_arg(arg)?))
 		} else {
-			Err(Error {
-				kind: ErrorKind::TooFewArguments,
-				src: Some(args.fn_span.clone()),
-			})
+			Ok(None)
 		}
+	}
+}
+
+impl FromCallContext for Env {
+	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
+		Ok(Env(Arc::clone(&ctx.env)))
 	}
 }

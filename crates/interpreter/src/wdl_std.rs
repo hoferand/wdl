@@ -7,7 +7,13 @@ use handler::Handler;
 mod into_result;
 use into_result::IntoResult;
 mod arg_type;
+use arg_type::ArgType;
+mod arg_types;
+use arg_types::*;
 mod result_type;
+use result_type::ResultType;
+mod from_argument;
+use from_argument::FromArgument;
 
 pub(crate) mod arguments;
 pub(crate) use arguments::*;
