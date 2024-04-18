@@ -1,5 +1,5 @@
-mod from_arguments;
-use from_arguments::FromArguments;
+mod from_call_context;
+use from_call_context::FromCallContext;
 mod handler_function;
 use handler_function::HandlerFunction;
 mod handler;
@@ -27,7 +27,7 @@ where
 {
 	let hf = HandlerFunction {
 		handler: fun,
-		call: |h, env, ctx| h.call(env, ctx),
+		call: |h, ctx| h.call(ctx),
 	};
 
 	FunctionValue::Std(Arc::new(hf))

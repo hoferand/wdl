@@ -4,14 +4,10 @@ use futures::future::BoxFuture;
 
 use crate::{Environment, Error, Value};
 
-use super::{Arguments, FromArguments, IntoResult};
+use super::{CallContext, FromCallContext, IntoResult};
 
 pub trait Handler<T>: Clone + Send + Sized + 'static {
-	fn call(
-		self,
-		env: Arc<Environment>,
-		args: Arguments,
-	) -> BoxFuture<'static, Result<Value, Error>>;
+	fn call(self, ctx: CallContext) -> BoxFuture<'static, Result<Value, Error>>;
 }
 
 impl_handler!();
@@ -25,13 +21,13 @@ macro_rules! impl_handler {
 		where
 			F: FnOnce(Arc<Environment>, $($ty,)*) -> Fut + Clone + Send + 'static, // TODO: check FnOnce
 			Fut: Future<Output = R> + Send,
-			$($ty: FromArguments + Send,)*
+			$($ty: FromCallContext + Send,)*
 			R: IntoResult
 		{
 			#[allow(non_snake_case, unused_variables, unused_mut)]
-			fn call(self, env: Arc<Environment>, mut args: Arguments) -> BoxFuture<'static, Result<Value, Error>> {
+			fn call(self, mut ctx: CallContext) -> BoxFuture<'static, Result<Value, Error>> {
 				Box::pin(async move {
-					(self)(env, $($ty::from_args(&mut args)?,)*).await.into_result()
+					(self)(Arc::clone(&ctx.env), $($ty::from_ctx(&mut ctx)?,)*).await.into_result()
 				})
 			}
 		}

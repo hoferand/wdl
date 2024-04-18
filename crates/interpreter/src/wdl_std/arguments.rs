@@ -1,11 +1,12 @@
-use std::vec::IntoIter;
+use std::{sync::Arc, vec::IntoIter};
 
 use ast::Span;
 
-use crate::value::Value;
+use crate::{Environment, Value};
 
-pub struct Arguments {
+pub struct CallContext {
 	pub fn_span: Span,
+	pub env: Arc<Environment>,
 	pub args: IntoIter<ArgumentValue>,
 }
 

@@ -1,16 +1,10 @@
-use std::sync::Arc;
-
 use futures::future::BoxFuture;
 
-use crate::{Environment, Error, Value};
+use crate::{Error, Value};
 
-use super::Arguments;
+use super::CallContext;
 
 pub trait StdFunction {
 	fn clone_box(&self) -> Box<dyn StdFunction>;
-	fn call_with_args(
-		&self,
-		env: Arc<Environment>,
-		args: Arguments,
-	) -> BoxFuture<Result<Value, Error>>;
+	fn call_with_ctx(&self, ctx: CallContext) -> BoxFuture<Result<Value, Error>>;
 }

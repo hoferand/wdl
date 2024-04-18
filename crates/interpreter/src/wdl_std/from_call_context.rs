@@ -2,17 +2,17 @@ use serde::Deserialize;
 
 use crate::{ChannelId, Error, ErrorKind, Value};
 
-use super::Arguments;
+use super::CallContext;
 
-pub(crate) trait FromArguments: Sized {
-	fn from_args(args: &mut Arguments) -> Result<Self, Error>;
+pub(crate) trait FromCallContext: Sized {
+	fn from_ctx(args: &mut CallContext) -> Result<Self, Error>;
 }
 
-impl<T> FromArguments for T
+impl<T> FromCallContext for T
 where
 	T: for<'de> Deserialize<'de>,
 {
-	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
+	fn from_ctx(args: &mut CallContext) -> Result<Self, Error> {
 		if let Some(arg) = args.args.next() {
 			let json_val = match serde_json::to_value(arg.val) {
 				Ok(val) => val,
@@ -47,8 +47,8 @@ where
 	}
 }
 
-impl FromArguments for ChannelId {
-	fn from_args(args: &mut Arguments) -> Result<Self, Error> {
+impl FromCallContext for ChannelId {
+	fn from_ctx(args: &mut CallContext) -> Result<Self, Error> {
 		if let Some(arg) = args.args.next() {
 			if let Value::Channel(ch_id) = arg.val {
 				Ok(ch_id)

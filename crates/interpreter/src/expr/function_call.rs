@@ -6,7 +6,7 @@ use ast::{FunctionCall, Node, Span};
 
 use crate::{
 	stmt,
-	wdl_std::{ArgumentValue, Arguments},
+	wdl_std::{ArgumentValue, CallContext},
 	Environment, Error, ErrorKind, FunctionValue, Interrupt, Value,
 };
 
@@ -87,13 +87,11 @@ pub async fn interpret_function_call(
 
 			let args = args.into_iter();
 			val = std_fn
-				.call_with_args(
-					Arc::clone(g_env),
-					Arguments {
-						fn_span: expr.val.function.get_src().clone(),
-						args,
-					},
-				)
+				.call_with_ctx(CallContext {
+					fn_span: expr.val.function.get_src().clone(),
+					env: Arc::clone(g_env),
+					args,
+				})
 				.await?;
 		}
 	}
