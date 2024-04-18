@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{Error, ErrorKind};
+use crate::{Error, ErrorKind, Value};
 
 use super::{CallContext, Env, FromArgument};
 
@@ -24,7 +24,11 @@ impl<T: FromArgument> FromCallContext for T {
 impl<T: FromArgument> FromCallContext for Option<T> {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
 		if let Some(arg) = ctx.args.next() {
-			Ok(Some(T::from_arg(arg)?))
+			if arg.val == Value::Null {
+				Ok(None)
+			} else {
+				Ok(Some(T::from_arg(arg)?))
+			}
 		} else {
 			Ok(None)
 		}

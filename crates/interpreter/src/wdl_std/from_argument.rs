@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{ChannelId, Error, ErrorKind, FunctionId, Value};
+use crate::{ChannelId, Error, ErrorKind, FunctionId, Value, ValueType};
 
 use super::{Arg, ArgType, ArgumentValue};
 
@@ -29,16 +29,7 @@ impl<T: FromArgument> FromArgument for Arg<Vec<T>> {
 
 			Ok(Arg::new(arg.idx, arg.span, vec))
 		} else {
-			Err(Error {
-				kind: ErrorKind::InvalidType {
-					msg: format!(
-						"expected `array`, given `{}` for argument {}",
-						arg.val.get_type(),
-						arg.idx
-					),
-				},
-				src: Some(arg.span),
-			})
+			Err(invalid_type(ValueType::Array, arg))
 		}
 	}
 }
@@ -61,16 +52,7 @@ impl<T: FromArgument> FromArgument for Arg<HashMap<String, T>> {
 
 			Ok(Arg::new(arg.idx, arg.span, map))
 		} else {
-			Err(Error {
-				kind: ErrorKind::InvalidType {
-					msg: format!(
-						"expected `object`, given `{}` for argument {}",
-						arg.val.get_type(),
-						arg.idx
-					),
-				},
-				src: Some(arg.span),
-			})
+			Err(invalid_type(ValueType::Object, arg))
 		}
 	}
 }
@@ -80,16 +62,7 @@ impl FromArgument for Arg<bool> {
 		if let Value::Bool(val) = arg.val {
 			Ok(Arg::new(arg.idx, arg.span, val))
 		} else {
-			Err(Error {
-				kind: ErrorKind::InvalidType {
-					msg: format!(
-						"expected `bool`, given `{}` for argument {}",
-						arg.val.get_type(),
-						arg.idx
-					),
-				},
-				src: Some(arg.span),
-			})
+			Err(invalid_type(ValueType::Bool, arg))
 		}
 	}
 }
@@ -99,16 +72,7 @@ impl FromArgument for Arg<f64> {
 		if let Value::Number(val) = arg.val {
 			Ok(Arg::new(arg.idx, arg.span, val))
 		} else {
-			Err(Error {
-				kind: ErrorKind::InvalidType {
-					msg: format!(
-						"expected `number`, given `{}` for argument {}",
-						arg.val.get_type(),
-						arg.idx
-					),
-				},
-				src: Some(arg.span),
-			})
+			Err(invalid_type(ValueType::Number, arg))
 		}
 	}
 }
@@ -118,16 +82,7 @@ impl FromArgument for Arg<String> {
 		if let Value::String(val) = arg.val {
 			Ok(Arg::new(arg.idx, arg.span, val))
 		} else {
-			Err(Error {
-				kind: ErrorKind::InvalidType {
-					msg: format!(
-						"expected `string`, given `{}` for argument {}",
-						arg.val.get_type(),
-						arg.idx
-					),
-				},
-				src: Some(arg.span),
-			})
+			Err(invalid_type(ValueType::String, arg))
 		}
 	}
 }
@@ -137,16 +92,7 @@ impl FromArgument for Arg<FunctionId> {
 		if let Value::Function(val) = arg.val {
 			Ok(Arg::new(arg.idx, arg.span, val))
 		} else {
-			Err(Error {
-				kind: ErrorKind::InvalidType {
-					msg: format!(
-						"expected `function`, given `{}` for argument {}",
-						arg.val.get_type(),
-						arg.idx
-					),
-				},
-				src: Some(arg.span),
-			})
+			Err(invalid_type(ValueType::Function, arg))
 		}
 	}
 }
@@ -158,16 +104,7 @@ impl FromArgument for Arg<ChannelId> {
 		if let Value::Channel(val) = arg.val {
 			Ok(Arg::new(arg.idx, arg.span, val))
 		} else {
-			Err(Error {
-				kind: ErrorKind::InvalidType {
-					msg: format!(
-						"expected `channel`, given `{}` for argument {}",
-						arg.val.get_type(),
-						arg.idx
-					),
-				},
-				src: Some(arg.span),
-			})
+			Err(invalid_type(ValueType::Channel, arg))
 		}
 	}
 }
@@ -201,5 +138,19 @@ where
 			}
 		};
 		Ok(rust_val)
+	}
+}
+
+fn invalid_type(expected: ValueType, got: ArgumentValue) -> Error {
+	Error {
+		kind: ErrorKind::InvalidType {
+			msg: format!(
+				"Expected `{}`, given `{}` for argument {}",
+				expected,
+				got.val.get_type(),
+				got.idx
+			),
+		},
+		src: Some(got.span),
 	}
 }
