@@ -30,7 +30,9 @@ struct MyStruct {
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum Either {
+	#[allow(dead_code)]
 	S(String),
+	#[allow(dead_code)]
 	N(f64),
 }
 
@@ -38,4 +40,5 @@ impl<'de> ArgType<'de> for MyStruct {}
 
 async fn test(arg1: Option<Arg<bool, { id(b"arg") }>>, arg: Arg<MyStruct, { id(b"arg") }>) {
 	log!("{:?}", arg.val);
+	log!("{:?}", arg1.map(|e| e.val));
 }

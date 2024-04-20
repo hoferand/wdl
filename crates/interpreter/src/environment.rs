@@ -124,7 +124,7 @@ impl Environment {
 	}
 
 	pub async fn get_fn(&self, id: &FunctionId) -> Option<FunctionValue> {
-		if id.scope.len() == 0 {
+		if id.scope.is_empty() {
 			if let Some(value) = self.functions.read().await.get(&id.id) {
 				return Some(value.clone());
 			}
