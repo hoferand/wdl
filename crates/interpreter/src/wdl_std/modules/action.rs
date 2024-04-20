@@ -1,13 +1,11 @@
-use std::collections::HashMap;
-
 use serde::Deserialize;
 
+use ast::Identifier;
 use logger::log;
 use logger::Colorize;
 
 use crate::{
-	expr::run_function,
-	wdl_std::{get_handler, id, Arg, ArgType, ArgumentValue, Env},
+	wdl_std::{call_function, get_handler, id, Arg, ArgType, Env},
 	Error, FunctionId, FunctionValue, Value,
 };
 
@@ -71,13 +69,19 @@ async fn pickup(
 	log!("events {:?}", events.as_ref().map(|e| &e.val));
 
 	if let Some(events) = events {
-		if let Some(event) = events.val.no_station_left {
-			let args = vec![ArgumentValue {
-				idx: 1,
-				span: events.span.clone(),
-				val: Value::String("Oh no, no station left for pickup!".to_owned()), // TODO: replace with an event struct and useful information
-			}];
-			run_function(&event, events.span, args, HashMap::new(), &env).await?;
+		if let Some(callback) = events.val.no_station_left {
+			let ret = call_function(
+				&callback,
+				vec![Value::String(
+					"Oh no, no station left for pickup!".to_owned(),
+				)],
+				Identifier("no_station_left".to_owned()),
+				events.span,
+				&env,
+			)
+			.await?;
+
+			log!("Return value: {:?}", ret);
 		}
 	}
 

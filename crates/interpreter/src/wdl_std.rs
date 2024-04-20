@@ -22,9 +22,11 @@ pub(crate) use modules::resolve_id;
 pub(crate) mod std_function;
 pub(crate) use std_function::StdFunction;
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
-use crate::FunctionValue;
+use ast::{Identifier, Span};
+
+use crate::{expr::run_function, Environment, Error, ErrorKind, FunctionId, FunctionValue, Value};
 
 fn get_handler<H, T>(fun: H) -> FunctionValue
 where
@@ -37,4 +39,51 @@ where
 	};
 
 	FunctionValue::Std(Arc::new(hf))
+}
+
+// TODO: make args and return type generic
+async fn call_function(
+	function_id: &FunctionId,
+	values: Vec<Value>,
+	callback_name: Identifier,
+	span: Span,
+	env: &Arc<Environment>,
+) -> Result<Value, Error> {
+	let mut args = Vec::new();
+
+	for val in values {
+		args.push(ArgumentValue {
+			idx: 1,
+			span: span,
+			val,
+		});
+	}
+
+	let error = match run_function(function_id, span, args, HashMap::new(), &env).await {
+		Ok(val) => return Ok(val),
+		Err(err) => err,
+	};
+	match error {
+		Error {
+			kind: ErrorKind::ArityMismatch { expected, given },
+			src,
+		} => Err(Error {
+			kind: ErrorKind::Fatal(format!(
+				"Callback for `{}` should require `{}` argument(s) but requires `{}` argument(s)",
+				callback_name, given, expected
+			)),
+			src,
+		}),
+		Error {
+			kind: ErrorKind::MissingArgument { id },
+			src,
+		} => Err(Error {
+			kind: ErrorKind::Fatal(format!(
+				"Callback for `{}` should not require argument `{}`",
+				callback_name, id
+			)),
+			src,
+		}),
+		err => Err(err),
+	}
 }
