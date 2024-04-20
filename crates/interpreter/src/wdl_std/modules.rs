@@ -3,6 +3,7 @@ mod channel;
 mod debug;
 mod http;
 mod regex;
+mod test;
 mod time;
 
 use crate::{FunctionId, FunctionValue};
@@ -16,6 +17,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 			"time" => time::resolve_id(id),
 			"regex" => regex::resolve_id(id),
 			"channel" => channel::resolve_id(id),
+			"test" => test::resolve_id(id),
 			_ => None,
 		};
 	}

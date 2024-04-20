@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use ast::{Identifier, ScopedIdentifier, Source};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FunctionId {
 	pub id: Identifier,
 	pub scope: Vec<Identifier>,
