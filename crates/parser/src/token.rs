@@ -24,6 +24,7 @@ pub enum TokenValue {
 	Asterisk,         // *
 	Slash,            // /
 	Percent,          // %
+	Question,         // ?
 	QuestionQuestion, // ??
 	Point,            // .
 	Colon,            // :

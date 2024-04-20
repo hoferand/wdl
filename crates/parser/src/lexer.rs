@@ -272,6 +272,7 @@ impl<'c> Lexer<'c> {
 			',' => TokenValue::Comma,
 			';' => TokenValue::Semicolon,
 			'!' => TokenValue::Bang,
+			'?' => TokenValue::Question,
 			'=' => TokenValue::Equal,
 			'<' => TokenValue::Less,
 			'>' => TokenValue::Greater,
