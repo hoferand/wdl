@@ -141,8 +141,8 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 				expected, given
 			);
 		}
-		interpreter::ErrorKind::TooFewArguments => {
-			error!("Too few arguments given for function call!");
+		interpreter::ErrorKind::TooFewArguments { id } => {
+			error!("Argument `{}` missing!", id);
 		}
 	}
 
@@ -193,15 +193,19 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 		}
 		parser::Error::Parser(err) => match err {
 			parser::ParserError::Fatal(msg) => error!("{}!", msg),
+			parser::ParserError::Positional { msg, span } => {
+				error!("{}!", msg);
+				print_error_location(&span.start, &span.end, src_code);
+			}
 			parser::ParserError::UnexpectedToken { src, span } => {
 				error!("Unexpected token `{}`!", src);
 				print_error_location(&span.start, &span.end, src_code);
 			}
 			parser::ParserError::SecondActions { actions1, actions2 } => {
 				error!("Multiple actions blocks found!");
-				println!("First block:");
+				eprintln!("First block:");
 				print_error_location(&actions1.start, &actions1.end, src_code);
-				println!("Second block:");
+				eprintln!("Second block:");
 				print_error_location(&actions2.start, &actions2.end, src_code);
 			}
 			parser::ParserError::UnexpectedEoF => error!("Unexpected end of file!"),
@@ -214,7 +218,7 @@ fn print_error_location(start: &Location, end: &Location, src: &str) {
 	lines.push("");
 
 	let number_padding = (end.line + 1).to_string().len();
-	println!("{:>pad$}", "|".blue(), pad = number_padding + 2);
+	eprintln!("{:>pad$}", "|".blue(), pad = number_padding + 2);
 
 	let show_lines = 3;
 	let mut skipped = false;
@@ -224,7 +228,7 @@ fn print_error_location(start: &Location, end: &Location, src: &str) {
 		{
 			if !skipped {
 				skipped = true;
-				println!(
+				eprintln!(
 					"{:>pad$} {}",
 					"|".blue(),
 					"...".blue(),
@@ -232,7 +236,7 @@ fn print_error_location(start: &Location, end: &Location, src: &str) {
 				);
 			}
 		} else if let Some(line) = lines.get(line_number) {
-			println!(
+			eprintln!(
 				"{:<pad$} {:} {}",
 				(line_number + 1).to_string().blue(),
 				"|".blue(),
@@ -247,5 +251,16 @@ fn print_error_location(start: &Location, end: &Location, src: &str) {
 		}
 	}
 
-	println!("{:>pad$}", "|".blue(), pad = number_padding + 2);
+	if start.line == end.line {
+		// TODO: fix tab ident
+		eprintln!(
+			"{:>pad$} {}{}",
+			"|".blue(),
+			" ".repeat(start.column),
+			"^".repeat(end.column - start.column).red(),
+			pad = number_padding + 2
+		);
+	}
+
+	eprintln!("{:>pad$}", "|".blue(), pad = number_padding + 2);
 }

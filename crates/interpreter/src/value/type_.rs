@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 pub enum ValueType {
+	Any,
 	Null,
 	Bool,
 	Number,
@@ -14,6 +15,7 @@ pub enum ValueType {
 impl Display for ValueType {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
+			ValueType::Any => write!(f, "any"),
 			ValueType::Null => write!(f, "null"),
 			ValueType::Bool => write!(f, "bool"),
 			ValueType::Number => write!(f, "number"),

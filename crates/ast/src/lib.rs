@@ -12,3 +12,5 @@ pub mod workflow;
 pub use workflow::Workflow;
 pub mod source;
 pub use source::*;
+pub mod argument;
+pub use argument::Argument;

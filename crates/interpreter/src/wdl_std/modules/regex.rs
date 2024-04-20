@@ -1,9 +1,8 @@
 use regex::Regex;
 
 use crate::{
-	function_value::FunctionValue,
-	wdl_std::{get_handler, Arg},
-	Error, ErrorKind, FunctionId,
+	wdl_std::{get_handler, id, Arg},
+	Error, ErrorKind, FunctionId, FunctionValue,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -19,7 +18,10 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-async fn match_(regex: Arg<String>, haystack: Arg<String>) -> Result<bool, Error> {
+async fn match_(
+	regex: Arg<String, { id(b"regex") }>,
+	haystack: Arg<String, { id(b"haystack") }>,
+) -> Result<bool, Error> {
 	let Ok(regex) = Regex::new(&regex.val) else {
 		return Err(Error {
 			kind: ErrorKind::Fatal(format!("Invalid regex pattern `{}`", regex.val)),
@@ -30,7 +32,10 @@ async fn match_(regex: Arg<String>, haystack: Arg<String>) -> Result<bool, Error
 	Ok(regex.is_match(&haystack.val))
 }
 
-async fn find(regex: Arg<String>, haystack: Arg<String>) -> Result<Vec<String>, Error> {
+async fn find(
+	regex: Arg<String, { id(b"regex") }>,
+	haystack: Arg<String, { id(b"haystack") }>,
+) -> Result<Vec<String>, Error> {
 	let Ok(regex) = Regex::new(&regex.val) else {
 		return Err(Error {
 			kind: ErrorKind::Fatal(format!("Invalid regex pattern `{}`", regex.val)),
@@ -45,9 +50,9 @@ async fn find(regex: Arg<String>, haystack: Arg<String>) -> Result<Vec<String>, 
 }
 
 async fn replace(
-	regex: Arg<String>,
-	haystack: Arg<String>,
-	replace: Arg<String>,
+	regex: Arg<String, { id(b"regex") }>,
+	haystack: Arg<String, { id(b"haystack") }>,
+	replace: Arg<String, { id(b"replace") }>,
 ) -> Result<String, Error> {
 	let Ok(regex) = Regex::new(&regex.val) else {
 		return Err(Error {

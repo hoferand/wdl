@@ -28,6 +28,7 @@ macro_rules! impl_handler {
 			#[allow(non_snake_case, unused_variables, unused_mut)]
 			fn call(self, mut ctx: CallContext) -> BoxFuture<'static, Result<Value, Error>> {
 				Box::pin(async move {
+					// TODO: check for unused arguments
 					(self)($($ty::from_ctx(&mut ctx)?,)*).await.into_result()
 				})
 			}

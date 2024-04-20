@@ -23,5 +23,5 @@ pub enum ErrorKind {
 	InvalidType { msg: String },
 	DivisionByZero,
 	ArityMismatch { expected: usize, given: usize },
-	TooFewArguments,
+	TooFewArguments { id: Identifier },
 }

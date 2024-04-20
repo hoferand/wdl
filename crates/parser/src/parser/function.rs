@@ -1,4 +1,4 @@
-use ast::{function::Parameter, Function, Node, Span};
+use ast::{function::FormalParameter, Function, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
@@ -23,7 +23,7 @@ pub(crate) fn parse_function(
 		let id = parse_identifier(parser)?;
 		parameter.push(Node {
 			src: id.src.clone(),
-			val: Parameter { id },
+			val: FormalParameter { id },
 		});
 		parser.tokens.want(TokenValue::Comma);
 	}

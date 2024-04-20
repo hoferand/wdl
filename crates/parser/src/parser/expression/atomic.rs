@@ -72,13 +72,13 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 
 			let id = scope.pop().unwrap(); // can not fail
 
-			let start = id.src.start.clone();
-			let end;
-			if let Some(s) = scope.first() {
-				end = s.src.end.clone();
+			let start;
+			if let Some(sc) = scope.first() {
+				start = sc.src.start.clone();
 			} else {
-				end = id.src.end.clone();
+				start = id.src.start.clone();
 			}
+			let end = id.src.end.clone();
 
 			Expression::Identifier(Node {
 				src: Span { start, end },

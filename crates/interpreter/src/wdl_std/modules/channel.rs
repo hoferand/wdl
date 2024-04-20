@@ -1,5 +1,5 @@
 use crate::{
-	wdl_std::{get_handler, Arg, Env},
+	wdl_std::{get_handler, id, Arg, Env},
 	ChannelId, Error, ErrorKind, FunctionId, FunctionValue,
 };
 
@@ -15,7 +15,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-pub async fn new(Env(env): Env, buffer: Arg<f64>) -> Result<ChannelId, Error> {
+pub async fn new(Env(env): Env, buffer: Arg<f64, { id(b"buffer") }>) -> Result<ChannelId, Error> {
 	if buffer.val < 1.0 {
 		return Err(Error {
 			kind: ErrorKind::Fatal(format!(
@@ -31,7 +31,7 @@ pub async fn new(Env(env): Env, buffer: Arg<f64>) -> Result<ChannelId, Error> {
 	Ok(ch_id)
 }
 
-pub async fn close(Env(env): Env, ch_id: Arg<ChannelId>) -> Result<(), Error> {
+pub async fn close(Env(env): Env, ch_id: Arg<ChannelId, { id(b"channel") }>) -> Result<(), Error> {
 	let Some(ch) = env.get_ch(&ch_id.val).await else {
 		return Err(Error::fatal(format!("Channel `{}` not found", ch_id.val.0)));
 	};

@@ -1,39 +1,69 @@
 use std::sync::Arc;
 
-use crate::{Error, ErrorKind, Value};
+use ast::Identifier;
 
-use super::{CallContext, Env, FromArgument};
+use crate::{Error, ErrorKind};
+
+use super::{name, Arg, CallContext, Env, FromValue};
 
 pub(crate) trait FromCallContext: Sized {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error>;
 }
 
-impl<T: FromArgument> FromCallContext for T {
+impl<T: FromValue, const N: u32> FromCallContext for Arg<T, N> {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
-		if let Some(arg) = ctx.args.next() {
-			Ok(T::from_arg(arg)?)
+		if let Some(val) = Option::<Arg<T, N>>::from_ctx(ctx)? {
+			Ok(val)
 		} else {
+			let id = Identifier(String::from_utf8_lossy(name(N)).into_owned());
 			Err(Error {
-				kind: ErrorKind::TooFewArguments,
+				kind: ErrorKind::TooFewArguments { id },
 				src: Some(ctx.fn_span.clone()),
 			})
 		}
 	}
 }
 
-impl<T: FromArgument> FromCallContext for Option<T> {
+impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
-		if let Some(arg) = ctx.args.next() {
-			if arg.val == Value::Null {
-				Ok(None)
+		let id = Identifier(String::from_utf8_lossy(name(N)).into_owned());
+
+		let mut arg = ctx.args.next();
+
+		if arg.is_none() {
+			arg = ctx.named_args.get(&id).cloned();
+			ctx.named_args.remove(&id);
+		}
+
+		if let Some(arg) = arg {
+			let arg_clone = arg.clone();
+			let value = T::from_value(arg.val).map_err(|mut err| {
+				err.src = Some(arg.span);
+				err
+			})?;
+			if let Some(val) = value {
+				Ok(Some(Arg::new(arg_clone.idx, arg_clone.span, val)))
 			} else {
-				Ok(Some(T::from_arg(arg)?))
+				Err(Error {
+					kind: ErrorKind::InvalidType {
+						msg: format!(
+							"expected `{}`, given `{}` for argument `{}` on index {}",
+							T::get_type(),
+							arg_clone.val.get_type(),
+							id,
+							arg_clone.idx
+						),
+					},
+					src: Some(arg_clone.span),
+				})
 			}
 		} else {
 			Ok(None)
 		}
 	}
 }
+
+// TODO: implement for Arg<Vec<T>, N> and Arg<HashMap<String, T>, N>
 
 impl FromCallContext for Env {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {

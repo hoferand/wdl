@@ -7,7 +7,7 @@ use logger::Colorize;
 use serde::Serialize;
 
 use crate::{
-	wdl_std::{get_handler, Arg, ResultType},
+	wdl_std::{get_handler, id, Arg, ResultType},
 	Error, FunctionId, FunctionValue,
 };
 
@@ -35,7 +35,7 @@ struct HttpResponse {
 
 impl ResultType for HttpResponse {}
 
-async fn get(url: Arg<String>) -> Result<Option<HttpResponse>, Error> {
+async fn get(url: Arg<String, { id(b"url") }>) -> Result<Option<HttpResponse>, Error> {
 	process_response(reqwest::get(parse_url(&url.val)?).await).await
 }
 

@@ -1,5 +1,5 @@
 use crate::{
-	wdl_std::{get_handler, Arg},
+	wdl_std::{get_handler, id, Arg},
 	FunctionId, FunctionValue, Value,
 };
 
@@ -14,6 +14,6 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-pub async fn print(arg: Arg<Value>) {
-	println!("{}", arg.val.to_string());
+pub async fn print(msg: Arg<Value, { id(b"msg") }>) {
+	println!("{}", msg.val.to_string());
 }

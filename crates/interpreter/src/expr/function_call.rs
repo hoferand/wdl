@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use async_recursion::async_recursion;
 
@@ -43,21 +43,21 @@ pub async fn interpret_function_call(
 			let inner_env = Arc::new(Environment::with_parent(Arc::clone(g_env)));
 
 			let mut ids = function.parameter.iter();
-			let mut vals = expr.val.parameter.val.iter();
+			let mut vals = expr.val.args.iter();
 			loop {
 				match (ids.next(), vals.next()) {
 					(None, Some(_)) | (Some(_), None) => {
 						return Err(Error {
 							kind: ErrorKind::ArityMismatch {
 								expected: function.parameter.len(),
-								given: expr.val.parameter.val.len(),
+								given: expr.val.args.len(),
 							},
-							src: Some(expr.val.parameter.src.clone()),
+							src: Some(expr.val.function.get_src().clone()),
 						});
 					}
 					(Some(id_node), Some(val_expr)) => {
 						let id = id_node.val.id.clone();
-						let val = interpret_expr(val_expr, env, g_env).await?;
+						let val = interpret_expr(&val_expr.val.val, env, g_env).await?;
 						inner_env.declare(id, val).await?;
 					}
 					_ => break,
@@ -77,12 +77,26 @@ pub async fn interpret_function_call(
 		}
 		FunctionValue::Std(std_fn) => {
 			let mut args = Vec::new();
-			for (idx, arg) in expr.val.parameter.val.iter().enumerate() {
-				args.push(ArgumentValue {
-					idx: idx + 1,
-					span: arg.get_src().clone(),
-					val: interpret_expr(arg, env, g_env).await?,
-				});
+			let mut named_args = HashMap::new();
+			for (idx, arg) in expr.val.args.iter().enumerate() {
+				let val = interpret_expr(&arg.val.val, env, g_env).await?;
+
+				if let Some(id) = &arg.val.id {
+					named_args.insert(
+						id.val.clone(),
+						ArgumentValue {
+							idx: idx + 1,
+							span: arg.src.clone(),
+							val,
+						},
+					);
+				} else {
+					args.push(ArgumentValue {
+						idx: idx + 1,
+						span: arg.val.val.get_src().clone(),
+						val,
+					});
+				}
 			}
 
 			let args = args.into_iter();
@@ -91,6 +105,7 @@ pub async fn interpret_function_call(
 					fn_span: expr.val.function.get_src().clone(),
 					env: Arc::clone(g_env),
 					args,
+					named_args,
 				})
 				.await?;
 		}

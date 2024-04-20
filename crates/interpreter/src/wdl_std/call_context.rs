@@ -1,6 +1,6 @@
-use std::{sync::Arc, vec::IntoIter};
+use std::{collections::HashMap, sync::Arc, vec::IntoIter};
 
-use ast::Span;
+use ast::{Identifier, Span};
 
 use crate::{Environment, Value};
 
@@ -8,9 +8,10 @@ pub struct CallContext {
 	pub fn_span: Span,
 	pub env: Arc<Environment>,
 	pub args: IntoIter<ArgumentValue>,
+	pub named_args: HashMap<Identifier, ArgumentValue>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ArgumentValue {
 	pub idx: usize,
 	pub span: Span,

@@ -1,4 +1,4 @@
-use ast::{Expression, FunctionCall, Member, Node, Offset, Span};
+use ast::{Argument, Expression, FunctionCall, Member, Node, Offset, Span};
 
 use crate::{parser::identifier::parse_identifier, Parser, ParserError, TokenValue};
 
@@ -10,17 +10,56 @@ pub(crate) fn parse_member_call_index(
 	let mut expr = parse_atomic(parser)?;
 
 	loop {
-		if let Some(paren) = parser.tokens.want(TokenValue::ParenOpen) {
+		if parser.tokens.want(TokenValue::ParenOpen).is_some() {
 			// parse function call
-			let start = paren.span.start.clone();
-
-			let mut parameter = Vec::new();
+			let mut args = Vec::new();
 			while let Some(token) = parser.tokens.peek() {
 				if token.value == TokenValue::ParenClose {
 					break;
 				}
-				parameter.push(parse_expression(parser)?);
-				parser.tokens.want(TokenValue::Comma);
+				let id = parse_expression(parser)?;
+
+				if let Some(token) = parser.tokens.want(TokenValue::Colon).cloned() {
+					let val = parse_expression(parser)?;
+					if let Expression::Identifier(id) = id {
+						if !id.val.scope.is_empty() {
+							return Err(ParserError::Positional {
+								msg: format!(
+									"Cannot use scoped identifier `{}` as named argument",
+									id.val
+								),
+								span: id.src,
+							});
+						}
+						args.push(Node {
+							src: Span {
+								start: id.src.start,
+								end: val.get_src().end.clone(),
+							},
+							val: Argument {
+								id: Some(Node {
+									src: id.val.id.src,
+									val: id.val.id.val,
+								}),
+								val,
+							},
+						});
+					} else {
+						return Err(ParserError::UnexpectedToken {
+							src: token.src,
+							span: token.span,
+						});
+					}
+				} else {
+					args.push(Node {
+						src: id.get_src().clone(),
+						val: Argument { id: None, val: id },
+					});
+				}
+
+				if parser.tokens.want(TokenValue::Comma).is_none() {
+					break;
+				}
 			}
 
 			let end = parser
@@ -37,10 +76,7 @@ pub(crate) fn parse_member_call_index(
 				},
 				val: FunctionCall {
 					function: Box::new(expr),
-					parameter: Node {
-						src: Span { start, end },
-						val: parameter,
-					},
+					args,
 				},
 			});
 		} else if let Some(bracket) = parser.tokens.want(TokenValue::BracketOpen) {

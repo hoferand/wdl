@@ -3,8 +3,10 @@ use serde::Deserialize;
 use logger::log;
 use logger::Colorize;
 
-use crate::wdl_std::arg_type::ArgType;
-use crate::{wdl_std::get_handler, FunctionId, FunctionValue};
+use crate::{
+	wdl_std::{get_handler, id, Arg, ArgType},
+	FunctionId, FunctionValue,
+};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -48,14 +50,14 @@ struct Coordinate {
 	y: u32,
 }
 
-async fn pickup(target: Target) {
-	log!("pickup from {:?}", target);
+async fn pickup(target: Arg<Target, { id(b"target") }>) {
+	log!("pickup from {:?}", target.val);
 }
 
-async fn drop(target: Target) {
-	log!("drop to {:?}", target);
+async fn drop(target: Arg<Target, { id(b"target") }>) {
+	log!("drop to {:?}", target.val);
 }
 
-async fn drive(target: Target) {
-	log!("drive to {:?}", target);
+async fn drive(target: Arg<Target, { id(b"target") }>) {
+	log!("drive to {:?}", target.val);
 }
