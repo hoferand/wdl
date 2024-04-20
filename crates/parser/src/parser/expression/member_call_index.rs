@@ -9,6 +9,7 @@ pub(crate) fn parse_member_call_index(
 ) -> Result<Expression<Span>, ParserError> {
 	let mut expr = parse_atomic(parser)?;
 
+	let mut named = false;
 	loop {
 		if parser.tokens.want(TokenValue::ParenOpen).is_some() {
 			// parse function call
@@ -20,6 +21,7 @@ pub(crate) fn parse_member_call_index(
 				let id = parse_expression(parser)?;
 
 				if let Some(token) = parser.tokens.want(TokenValue::Colon).cloned() {
+					named = true;
 					let val = parse_expression(parser)?;
 					if let Expression::Identifier(id) = id {
 						if !id.val.scope.is_empty() {
@@ -50,10 +52,16 @@ pub(crate) fn parse_member_call_index(
 							span: token.span,
 						});
 					}
-				} else {
+				} else if !named {
 					args.push(Node {
 						src: id.get_src().clone(),
 						val: Argument { id: None, val: id },
+					});
+				} else {
+					return Err(ParserError::Positional {
+						msg: "Positional arguments are not allowed after named arguments"
+							.to_owned(),
+						span: id.get_src().clone(),
 					});
 				}
 
