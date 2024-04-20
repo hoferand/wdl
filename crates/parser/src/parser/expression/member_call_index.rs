@@ -14,6 +14,7 @@ pub(crate) fn parse_member_call_index(
 		if parser.tokens.want(TokenValue::ParenOpen).is_some() {
 			// parse function call
 			let mut args = Vec::new();
+			let mut names = Vec::new();
 			while let Some(token) = parser.tokens.peek() {
 				if token.value == TokenValue::ParenClose {
 					break;
@@ -33,6 +34,21 @@ pub(crate) fn parse_member_call_index(
 								span: id.src,
 							});
 						}
+
+						if names.contains(&id.val.id.val) {
+							return Err(ParserError::Positional {
+								msg: format!(
+									"Same named argument `{}` multiple times",
+									id.val.id.val
+								),
+								span: Span {
+									start: id.src.start,
+									end: val.get_src().end.clone(),
+								},
+							});
+						}
+						names.push(id.val.id.val.clone());
+
 						args.push(Node {
 							src: Span {
 								start: id.src.start,
