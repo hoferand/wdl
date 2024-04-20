@@ -9,7 +9,8 @@
         "peekable",
         "reqwest",
         "stationarea",
-        "stationareas"
+        "stationareas",
+        "newtype"
     ],
     "flagWords": []
 }
