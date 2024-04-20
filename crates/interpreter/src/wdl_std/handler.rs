@@ -37,7 +37,7 @@ macro_rules! impl_handler {
 					let rem = ctx.args.count();
 					let rem_named = ctx.named_args.keys().len();
 
-					for (id, arg) in ctx.named_args {
+					if let Some((id, arg)) = ctx.named_args.into_iter().next() {
 						return Err(Error{
 							kind: ErrorKind::UnknownArgument {
 								id
