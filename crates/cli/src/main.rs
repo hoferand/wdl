@@ -145,7 +145,7 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			error!("Argument `{}` missing!", id);
 		}
 		interpreter::ErrorKind::UnknownArgument { id } => {
-			error!("Argument name `{}` unknown!", id);
+			error!("Named argument `{}` unknown!", id);
 		}
 	}
 
