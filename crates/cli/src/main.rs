@@ -206,7 +206,9 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 				expected,
 			} => {
 				let mut msg = format!("Unexpected token `{}`", src);
-				if expected.len() > 0 {
+				if expected.len() == 1 {
+					msg += &format!(", expected `{}`", expected[0]);
+				} else if expected.len() > 0 {
 					msg += ", expected one of [";
 					msg += &expected
 						.into_iter()
