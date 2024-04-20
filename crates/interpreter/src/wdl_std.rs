@@ -54,12 +54,12 @@ async fn call_function(
 	for val in values {
 		args.push(ArgumentValue {
 			idx: 1,
-			span: span,
+			span,
 			val,
 		});
 	}
 
-	let error = match run_function(function_id, span, args, HashMap::new(), &env).await {
+	let error = match run_function(function_id, span, args, HashMap::new(), env).await {
 		Ok(val) => return Ok(val),
 		Err(err) => err,
 	};

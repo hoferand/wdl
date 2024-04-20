@@ -10,8 +10,8 @@ pub(crate) fn parse_unary(parser: &mut Parser) -> Result<Expression<Span>, Parse
 
 		Ok(Expression::Unary(Node {
 			src: Span {
-				start: op.src.start.clone(),
-				end: value.get_src().end.clone(),
+				start: op.src.start,
+				end: value.get_src().end,
 			},
 			val: Unary {
 				op,

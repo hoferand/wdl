@@ -39,7 +39,7 @@ impl<'t> Parser<'t> {
 				Declaration::Actions(actions) => {
 					if let Some(actions1) = wf_actions {
 						return Err(ParserError::SecondActions {
-							actions1: actions1.src.clone(),
+							actions1: actions1.src,
 							actions2: actions.src,
 						});
 					} else {

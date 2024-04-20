@@ -25,7 +25,7 @@ pub async fn interpret_member(
 			kind: ErrorKind::InvalidType {
 				msg: format!("`{}`.{}", value.get_type(), id.val.0),
 			},
-			src: Some(expr.src.clone()),
+			src: Some(expr.src),
 		})
 	}
 }

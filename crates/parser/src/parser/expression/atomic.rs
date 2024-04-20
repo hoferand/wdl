@@ -13,30 +13,29 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 
 	let expr = match &token.value {
 		TokenValue::Null => Expression::Literal(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: Literal::Null,
 		}),
 		TokenValue::Bool(b) => Expression::Literal(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: Literal::Bool(*b),
 		}),
 		TokenValue::Number(n) => Expression::Literal(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: Literal::Number(*n),
 		}),
 		TokenValue::String(s) => Expression::Literal(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: Literal::String(s.to_owned()),
 		}),
 		TokenValue::ParenOpen => {
-			let start = token.span.start.clone();
+			let start = token.span.start;
 			let expr = parse_expression(parser)?;
 			let end = parser
 				.tokens
 				.expect(TokenValue::ParenClose)?
 				.span
-				.end
-				.clone();
+				.end;
 
 			Expression::Group(Node {
 				src: Span { start, end },
@@ -48,7 +47,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 		TokenValue::Identifier(id) => {
 			let mut scope = Vec::new();
 			scope.push(Node {
-				src: token.span.clone(),
+				src: token.span,
 				val: Identifier(id.to_owned()),
 			});
 
@@ -64,7 +63,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 
 				if let TokenValue::Identifier(id_str) = &id.value {
 					scope.push(Node {
-						src: id.span.clone(),
+						src: id.span,
 						val: Identifier(id_str.to_owned()),
 					});
 				}
@@ -74,11 +73,11 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 
 			let start;
 			if let Some(sc) = scope.first() {
-				start = sc.src.start.clone();
+				start = sc.src.start;
 			} else {
-				start = id.src.start.clone();
+				start = id.src.start;
 			}
-			let end = id.src.end.clone();
+			let end = id.src.end;
 
 			Expression::Identifier(Node {
 				src: Span { start, end },
@@ -86,7 +85,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 			})
 		}
 		TokenValue::BracketOpen => {
-			let start = token.span.start.clone();
+			let start = token.span.start;
 
 			let mut values = Vec::new();
 
@@ -106,8 +105,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 				.tokens
 				.expect(TokenValue::BracketClose)?
 				.span
-				.end
-				.clone();
+				.end;
 
 			Expression::Array(Node {
 				src: Span { start, end },
@@ -115,7 +113,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 			})
 		}
 		TokenValue::CurlyOpen => {
-			let start = token.span.start.clone();
+			let start = token.span.start;
 
 			let mut values = HashMap::new();
 			while let Some(token) = parser.tokens.peek() {
@@ -133,7 +131,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 					_ => {
 						return Err(ParserError::UnexpectedToken {
 							src: key_token.src.clone(),
-							span: key_token.span.clone(),
+							span: key_token.span,
 						});
 					}
 				}
@@ -152,8 +150,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 				.tokens
 				.expect(TokenValue::CurlyClose)?
 				.span
-				.end
-				.clone();
+				.end;
 
 			Expression::Object(Node {
 				src: Span { start, end },
@@ -163,7 +160,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 		_ => {
 			return Err(ParserError::UnexpectedToken {
 				src: token.src.clone(),
-				span: token.span.clone(),
+				span: token.span,
 			});
 		}
 	};

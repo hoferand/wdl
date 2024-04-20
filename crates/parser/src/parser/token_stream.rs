@@ -28,7 +28,7 @@ impl<'t> TokenStream<'t> {
 			if token.value != expect {
 				Err(ParserError::UnexpectedToken {
 					src: token.src.clone(),
-					span: token.span.clone(),
+					span: token.span,
 				})
 			} else {
 				Ok(token)
@@ -65,7 +65,7 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: op,
 		})
 	}
@@ -83,7 +83,7 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: op,
 		})
 	}
@@ -102,7 +102,7 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: op,
 		})
 	}
@@ -121,7 +121,7 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: op,
 		})
 	}
@@ -138,7 +138,7 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span.clone(),
+			src: token.span,
 			val: op,
 		})
 	}

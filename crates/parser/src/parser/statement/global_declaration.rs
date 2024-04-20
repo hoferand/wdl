@@ -5,7 +5,7 @@ use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValu
 pub(crate) fn parse_global_declaration(
 	parser: &mut Parser,
 ) -> Result<Node<Span, GlobalDeclaration<Span>>, ParserError> {
-	let start = parser.tokens.expect(TokenValue::Global)?.span.start.clone();
+	let start = parser.tokens.expect(TokenValue::Global)?.span.start;
 
 	let Some(id_token) = parser.tokens.next().cloned() else {
 		return Err(ParserError::UnexpectedEoF);
@@ -13,7 +13,7 @@ pub(crate) fn parse_global_declaration(
 	let TokenValue::Identifier(id) = &id_token.value else {
 		return Err(ParserError::UnexpectedToken {
 			src: id_token.src.clone(),
-			span: id_token.span.clone(),
+			span: id_token.span,
 		});
 	};
 
@@ -33,8 +33,7 @@ pub(crate) fn parse_global_declaration(
 		.tokens
 		.expect(TokenValue::Semicolon)?
 		.span
-		.end
-		.clone();
+		.end;
 
 	Ok(Node {
 		src: Span { start, end },

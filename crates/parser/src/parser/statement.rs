@@ -49,7 +49,7 @@ pub(crate) fn parse_declaration(
 		_ => {
 			return Err(ParserError::UnexpectedToken {
 				src: token.src.clone(),
-				span: token.span.clone(),
+				span: token.span,
 			});
 		}
 	}))
@@ -94,8 +94,8 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Sp
 
 					val = Statement::Assignment(Node {
 						src: Span {
-							start: id.src.start.clone(),
-							end: value.get_src().end.clone(),
+							start: id.src.start,
+							end: value.get_src().end,
 						},
 						val: Assignment {
 							id: id.val.id,
@@ -111,8 +111,8 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Sp
 
 				val = Statement::Send(Node {
 					src: Span {
-						start: expr.get_src().start.clone(),
-						end: value.get_src().end.clone(),
+						start: expr.get_src().start,
+						end: value.get_src().end,
 					},
 					val: Send {
 						ch: Box::new(expr),

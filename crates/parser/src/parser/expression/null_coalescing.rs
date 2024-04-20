@@ -12,8 +12,8 @@ pub(crate) fn parse_null_coalescing(parser: &mut Parser) -> Result<Expression<Sp
 
 		left = Expression::Binary(Node {
 			src: Span {
-				start: left.get_src().start.clone(),
-				end: right.get_src().end.clone(),
+				start: left.get_src().start,
+				end: right.get_src().end,
 			},
 			val: Binary {
 				left: Box::new(left),

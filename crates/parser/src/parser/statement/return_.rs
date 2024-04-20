@@ -8,11 +8,11 @@ pub(crate) fn parse_return(parser: &mut Parser) -> Result<Node<Span, Return<Span
 	if parser.state.in_par > 0 || parser.state.in_function < 1 {
 		return Err(ParserError::UnexpectedToken {
 			src: token.src.clone(),
-			span: token.span.clone(),
+			span: token.span,
 		});
 	}
 
-	let start = token.span.start.clone();
+	let start = token.span.start;
 
 	let value = parse_expression(parser)?;
 
@@ -20,8 +20,7 @@ pub(crate) fn parse_return(parser: &mut Parser) -> Result<Node<Span, Return<Span
 		.tokens
 		.expect(TokenValue::Semicolon)?
 		.span
-		.end
-		.clone();
+		.end;
 
 	Ok(Node {
 		src: Span { start, end },

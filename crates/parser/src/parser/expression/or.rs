@@ -12,8 +12,8 @@ pub(crate) fn parse_or(parser: &mut Parser) -> Result<Expression<Span>, ParserEr
 
 		left = Expression::Logical(Node {
 			src: Span {
-				start: left.get_src().start.clone(),
-				end: right.get_src().end.clone(),
+				start: left.get_src().start,
+				end: right.get_src().end,
 			},
 			val: Logical {
 				left: Box::new(left),

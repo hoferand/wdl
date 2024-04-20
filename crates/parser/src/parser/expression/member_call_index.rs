@@ -43,7 +43,7 @@ pub(crate) fn parse_member_call_index(
 								),
 								span: Span {
 									start: id.src.start,
-									end: val.get_src().end.clone(),
+									end: val.get_src().end,
 								},
 							});
 						}
@@ -52,7 +52,7 @@ pub(crate) fn parse_member_call_index(
 						args.push(Node {
 							src: Span {
 								start: id.src.start,
-								end: val.get_src().end.clone(),
+								end: val.get_src().end,
 							},
 							val: Argument {
 								id: Some(Node {
@@ -70,14 +70,14 @@ pub(crate) fn parse_member_call_index(
 					}
 				} else if !named {
 					args.push(Node {
-						src: id.get_src().clone(),
+						src: *id.get_src(),
 						val: Argument { id: None, val: id },
 					});
 				} else {
 					return Err(ParserError::Positional {
 						msg: "Positional arguments are not allowed after named arguments"
 							.to_owned(),
-						span: id.get_src().clone(),
+						span: *id.get_src(),
 					});
 				}
 
@@ -90,13 +90,12 @@ pub(crate) fn parse_member_call_index(
 				.tokens
 				.expect(TokenValue::ParenClose)?
 				.span
-				.end
-				.clone();
+				.end;
 
 			expr = Expression::FunctionCall(Node {
 				src: Span {
-					start: expr.get_src().start.clone(),
-					end: end.clone(),
+					start: expr.get_src().start,
+					end,
 				},
 				val: FunctionCall {
 					function: Box::new(expr),
@@ -105,7 +104,7 @@ pub(crate) fn parse_member_call_index(
 			});
 		} else if let Some(bracket) = parser.tokens.want(TokenValue::BracketOpen) {
 			// parse index
-			let start = bracket.span.start.clone();
+			let start = bracket.span.start;
 
 			let offset = parse_expression(parser)?;
 
@@ -113,8 +112,7 @@ pub(crate) fn parse_member_call_index(
 				.tokens
 				.expect(TokenValue::BracketClose)?
 				.span
-				.end
-				.clone();
+				.end;
 
 			expr = Expression::Offset(Node {
 				src: Span { start, end },
@@ -125,14 +123,14 @@ pub(crate) fn parse_member_call_index(
 			});
 		} else if let Some(point) = parser.tokens.want(TokenValue::Point) {
 			// parse member
-			let start = point.span.start.clone();
+			let start = point.span.start;
 
 			let id = parse_identifier(parser)?;
 
 			expr = Expression::Member(Node {
 				src: Span {
 					start,
-					end: id.src.end.clone(),
+					end: id.src.end,
 				},
 				val: Member {
 					object: Box::new(expr),

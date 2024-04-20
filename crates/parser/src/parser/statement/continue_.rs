@@ -8,18 +8,17 @@ pub(crate) fn parse_continue(parser: &mut Parser) -> Result<Node<Span, Continue>
 	if parser.state.in_par > 0 || parser.state.in_loop < 1 {
 		return Err(ParserError::UnexpectedToken {
 			src: token.src.clone(),
-			span: token.span.clone(),
+			span: token.span,
 		});
 	}
 
-	let start = token.span.start.clone();
+	let start = token.span.start;
 
 	let end = parser
 		.tokens
 		.expect(TokenValue::Semicolon)?
 		.span
-		.end
-		.clone();
+		.end;
 
 	Ok(Node {
 		src: Span { start, end },

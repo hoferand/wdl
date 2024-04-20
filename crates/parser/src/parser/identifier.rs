@@ -9,14 +9,14 @@ pub(crate) fn parse_identifier(parser: &mut Parser) -> Result<Node<Span, Identif
 	let TokenValue::Identifier(id_str) = &id_token.value else {
 		return Err(ParserError::UnexpectedToken {
 			src: id_token.src.clone(),
-			span: id_token.span.clone(),
+			span: id_token.span,
 		});
 	};
 
 	Ok(Node {
 		src: Span {
-			start: id_token.span.start.clone(),
-			end: id_token.span.end.clone(),
+			start: id_token.span.start,
+			end: id_token.span.end,
 		},
 		val: Identifier(id_str.to_owned()),
 	})

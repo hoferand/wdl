@@ -10,11 +10,11 @@ pub(crate) fn parse_par(parser: &mut Parser) -> Result<Node<Span, Par<Span>>, Pa
 	if parser.state.in_par > 0 {
 		return Err(ParserError::UnexpectedToken {
 			src: token.src.clone(),
-			span: token.span.clone(),
+			span: token.span,
 		});
 	}
 
-	let start = token.span.start.clone();
+	let start = token.span.start;
 
 	parser.tokens.expect(TokenValue::CurlyOpen)?;
 	parser.state.in_par += 1;
@@ -33,8 +33,7 @@ pub(crate) fn parse_par(parser: &mut Parser) -> Result<Node<Span, Par<Span>>, Pa
 		.tokens
 		.expect(TokenValue::CurlyClose)?
 		.span
-		.end
-		.clone();
+		.end;
 
 	Ok(Node {
 		src: Span { start, end },

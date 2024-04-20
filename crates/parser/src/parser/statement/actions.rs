@@ -9,8 +9,7 @@ pub(crate) fn parse_actions(parser: &mut Parser) -> Result<Node<Span, Actions<Sp
 		.tokens
 		.expect(TokenValue::Actions)?
 		.span
-		.start
-		.clone();
+		.start;
 	parser.state.in_actions += 1;
 	let block = parse_block(parser)?;
 	parser.state.in_actions -= 1;
@@ -18,7 +17,7 @@ pub(crate) fn parse_actions(parser: &mut Parser) -> Result<Node<Span, Actions<Sp
 	Ok(Node {
 		src: Span {
 			start,
-			end: block.src.end.clone(),
+			end: block.src.end,
 		},
 		val: Actions { block },
 	})

@@ -18,7 +18,7 @@ impl<T: FromValue, const N: u32> FromCallContext for Arg<T, N> {
 			let id = Identifier(String::from_utf8_lossy(name(N)).into_owned());
 			Err(Error {
 				kind: ErrorKind::MissingArgument { id },
-				src: Some(ctx.fn_span.clone()),
+				src: Some(ctx.fn_span),
 			})
 		}
 	}

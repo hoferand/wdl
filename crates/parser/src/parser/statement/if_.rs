@@ -5,7 +5,7 @@ use crate::{parser::expression::parse_expression, token::TokenValue, Parser, Par
 use super::{parse_block, parse_else};
 
 pub(crate) fn parse_if(parser: &mut Parser) -> Result<Node<Span, If<Span>>, ParserError> {
-	let start = parser.tokens.expect(TokenValue::If)?.span.start.clone();
+	let start = parser.tokens.expect(TokenValue::If)?.span.start;
 
 	let condition = parse_expression(parser)?;
 
@@ -21,7 +21,7 @@ pub(crate) fn parse_if(parser: &mut Parser) -> Result<Node<Span, If<Span>>, Pars
 	Ok(Node {
 		src: Span {
 			start,
-			end: block.src.end.clone(),
+			end: block.src.end,
 		},
 		val: If {
 			condition,

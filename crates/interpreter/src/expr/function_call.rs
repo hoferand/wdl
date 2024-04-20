@@ -25,7 +25,7 @@ pub async fn interpret_function_call(
 				kind: ErrorKind::InvalidType {
 					msg: format!("`{}`()", v.get_type()),
 				},
-				src: Some(expr.val.function.get_src().clone()),
+				src: Some(*expr.val.function.get_src()),
 			});
 		}
 	};
@@ -40,14 +40,14 @@ pub async fn interpret_function_call(
 				id.val.clone(),
 				ArgumentValue {
 					idx: idx + 1,
-					span: arg.src.clone(),
+					span: arg.src,
 					val,
 				},
 			);
 		} else {
 			args.push(ArgumentValue {
 				idx: idx + 1,
-				span: arg.val.val.get_src().clone(),
+				span: *arg.val.val.get_src(),
 				val,
 			});
 		}
@@ -55,7 +55,7 @@ pub async fn interpret_function_call(
 
 	run_function(
 		&function_id,
-		expr.val.function.get_src().clone(),
+		*expr.val.function.get_src(),
 		args,
 		named_args,
 		g_env,
@@ -71,7 +71,7 @@ pub async fn run_function(
 	mut named_args: HashMap<Identifier, ArgumentValue>,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let Some(function_val) = g_env.get_fn(&fn_id).await else {
+	let Some(function_val) = g_env.get_fn(fn_id).await else {
 		return Err(Error::fatal(format!("Function `{}` not found", fn_id)));
 	};
 

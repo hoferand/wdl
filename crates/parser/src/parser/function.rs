@@ -11,8 +11,7 @@ pub(crate) fn parse_function(
 		.tokens
 		.expect(TokenValue::ParenOpen)?
 		.span
-		.start
-		.clone();
+		.start;
 
 	// parse parameter
 	let mut parameter = Vec::new();
@@ -22,7 +21,7 @@ pub(crate) fn parse_function(
 		}
 		let id = parse_identifier(parser)?;
 		parameter.push(Node {
-			src: id.src.clone(),
+			src: id.src,
 			val: FormalParameter { id },
 		});
 		parser.tokens.want(TokenValue::Comma);
@@ -38,7 +37,7 @@ pub(crate) fn parse_function(
 	Ok(Node {
 		src: Span {
 			start,
-			end: body.src.end.clone(),
+			end: body.src.end,
 		},
 		val: Function { parameter, body },
 	})

@@ -9,8 +9,7 @@ pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Span, Block<Span>>
 		.tokens
 		.expect(TokenValue::CurlyOpen)?
 		.span
-		.start
-		.clone();
+		.start;
 
 	let mut stmts = Vec::new();
 	loop {
@@ -35,8 +34,7 @@ pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Span, Block<Span>>
 		.tokens
 		.expect(TokenValue::CurlyClose)?
 		.span
-		.end
-		.clone();
+		.end;
 
 	Ok(Node {
 		src: Span { start, end },

@@ -12,8 +12,7 @@ pub(crate) fn parse_function_declaration(
 		.tokens
 		.expect(TokenValue::Function)?
 		.span
-		.start
-		.clone();
+		.start;
 
 	let id = parse_identifier(parser)?;
 
@@ -22,7 +21,7 @@ pub(crate) fn parse_function_declaration(
 	Ok(Node {
 		src: Span {
 			start,
-			end: function.src.end.clone(),
+			end: function.src.end,
 		},
 		val: FunctionDeclaration { id, function },
 	})

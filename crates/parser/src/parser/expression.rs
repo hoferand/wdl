@@ -29,8 +29,8 @@ pub(crate) fn parse_expression(parser: &mut Parser) -> Result<Expression<Span>, 
 	if let Some(spawn) = spawn_option {
 		Ok(Expression::Spawn(Node {
 			src: Span {
-				start: spawn.span.start.clone(),
-				end: expr.get_src().end.clone(),
+				start: spawn.span.start,
+				end: expr.get_src().end,
 			},
 			val: Spawn {
 				expr: Box::new(expr),
