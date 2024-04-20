@@ -141,8 +141,11 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 				expected, given
 			);
 		}
-		interpreter::ErrorKind::TooFewArguments { id } => {
+		interpreter::ErrorKind::MissingArgument { id } => {
 			error!("Argument `{}` missing!", id);
+		}
+		interpreter::ErrorKind::UnknownArgument { id } => {
+			error!("Argument name `{}` unknown!", id);
 		}
 	}
 

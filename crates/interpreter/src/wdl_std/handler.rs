@@ -2,7 +2,7 @@ use std::future::Future;
 
 use futures::future::BoxFuture;
 
-use crate::{Error, Value};
+use crate::{Error, ErrorKind, Value};
 
 use super::{CallContext, FromCallContext, IntoResult};
 
@@ -28,8 +28,35 @@ macro_rules! impl_handler {
 			#[allow(non_snake_case, unused_variables, unused_mut)]
 			fn call(self, mut ctx: CallContext) -> BoxFuture<'static, Result<Value, Error>> {
 				Box::pin(async move {
-					// TODO: check for unused arguments
-					(self)($($ty::from_ctx(&mut ctx)?,)*).await.into_result()
+					let mut cnt = 0;
+					$(
+						let $ty = $ty::from_ctx(&mut ctx)?; // TODO: do not shadow type parameter
+						cnt += 1;
+					)*
+
+					let rem = ctx.args.count();
+					let rem_named = ctx.named_args.keys().len();
+
+					for (id, arg) in ctx.named_args {
+						return Err(Error{
+							kind: ErrorKind::UnknownArgument {
+								id
+							},
+							src: Some(arg.span)
+						});
+					}
+
+					if rem != 0 {
+						return Err(Error {
+							kind: ErrorKind::ArityMismatch {
+								expected: cnt,
+								given: cnt + rem + rem_named
+							},
+							src: Some(ctx.fn_span)
+						});
+					}
+
+					(self)($($ty,)*).await.into_result()
 				})
 			}
 		}
