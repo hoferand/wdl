@@ -7,11 +7,7 @@ use super::{identifier::parse_identifier, statement::parse_block};
 pub(crate) fn parse_function(
 	parser: &mut Parser,
 ) -> Result<Node<Span, Function<Span>>, ParserError> {
-	let start = parser
-		.tokens
-		.expect(TokenValue::ParenOpen)?
-		.span
-		.start;
+	let start = parser.tokens.expect(TokenValue::ParenOpen)?.span.start;
 
 	// parse parameter
 	let mut parameter = Vec::new();

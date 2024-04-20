@@ -50,6 +50,11 @@ pub(crate) fn parse_declaration(
 			return Err(ParserError::UnexpectedToken {
 				src: token.src.clone(),
 				span: token.span,
+				expected: vec![
+					TokenValue::Global.type_str(),
+					TokenValue::Actions.type_str(),
+					TokenValue::Function.type_str(),
+				],
 			});
 		}
 	}))

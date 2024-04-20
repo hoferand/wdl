@@ -7,8 +7,10 @@ pub(crate) fn parse_return(parser: &mut Parser) -> Result<Node<Span, Return<Span
 
 	if parser.state.in_par > 0 || parser.state.in_function < 1 {
 		return Err(ParserError::UnexpectedToken {
+			// TODO: improve error message
 			src: token.src.clone(),
 			span: token.span,
+			expected: Vec::new(),
 		});
 	}
 
@@ -16,11 +18,7 @@ pub(crate) fn parse_return(parser: &mut Parser) -> Result<Node<Span, Return<Span
 
 	let value = parse_expression(parser)?;
 
-	let end = parser
-		.tokens
-		.expect(TokenValue::Semicolon)?
-		.span
-		.end;
+	let end = parser.tokens.expect(TokenValue::Semicolon)?.span.end;
 
 	Ok(Node {
 		src: Span { start, end },

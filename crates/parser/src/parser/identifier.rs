@@ -10,6 +10,7 @@ pub(crate) fn parse_identifier(parser: &mut Parser) -> Result<Node<Span, Identif
 		return Err(ParserError::UnexpectedToken {
 			src: id_token.src.clone(),
 			span: id_token.span,
+			expected: vec![TokenValue::Identifier(String::new()).type_str()],
 		});
 	};
 

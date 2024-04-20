@@ -66,6 +66,7 @@ pub(crate) fn parse_member_call_index(
 						return Err(ParserError::UnexpectedToken {
 							src: token.src,
 							span: token.span,
+							expected: vec![TokenValue::Identifier(String::new()).type_str()],
 						});
 					}
 				} else if !named {
@@ -86,11 +87,7 @@ pub(crate) fn parse_member_call_index(
 				}
 			}
 
-			let end = parser
-				.tokens
-				.expect(TokenValue::ParenClose)?
-				.span
-				.end;
+			let end = parser.tokens.expect(TokenValue::ParenClose)?.span.end;
 
 			expr = Expression::FunctionCall(Node {
 				src: Span {
@@ -108,11 +105,7 @@ pub(crate) fn parse_member_call_index(
 
 			let offset = parse_expression(parser)?;
 
-			let end = parser
-				.tokens
-				.expect(TokenValue::BracketClose)?
-				.span
-				.end;
+			let end = parser.tokens.expect(TokenValue::BracketClose)?.span.end;
 
 			expr = Expression::Offset(Node {
 				src: Span { start, end },

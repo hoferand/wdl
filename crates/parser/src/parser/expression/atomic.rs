@@ -28,22 +28,6 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 			src: token.span,
 			val: Literal::String(s.to_owned()),
 		}),
-		TokenValue::ParenOpen => {
-			let start = token.span.start;
-			let expr = parse_expression(parser)?;
-			let end = parser
-				.tokens
-				.expect(TokenValue::ParenClose)?
-				.span
-				.end;
-
-			Expression::Group(Node {
-				src: Span { start, end },
-				val: Group {
-					expression: Box::new(expr),
-				},
-			})
-		}
 		TokenValue::Identifier(id) => {
 			let mut scope = Vec::new();
 			scope.push(Node {
@@ -84,6 +68,18 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 				val: ScopedIdentifier { id, scope },
 			})
 		}
+		TokenValue::ParenOpen => {
+			let start = token.span.start;
+			let expr = parse_expression(parser)?;
+			let end = parser.tokens.expect(TokenValue::ParenClose)?.span.end;
+
+			Expression::Group(Node {
+				src: Span { start, end },
+				val: Group {
+					expression: Box::new(expr),
+				},
+			})
+		}
 		TokenValue::BracketOpen => {
 			let start = token.span.start;
 
@@ -101,11 +97,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 				}
 			}
 
-			let end = parser
-				.tokens
-				.expect(TokenValue::BracketClose)?
-				.span
-				.end;
+			let end = parser.tokens.expect(TokenValue::BracketClose)?.span.end;
 
 			Expression::Array(Node {
 				src: Span { start, end },
@@ -132,6 +124,10 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 						return Err(ParserError::UnexpectedToken {
 							src: key_token.src.clone(),
 							span: key_token.span,
+							expected: vec![
+								TokenValue::Identifier(String::new()).type_str(),
+								TokenValue::String(String::new()).type_str(),
+							],
 						});
 					}
 				}
@@ -146,11 +142,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 				}
 			}
 
-			let end = parser
-				.tokens
-				.expect(TokenValue::CurlyClose)?
-				.span
-				.end;
+			let end = parser.tokens.expect(TokenValue::CurlyClose)?.span.end;
 
 			Expression::Object(Node {
 				src: Span { start, end },
@@ -161,6 +153,16 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 			return Err(ParserError::UnexpectedToken {
 				src: token.src.clone(),
 				span: token.span,
+				expected: vec![
+					TokenValue::Null.type_str(),
+					TokenValue::Bool(false).type_str(),
+					TokenValue::Number(0.0).type_str(),
+					TokenValue::String(String::new()).type_str(),
+					TokenValue::Identifier(String::new()).type_str(),
+					TokenValue::ParenOpen.type_str(),
+					TokenValue::BracketOpen.type_str(),
+					TokenValue::CurlyOpen.type_str(),
+				],
 			});
 		}
 	};

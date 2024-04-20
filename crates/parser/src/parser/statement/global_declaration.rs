@@ -14,6 +14,7 @@ pub(crate) fn parse_global_declaration(
 		return Err(ParserError::UnexpectedToken {
 			src: id_token.src.clone(),
 			span: id_token.span,
+			expected: vec![TokenValue::Identifier(String::new()).type_str()],
 		});
 	};
 
@@ -29,11 +30,7 @@ pub(crate) fn parse_global_declaration(
 
 	// TODO: parse global description
 
-	let end = parser
-		.tokens
-		.expect(TokenValue::Semicolon)?
-		.span
-		.end;
+	let end = parser.tokens.expect(TokenValue::Semicolon)?.span.end;
 
 	Ok(Node {
 		src: Span { start, end },

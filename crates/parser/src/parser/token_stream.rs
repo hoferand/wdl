@@ -29,6 +29,7 @@ impl<'t> TokenStream<'t> {
 				Err(ParserError::UnexpectedToken {
 					src: token.src.clone(),
 					span: token.span,
+					expected: vec![expect.type_str()],
 				})
 			} else {
 				Ok(token)

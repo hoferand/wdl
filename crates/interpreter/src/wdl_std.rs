@@ -52,11 +52,7 @@ async fn call_function(
 	let mut args = Vec::new();
 
 	for val in values {
-		args.push(ArgumentValue {
-			idx: 1,
-			span,
-			val,
-		});
+		args.push(ArgumentValue { idx: 1, span, val });
 	}
 
 	let error = match run_function(function_id, span, args, HashMap::new(), env).await {

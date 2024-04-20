@@ -200,8 +200,22 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 				error!("{}!", msg);
 				print_error_location(&span.start, &span.end, src_code);
 			}
-			parser::ParserError::UnexpectedToken { src, span } => {
-				error!("Unexpected token `{}`!", src);
+			parser::ParserError::UnexpectedToken {
+				src,
+				span,
+				expected,
+			} => {
+				let mut msg = format!("Unexpected token `{}`", src);
+				if expected.len() > 0 {
+					msg += ", expected one of [";
+					msg += &expected
+						.into_iter()
+						.map(|e| format!("`{}`", e))
+						.collect::<Vec<String>>()
+						.join(", ");
+					msg += "]";
+				}
+				error!("{}!", msg);
 				print_error_location(&span.start, &span.end, src_code);
 			}
 			parser::ParserError::SecondActions { actions1, actions2 } => {

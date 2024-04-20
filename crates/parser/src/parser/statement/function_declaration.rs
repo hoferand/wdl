@@ -8,11 +8,7 @@ use crate::{
 pub(crate) fn parse_function_declaration(
 	parser: &mut Parser,
 ) -> Result<Node<Span, FunctionDeclaration<Span>>, ParserError> {
-	let start = parser
-		.tokens
-		.expect(TokenValue::Function)?
-		.span
-		.start;
+	let start = parser.tokens.expect(TokenValue::Function)?.span.start;
 
 	let id = parse_identifier(parser)?;
 

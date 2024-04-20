@@ -12,6 +12,7 @@ pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Span, Let<Span>>, Pa
 		return Err(ParserError::UnexpectedToken {
 			src: id_token.src.clone(),
 			span: id_token.span,
+			expected: vec![TokenValue::Identifier(String::new()).type_str()],
 		});
 	};
 
@@ -20,17 +21,10 @@ pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Span, Let<Span>>, Pa
 	// TODO: make it optional
 	let value = parse_expression(parser)?;
 
-	let end = parser
-		.tokens
-		.expect(TokenValue::Semicolon)?
-		.span
-		.end;
+	let end = parser.tokens.expect(TokenValue::Semicolon)?.span.end;
 
 	let id_node = Node {
-		src: Span {
-			start,
-			end,
-		},
+		src: Span { start, end },
 		val: Identifier(id.to_owned()),
 	};
 

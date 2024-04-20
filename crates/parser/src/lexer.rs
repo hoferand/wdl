@@ -47,6 +47,8 @@ impl<'c> Lexer<'c> {
 				continue;
 			}
 
+			self.check_line_break();
+
 			self.start_line = self.line;
 			self.start_column = self.column;
 			self.curr_src = String::new();
@@ -351,11 +353,7 @@ impl<'c> Lexer<'c> {
 
 	fn get_char(&mut self) -> Option<char> {
 		let curr_char = self.chars.next();
-		if self.new_line {
-			self.new_line = false;
-			self.line += 1;
-			self.column = 0;
-		}
+		self.check_line_break();
 		if let Some(char) = curr_char {
 			self.curr_src.push(char);
 			self.column += 1;
@@ -365,6 +363,14 @@ impl<'c> Lexer<'c> {
 		}
 
 		curr_char
+	}
+
+	fn check_line_break(&mut self) {
+		if self.new_line {
+			self.new_line = false;
+			self.line += 1;
+			self.column = 0;
+		}
 	}
 
 	fn get_keyword(id: &str) -> TokenValue {
