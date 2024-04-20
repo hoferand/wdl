@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use ast::Identifier;
 
-use crate::{Error, ErrorKind};
+use crate::{Error, ErrorKind, Value};
 
 use super::{name, Arg, CallContext, Env, FromValue};
 
@@ -36,6 +36,9 @@ impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 		}
 
 		if let Some(arg) = arg {
+			if arg.val == Value::Null {
+				return Ok(None);
+			}
 			let arg_clone = arg.clone();
 			let value = T::from_value(arg.val).map_err(|mut err| {
 				err.src = Some(arg.span);

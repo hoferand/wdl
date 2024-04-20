@@ -96,6 +96,8 @@ where
 	T: for<'de> ArgType<'de>,
 {
 	fn from_value(val: Value) -> Result<Option<Self>, Error> {
+		// TODO: do not abuse json for that
+
 		let json_val = match serde_json::to_value(val) {
 			Ok(val) => val,
 			Err(err) => {
