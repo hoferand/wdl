@@ -3,6 +3,8 @@ pub use lexer_error::LexerError;
 
 use std::{iter::Peekable, str::Chars};
 
+use unicode_ident::{is_xid_continue, is_xid_start};
+
 use ast::{Location, Span};
 
 use crate::{Token, TokenValue};
@@ -182,14 +184,14 @@ impl<'c> Lexer<'c> {
 		let Some(ch) = self.chars.peek() else {
 			return Ok(None);
 		};
-		if !ch.is_ascii_alphabetic() || *ch == '_' {
+		if !(is_xid_start(*ch) || *ch == '_') {
 			return Ok(None);
 		}
 
 		self.get_char();
 
 		while let Some(next_char) = self.chars.peek() {
-			if next_char.is_ascii_alphanumeric() || *next_char == '_' {
+			if is_xid_continue(*next_char) {
 				self.get_char();
 				continue;
 			}
