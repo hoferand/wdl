@@ -1,11 +1,14 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
 
 use logger::log;
 use logger::Colorize;
 
 use crate::{
-	wdl_std::{get_handler, id, Arg, ArgType},
-	FunctionId, FunctionValue,
+	expr::run_function,
+	wdl_std::{get_handler, id, Arg, ArgType, ArgumentValue, Env},
+	Error, FunctionId, FunctionValue, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -50,8 +53,35 @@ struct Coordinate {
 	y: u32,
 }
 
-async fn pickup(target: Arg<Target, { id(b"target") }>) {
+#[allow(dead_code)]
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Events {
+	no_station_left: Option<FunctionId>,
+}
+
+impl<'de> ArgType<'de> for Events {}
+
+async fn pickup(
+	Env(env): Env,
+	target: Arg<Target, { id(b"target") }>,
+	events: Option<Arg<Events, { id(b"events") }>>,
+) -> Result<(), Error> {
 	log!("pickup from {:?}", target.val);
+	log!("events {:?}", events.as_ref().map(|e| &e.val));
+
+	if let Some(events) = events {
+		if let Some(event) = events.val.no_station_left {
+			let args = vec![ArgumentValue {
+				idx: 1,
+				span: events.span.clone(),
+				val: Value::String("Oh no, no station left for pickup!".to_owned()), // TODO: replace with an event struct and useful information
+			}];
+			run_function(&event, events.span, args, HashMap::new(), &env).await?;
+		}
+	}
+
+	Ok(())
 }
 
 async fn drop(target: Arg<Target, { id(b"target") }>) {

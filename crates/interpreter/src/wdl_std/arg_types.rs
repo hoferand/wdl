@@ -30,6 +30,7 @@ pub const fn id(name: &[u8]) -> u32 {
 		b"buffer" => 8,
 		b"channel" => 9,
 		b"arg" => 10,
+		b"events" => 11,
 		_ => todo!(),
 	};
 
@@ -53,6 +54,7 @@ pub const fn name(id: u32) -> &'static [u8] {
 		8 => b"buffer",
 		9 => b"channel",
 		10 => b"arg",
+		11 => b"events",
 		_ => todo!(),
 	};
 

@@ -2,12 +2,12 @@ use std::{collections::HashMap, sync::Arc};
 
 use async_recursion::async_recursion;
 
-use ast::{FunctionCall, Node, Span};
+use ast::{FunctionCall, Identifier, Node, Span};
 
 use crate::{
 	stmt,
 	wdl_std::{ArgumentValue, CallContext},
-	Environment, Error, ErrorKind, FunctionValue, Interrupt, Value,
+	Environment, Error, ErrorKind, FunctionId, FunctionValue, Interrupt, Value,
 };
 
 use super::interpret_expr;
@@ -28,13 +28,6 @@ pub async fn interpret_function_call(
 				src: Some(expr.val.function.get_src().clone()),
 			});
 		}
-	};
-
-	let Some(function_val) = g_env.get_fn(&function_id).await else {
-		return Err(Error::fatal(format!(
-			"Function `{}` not found",
-			function_id
-		)));
 	};
 
 	let mut args = Vec::new();
@@ -60,6 +53,28 @@ pub async fn interpret_function_call(
 		}
 	}
 
+	run_function(
+		&function_id,
+		expr.val.function.get_src().clone(),
+		args,
+		named_args,
+		g_env,
+	)
+	.await
+}
+
+#[async_recursion]
+pub async fn run_function(
+	fn_id: &FunctionId,
+	fn_span: Span,
+	args: Vec<ArgumentValue>,
+	mut named_args: HashMap<Identifier, ArgumentValue>,
+	g_env: &Arc<Environment>,
+) -> Result<Value, Error> {
+	let Some(function_val) = g_env.get_fn(&fn_id).await else {
+		return Err(Error::fatal(format!("Function `{}` not found", fn_id)));
+	};
+
 	let val;
 	match function_val {
 		FunctionValue::Custom(function) => {
@@ -80,7 +95,7 @@ pub async fn interpret_function_call(
 						kind: ErrorKind::MissingArgument {
 							id: id.val.id.val.clone(),
 						},
-						src: Some(expr.val.function.get_src().clone()),
+						src: Some(fn_span),
 					});
 				}
 			}
@@ -102,7 +117,7 @@ pub async fn interpret_function_call(
 						expected,
 						given: expected + rem + rem_named,
 					},
-					src: Some(expr.val.function.get_src().clone()),
+					src: Some(fn_span),
 				});
 			}
 
@@ -121,7 +136,7 @@ pub async fn interpret_function_call(
 			let args = args.into_iter();
 			val = std_fn
 				.call_with_ctx(CallContext {
-					fn_span: expr.val.function.get_src().clone(),
+					fn_span,
 					env: Arc::clone(g_env),
 					args,
 					named_args,
