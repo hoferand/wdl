@@ -12,13 +12,27 @@ message PickupRequest {
 
 message Target {
 	repeated string stations = 1;
+	repeated string stationareas = 2;
+	repeated Coordinate coordinates = 3;
+	NotTarget not = 4;
+}
+
+message NotTarget {
+	repeated string stations = 1;
+	repeated string stationareas = 2;
+	repeated Coordinate coordinates = 3;
+}
+
+message Coordinate {
+	double x = 1;
+	double y = 2;
 }
 
 message PickupResponse {
-	Status status = 1;
+	PickupStatus status = 1;
 }
 
-enum Status {
+enum PickupStatus {
 	DONE = 0;
 	NO_STATION_LEFT = 1;
 }

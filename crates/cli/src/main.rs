@@ -211,10 +211,10 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 				let mut msg = format!("Unexpected token `{}`", src);
 				if expected.len() == 1 {
 					msg += &format!(", expected `{}`", expected[0]);
-				} else if expected.len() > 0 {
+				} else if !expected.is_empty() {
 					msg += ", expected one of [";
 					msg += &expected
-						.into_iter()
+						.iter()
 						.map(|e| format!("`{}`", e))
 						.collect::<Vec<String>>()
 						.join(", ");

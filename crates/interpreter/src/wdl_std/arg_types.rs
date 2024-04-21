@@ -18,6 +18,8 @@ impl<V, const N: u32> Arg<V, N> {
 
 pub struct Env(pub Arc<Environment>);
 
+pub struct Source(pub Span);
+
 pub const fn id(name: &[u8]) -> u32 {
 	let id = match name {
 		b"millis" => 1,

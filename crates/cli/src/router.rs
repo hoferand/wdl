@@ -5,7 +5,10 @@ use tonic::transport::Server;
 
 use logger::log;
 use logger::Colorize;
-use router::{PickupRequest, PickupResponse, Router, RouterServer};
+use router::{
+	proto::{PickupRequest, PickupResponse},
+	Router, RouterServer, Target,
+};
 
 #[derive(Debug, Default)]
 pub struct RouterService;
@@ -16,20 +19,19 @@ impl Router for RouterService {
 		&self,
 		request: tonic::Request<PickupRequest>,
 	) -> Result<tonic::Response<PickupResponse>, tonic::Status> {
-		log!("Pickup from station `{:?}`", request.get_ref().target);
+		let target: Target = match request.get_ref().clone().target {
+			Some(t) => t.into(),
+			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
+		};
+		log!("Pickup from station `{:?}`", target);
 
 		log!("Enter: 0 for action done, 1 to trigger no station left");
-		eprint!("> ");
 
-		let stdin = io::stdin();
-		let input: i32 = stdin
-			.lock()
-			.lines()
-			.next()
-			.unwrap()
-			.unwrap()
-			.parse()
-			.unwrap();
+		let Some(input) = read_i32_stdin() else {
+			return Err(tonic::Status::internal("Failed to read from stdin"));
+		};
+
+		eprintln!();
 
 		let res = PickupResponse { status: input };
 
@@ -38,11 +40,11 @@ impl Router for RouterService {
 }
 
 pub async fn router() -> ExitCode {
-	let Ok(addr) = "0.0.0.0:3003".parse() else {
+	let Ok(addr) = router::URL.parse() else {
 		return ExitCode::FAILURE;
 	};
 
-	let router = RouterService::default();
+	let router = RouterService;
 
 	if Server::builder()
 		.add_service(RouterServer::new(router))
@@ -54,4 +56,23 @@ pub async fn router() -> ExitCode {
 	}
 
 	ExitCode::SUCCESS
+}
+
+fn read_i32_stdin() -> Option<i32> {
+	let stdin = io::stdin();
+
+	let mut ret = None;
+	eprint!("> ");
+	for input in stdin.lock().lines() {
+		let input = input.ok()?;
+		if let Ok(r) = input.parse() {
+			ret = Some(r);
+			break;
+		} else {
+			eprintln!("`{}` is not a valid input, try another!", input);
+			eprint!("> ");
+		}
+	}
+
+	ret
 }

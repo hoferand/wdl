@@ -3,11 +3,11 @@ use serde::Deserialize;
 use ast::Identifier;
 use logger::log;
 use logger::Colorize;
-use router::{self, PickupRequest, Status};
+use router::{self, PickupStatus, Target};
 
 use crate::{
-	wdl_std::{call_function, get_handler, id, Arg, ArgType, Env},
-	Error, FunctionId, FunctionValue, Value,
+	wdl_std::{call_function, get_handler, id, Arg, ArgType, Env, Source},
+	Error, ErrorKind, FunctionId, FunctionValue, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -23,67 +23,36 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-#[allow(dead_code)]
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct Target {
-	stations: Option<Vec<String>>,
-	stationareas: Option<Vec<String>>,
-	coordinates: Option<Vec<Coordinate>>,
-	not: Option<Box<TargetNot>>,
-}
-
-impl<'de> ArgType<'de> for Target {}
-
-#[allow(dead_code)]
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct TargetNot {
-	stations: Option<Vec<String>>,
-	stationareas: Option<Vec<String>>,
-	coordinates: Option<Vec<Coordinate>>,
-}
-
-#[allow(dead_code)]
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct Coordinate {
-	x: u32,
-	y: u32,
-}
-
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Events {
-	no_station_left: Option<FunctionId>,
+	pub no_station_left: Option<FunctionId>,
 }
 
 impl<'de> ArgType<'de> for Events {}
 
 async fn pickup(
+	Source(src): Source,
 	Env(env): Env,
 	target: Arg<Target, { id(b"target") }>,
 	events: Option<Arg<Events, { id(b"events") }>>,
 ) -> Result<(), Error> {
 	log!("pickup from {:?}", target.val);
 
-	let url = "http://0.0.0.0:3003";
-	let mut client = router::RouterClient::connect(url).await.unwrap();
-
-	let request = tonic::Request::new(PickupRequest {
-		target: Some(router::Target {
-			stations: target.val.stations.unwrap_or(Vec::new()),
-		}),
-	});
-
-	let response = client.pickup(request).await.unwrap();
-	let status = Status::try_from(response.get_ref().status).unwrap();
+	let status = match router::pickup(target.val).await {
+		Some(s) => s,
+		None => {
+			return Err(Error {
+				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
+				src: Some(src),
+			});
+		}
+	};
 
 	log!("pickup status: `{:?}`", status);
 
 	if let Some(events) = events {
-		if status == Status::NoStationLeft {
+		if status == PickupStatus::NoStationLeft {
 			if let Some(callback) = events.val.no_station_left {
 				let ret = call_function(
 					&callback,

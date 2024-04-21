@@ -4,7 +4,7 @@ use ast::Identifier;
 
 use crate::{Error, ErrorKind, Value};
 
-use super::{name, Arg, CallContext, Env, FromValue};
+use super::{name, Arg, CallContext, Env, FromValue, Source};
 
 pub(crate) trait FromCallContext: Sized {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error>;
@@ -71,5 +71,11 @@ impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 impl FromCallContext for Env {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
 		Ok(Env(Arc::clone(&ctx.env)))
+	}
+}
+
+impl FromCallContext for Source {
+	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
+		Ok(Source(ctx.fn_span))
 	}
 }

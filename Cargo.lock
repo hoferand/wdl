@@ -1284,7 +1284,9 @@ dependencies = [
 name = "router"
 version = "0.1.0"
 dependencies = [
+ "logger",
  "prost",
+ "serde",
  "tokio",
  "tonic",
  "tonic-build",
