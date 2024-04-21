@@ -26,16 +26,12 @@ impl Router for RouterService {
 		log!("Pickup from station `{:?}`", target);
 
 		log!("Enter: 0 for action done, 1 to trigger no station left");
-
 		let Some(input) = read_i32_stdin() else {
 			return Err(tonic::Status::internal("Failed to read from stdin"));
 		};
-
 		eprintln!();
 
-		let res = PickupResponse { status: input };
-
-		Ok(tonic::Response::new(res))
+		Ok(tonic::Response::new(PickupResponse { status: input }))
 	}
 }
 
