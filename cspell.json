@@ -10,7 +10,9 @@
         "reqwest",
         "stationarea",
         "stationareas",
-        "newtype"
+        "newtype",
+        "proto",
+        "protos"
     ],
     "flagWords": []
 }

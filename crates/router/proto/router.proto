@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package router;
+
+service Router {
+	rpc Pickup(PickupRequest) returns (PickupResponse);
+}
+
+message PickupRequest {
+	Target target = 1;
+}
+
+message Target {
+	repeated string stations = 1;
+}
+
+message PickupResponse {
+	Status status = 1;
+}
+
+enum Status {
+	DONE = 0;
+	NO_STATION_LEFT = 1;
+}

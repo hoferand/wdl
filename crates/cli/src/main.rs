@@ -1,3 +1,6 @@
+mod router;
+use router::router;
+
 use std::collections::HashMap;
 use std::process::ExitCode;
 
@@ -33,7 +36,7 @@ async fn main() -> ExitCode {
 		Cli::Compile { file } => compile(&file).await,
 		Cli::Fmt { .. } => todo!(),
 		Cli::Check { .. } => todo!(),
-		Cli::Router => todo!(),
+		Cli::Router => router().await,
 	}
 }
 

@@ -3,6 +3,7 @@ use serde::Deserialize;
 use ast::Identifier;
 use logger::log;
 use logger::Colorize;
+use router::{self, PickupRequest, Status};
 
 use crate::{
 	wdl_std::{call_function, get_handler, id, Arg, ArgType, Env},
@@ -66,22 +67,37 @@ async fn pickup(
 	events: Option<Arg<Events, { id(b"events") }>>,
 ) -> Result<(), Error> {
 	log!("pickup from {:?}", target.val);
-	log!("events {:?}", events.as_ref().map(|e| &e.val));
+
+	let url = "http://0.0.0.0:3003";
+	let mut client = router::RouterClient::connect(url).await.unwrap();
+
+	let request = tonic::Request::new(PickupRequest {
+		target: Some(router::Target {
+			stations: target.val.stations.unwrap_or(Vec::new()),
+		}),
+	});
+
+	let response = client.pickup(request).await.unwrap();
+	let status = Status::try_from(response.get_ref().status).unwrap();
+
+	log!("pickup status: `{:?}`", status);
 
 	if let Some(events) = events {
-		if let Some(callback) = events.val.no_station_left {
-			let ret = call_function(
-				&callback,
-				vec![Value::String(
-					"Oh no, no station left for pickup!".to_owned(),
-				)],
-				Identifier("no_station_left".to_owned()),
-				events.span,
-				&env,
-			)
-			.await?;
+		if status == Status::NoStationLeft {
+			if let Some(callback) = events.val.no_station_left {
+				let ret = call_function(
+					&callback,
+					vec![Value::String(
+						"Oh no, no station left for pickup!".to_owned(),
+					)],
+					Identifier("no_station_left".to_owned()),
+					events.span,
+					&env,
+				)
+				.await?;
 
-			log!("Return value: {:?}", ret);
+				log!("Return value: {:?}", ret);
+			}
 		}
 	}
 
