@@ -40,7 +40,7 @@ pub async fn receive(ch: Value, _span: &Span, g_env: &Arc<Environment>) -> Resul
 	match ch {
 		Value::Channel(ch_id) => {
 			let Some(ch) = g_env.get_ch(&ch_id).await else {
-				return Err(Error::fatal(format!("Channel `{}` not found", ch_id.0)));
+				return Err(Error::fatal(format!("Channel `{}` not found", ch_id.id)));
 			};
 			if let Some(v) = ch.receive().await {
 				Ok(v)

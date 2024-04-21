@@ -90,7 +90,7 @@ impl ToString for Value {
 				out
 			}
 			Self::Function(fn_id) => format!("<function `{}`>", fn_id),
-			Self::Channel(ch_id) => format!("<channel `{}`>", ch_id.0),
+			Self::Channel(ch_id) => format!("<channel `{}`>", ch_id.id),
 		}
 	}
 }

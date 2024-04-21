@@ -33,7 +33,10 @@ pub async fn new(Env(env): Env, buffer: Arg<f64, { id(b"buffer") }>) -> Result<C
 
 pub async fn close(Env(env): Env, ch_id: Arg<ChannelId, { id(b"channel") }>) -> Result<(), Error> {
 	let Some(ch) = env.get_ch(&ch_id.val).await else {
-		return Err(Error::fatal(format!("Channel `{}` not found", ch_id.val.0)));
+		return Err(Error::fatal(format!(
+			"Channel `{}` not found",
+			ch_id.val.id
+		)));
 	};
 
 	ch.close().await;

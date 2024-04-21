@@ -135,7 +135,9 @@ impl Environment {
 
 	pub async fn create_ch(&self, buffer: usize) -> (ChannelId, Channel) {
 		let ch = Channel::new(buffer);
-		let id = ChannelId(self.channel_id.fetch_add(1, Ordering::Relaxed));
+		let id = ChannelId {
+			id: self.channel_id.fetch_add(1, Ordering::Relaxed),
+		};
 
 		let mut lock = self.channels.write().await;
 		lock.insert(id.clone(), ch.clone());
