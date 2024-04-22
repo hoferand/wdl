@@ -16,5 +16,8 @@ pub enum ParserError {
 		actions1: Span,
 		actions2: Span,
 	},
+	ExpectedSemicolon {
+		span: Span,
+	},
 	UnexpectedEoF,
 }

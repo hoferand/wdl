@@ -1,4 +1,4 @@
-use ast::{BinaryOperator, Node, Span, UnaryOperator};
+use ast::{BinaryOperator, Location, Node, Span, UnaryOperator};
 
 use crate::{ParserError, Token, TokenValue};
 
@@ -23,14 +23,45 @@ impl<'t> TokenStream<'t> {
 		token
 	}
 
+	pub fn last(&mut self) -> Option<&Token> {
+		if self.pointer < 1 {
+			return None;
+		}
+		self.tokens.get(self.pointer - 1)
+	}
+
 	pub fn expect(&mut self, expect: TokenValue) -> Result<&Token, ParserError> {
+		let last_span = self.last().map(|t| t.span);
 		if let Some(token) = self.next() {
 			if token.value != expect {
-				Err(ParserError::UnexpectedToken {
-					src: token.src.clone(),
-					span: token.span,
-					expected: vec![expect.type_str()],
-				})
+				if expect == TokenValue::Semicolon {
+					let span;
+					if let Some(last_span) = last_span {
+						span = Span {
+							start: last_span.end,
+							end: Location {
+								line: last_span.end.line,
+								column: last_span.end.column + 1,
+							},
+						};
+					} else {
+						span = Span {
+							start: token.span.start,
+							end: Location {
+								line: token.span.start.line,
+								column: token.span.start.column + 1,
+							},
+						}
+					}
+
+					Err(ParserError::ExpectedSemicolon { span })
+				} else {
+					Err(ParserError::UnexpectedToken {
+						src: token.src.clone(),
+						span: token.span,
+						expected: vec![expect.type_str()],
+					})
+				}
 			} else {
 				Ok(token)
 			}

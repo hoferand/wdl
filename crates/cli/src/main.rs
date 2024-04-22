@@ -246,6 +246,10 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 				eprintln!("Second block:");
 				print_error_location(&actions2.start, &actions2.end, src_code);
 			}
+			parser::ParserError::ExpectedSemicolon { span } => {
+				error!("Expected semicolon `;`!");
+				print_error_location(&span.start, &span.end, src_code);
+			}
 			parser::ParserError::UnexpectedEoF => error!("Unexpected end of file!"),
 		},
 	}
