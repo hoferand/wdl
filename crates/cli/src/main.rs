@@ -34,8 +34,8 @@ async fn main() -> ExitCode {
 	match Cli::parse() {
 		Cli::Run { file, variables } => run(&file, variables).await,
 		Cli::Compile { file } => compile(&file).await,
+		Cli::Check { file } => check(&file).await,
 		Cli::Fmt { .. } => todo!(),
-		Cli::Check { .. } => todo!(),
 		Cli::Router => router().await,
 	}
 }
@@ -119,6 +119,22 @@ async fn compile(file: &str) -> ExitCode {
 		error!("Failed to write compiled workflow to file!");
 		return ExitCode::FAILURE;
 	}
+
+	ExitCode::SUCCESS
+}
+
+async fn check(file: &str) -> ExitCode {
+	let src_code = match read_to_string(file).await {
+		Ok(content) => content,
+		Err(err) => {
+			error!("Failed to read source file, {}!", err.kind());
+			return ExitCode::FAILURE;
+		}
+	};
+	if let Err(error) = parser::get_ast(&src_code) {
+		print_parser_error(&error, &src_code);
+		return ExitCode::FAILURE;
+	};
 
 	ExitCode::SUCCESS
 }
