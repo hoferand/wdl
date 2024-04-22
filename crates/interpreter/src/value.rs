@@ -56,7 +56,7 @@ impl ToString for Value {
 			Self::Null => "null".to_owned(),
 			Self::Bool(b) => b.to_string(),
 			Self::Number(n) => n.to_string(),
-			Self::String(s) => format!("\"{}\"", s.to_owned()),
+			Self::String(s) => format!("{}", s.to_owned()),
 			Self::Array(a) => {
 				let mut out = String::new();
 				out.push('[');
