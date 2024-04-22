@@ -1,0 +1,15 @@
+[book]
+authors = ["Andreas Hofer"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Workflow Definition Language"
+
+[output.html.playground]
+runnable = false
+
+[output.html.print]
+enable = false
+
+[output.html.code.hidelines]
+wdl = "#"
