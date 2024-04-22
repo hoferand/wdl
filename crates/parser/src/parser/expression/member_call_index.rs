@@ -66,7 +66,7 @@ pub(crate) fn parse_member_call_index(
 						return Err(ParserError::UnexpectedToken {
 							src: token.src,
 							span: token.span,
-							expected: vec![TokenValue::Identifier(String::new()).type_str()],
+							expected: vec![], // TODO
 						});
 					}
 				} else if !named {
