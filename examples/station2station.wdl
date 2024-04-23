@@ -1,6 +1,3 @@
-# Introduction
-
-```wdl
 global source = "mySource";
 global destination = "myDestination";
 
@@ -24,4 +21,3 @@ actions {
         }
     );
 }
-```
