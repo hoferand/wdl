@@ -10,6 +10,8 @@ use tokio::fs::read_to_string;
 
 use ast::{Identifier, Location};
 use logger::error;
+use logger::log;
+use logger::warning;
 use logger::Colorize;
 
 #[derive(Debug, Parser)]
@@ -165,6 +167,12 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 		}
 		interpreter::ErrorKind::UnknownArgument { id } => {
 			error!("Named argument `{}` unknown!", id);
+		}
+		interpreter::ErrorKind::OrderDone => {
+			log!("Order done!");
+		}
+		interpreter::ErrorKind::OrderCancel => {
+			warning!("Order canceled!")
 		}
 	}
 

@@ -2,6 +2,7 @@ mod action;
 mod channel;
 mod debug;
 mod http;
+mod order;
 mod regex;
 mod test;
 mod time;
@@ -17,6 +18,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 			"time" => time::resolve_id(id),
 			"regex" => regex::resolve_id(id),
 			"channel" => channel::resolve_id(id),
+			"order" => order::resolve_id(id),
 			"test" => test::resolve_id(id),
 			_ => None,
 		};

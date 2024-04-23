@@ -25,4 +25,6 @@ pub enum ErrorKind {
 	ArityMismatch { expected: usize, given: usize },
 	MissingArgument { id: Identifier },
 	UnknownArgument { id: Identifier },
+	OrderDone,
+	OrderCancel,
 }
