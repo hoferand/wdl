@@ -7,7 +7,7 @@ use crate::{Error, ErrorKind, Value};
 use super::{CallContext, FromCallContext, IntoResult};
 
 pub trait Handler<T>: Clone + Send + Sized + 'static {
-	fn call(self, ctx: CallContext) -> BoxFuture<'static, Result<Value, Error>>;
+	fn call(self, ctx: CallContext, strict: bool) -> BoxFuture<'static, Result<Value, Error>>;
 }
 
 impl_handler!();
@@ -26,7 +26,7 @@ macro_rules! impl_handler {
 			R: IntoResult
 		{
 			#[allow(non_snake_case, unused_variables, unused_mut)]
-			fn call(self, mut ctx: CallContext) -> BoxFuture<'static, Result<Value, Error>> {
+			fn call(self, mut ctx: CallContext, strict: bool) -> BoxFuture<'static, Result<Value, Error>> {
 				Box::pin(async move {
 					let mut cnt = 0;
 					$(
@@ -46,7 +46,7 @@ macro_rules! impl_handler {
 						});
 					}
 
-					if rem != 0 {
+					if strict && rem != 0 {
 						return Err(Error {
 							kind: ErrorKind::ArityMismatch {
 								expected: cnt,

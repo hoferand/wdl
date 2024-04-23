@@ -58,6 +58,7 @@ pub async fn interpret_function_call(
 		*expr.val.function.get_src(),
 		args,
 		named_args,
+		true,
 		g_env,
 	)
 	.await
@@ -69,6 +70,7 @@ pub async fn run_function(
 	fn_span: Span,
 	args: Vec<ArgumentValue>,
 	mut named_args: HashMap<Identifier, ArgumentValue>,
+	strict: bool,
 	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	let Some(function_val) = g_env.get_fn(fn_id).await else {
@@ -110,7 +112,7 @@ pub async fn run_function(
 				});
 			}
 
-			if rem != 0 {
+			if strict && rem != 0 {
 				let expected = function.parameter.len();
 				return Err(Error {
 					kind: ErrorKind::ArityMismatch {
@@ -135,12 +137,15 @@ pub async fn run_function(
 		FunctionValue::Std(std_fn) => {
 			let args = args.into_iter();
 			val = std_fn
-				.call_with_ctx(CallContext {
-					fn_span,
-					env: Arc::clone(g_env),
-					args,
-					named_args,
-				})
+				.call_with_ctx(
+					CallContext {
+						fn_span,
+						env: Arc::clone(g_env),
+						args,
+						named_args,
+					},
+					strict,
+				)
 				.await?;
 		}
 	}

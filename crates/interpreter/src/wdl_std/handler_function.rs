@@ -6,7 +6,7 @@ use super::{CallContext, StdFunction};
 
 pub(crate) struct HandlerFunction<H: Clone> {
 	pub handler: H,
-	pub call: fn(H, CallContext) -> BoxFuture<'static, Result<Value, Error>>,
+	pub call: fn(H, CallContext, bool) -> BoxFuture<'static, Result<Value, Error>>,
 }
 
 impl<H: Clone> Clone for HandlerFunction<H> {
@@ -26,7 +26,7 @@ where
 		Box::new(self.clone())
 	}
 
-	fn call_with_ctx(&self, ctx: CallContext) -> BoxFuture<Result<Value, Error>> {
-		(self.call)(self.handler.clone(), ctx)
+	fn call_with_ctx(&self, ctx: CallContext, strict: bool) -> BoxFuture<Result<Value, Error>> {
+		(self.call)(self.handler.clone(), ctx, strict)
 	}
 }

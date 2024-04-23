@@ -35,7 +35,7 @@ where
 {
 	let hf = HandlerFunction {
 		handler: fun,
-		call: |h, ctx| h.call(ctx),
+		call: |h, ctx, strict| h.call(ctx, strict),
 	};
 
 	FunctionValue::Std(Arc::new(hf))
@@ -55,7 +55,7 @@ async fn call_function(
 		args.push(ArgumentValue { idx: 1, span, val });
 	}
 
-	let error = match run_function(function_id, span, args, HashMap::new(), env).await {
+	let error = match run_function(function_id, span, args, HashMap::new(), false, env).await {
 		Ok(val) => return Ok(val),
 		Err(err) => err,
 	};
