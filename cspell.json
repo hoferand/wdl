@@ -13,7 +13,8 @@
         "newtype",
         "proto",
         "protos",
-        "mdbook"
+        "mdbook",
+        "clippy"
     ],
     "flagWords": []
 }
