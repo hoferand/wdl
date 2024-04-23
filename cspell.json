@@ -12,7 +12,8 @@
         "stationareas",
         "newtype",
         "proto",
-        "protos"
+        "protos",
+        "mdbook"
     ],
     "flagWords": []
 }
