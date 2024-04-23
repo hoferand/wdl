@@ -7,7 +7,7 @@ use crate::{
 	RouterClient, Target,
 };
 
-pub async fn pickup(target: Target) -> Option<RouterStatus> {
+pub async fn drop(target: Target) -> Option<RouterStatus> {
 	// TODO: return Result instead of Option
 	let mut client = match RouterClient::connect(String::from("http://") + super::URL).await {
 		Ok(c) => c,
@@ -21,7 +21,7 @@ pub async fn pickup(target: Target) -> Option<RouterStatus> {
 		target: Some(target.into()),
 	});
 
-	let response = match client.pickup(request).await {
+	let response = match client.drop(request).await {
 		Ok(r) => r,
 		Err(err) => {
 			error!("{}", err.to_string());

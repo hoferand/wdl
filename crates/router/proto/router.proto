@@ -3,11 +3,22 @@ syntax = "proto3";
 package router;
 
 service Router {
-	rpc Pickup(PickupRequest) returns (PickupResponse);
+	rpc Pickup(RouterRequest) returns (RouterResponse);
+	rpc Drop(RouterRequest) returns (RouterResponse);
+	rpc Drive(RouterRequest) returns (RouterResponse);
 }
 
-message PickupRequest {
+message RouterRequest {
 	Target target = 1;
+}
+
+message RouterResponse {
+	RouterStatus status = 1;
+}
+
+enum RouterStatus {
+	DONE = 0;
+	NO_STATION_LEFT = 1;
 }
 
 message Target {
@@ -26,13 +37,4 @@ message NotTarget {
 message Coordinate {
 	double x = 1;
 	double y = 2;
-}
-
-message PickupResponse {
-	PickupStatus status = 1;
-}
-
-enum PickupStatus {
-	DONE = 0;
-	NO_STATION_LEFT = 1;
 }

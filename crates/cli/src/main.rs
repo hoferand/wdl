@@ -172,7 +172,7 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			log!("Order done!");
 		}
 		interpreter::ErrorKind::OrderCancel => {
-			warning!("Order canceled!")
+			warning!("Order cancelled!")
 		}
 	}
 

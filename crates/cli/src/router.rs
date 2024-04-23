@@ -6,7 +6,7 @@ use tonic::transport::Server;
 use logger::log;
 use logger::Colorize;
 use router::{
-	proto::{PickupRequest, PickupResponse},
+	proto::{RouterRequest, RouterResponse},
 	Router, RouterServer, Target,
 };
 
@@ -17,8 +17,8 @@ pub struct RouterService;
 impl Router for RouterService {
 	async fn pickup(
 		&self,
-		request: tonic::Request<PickupRequest>,
-	) -> Result<tonic::Response<PickupResponse>, tonic::Status> {
+		request: tonic::Request<RouterRequest>,
+	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
 		let target: Target = match request.get_ref().clone().target {
 			Some(t) => t.into(),
 			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
@@ -31,7 +31,45 @@ impl Router for RouterService {
 		};
 		eprintln!();
 
-		Ok(tonic::Response::new(PickupResponse { status: input }))
+		Ok(tonic::Response::new(RouterResponse { status: input }))
+	}
+
+	async fn drop(
+		&self,
+		request: tonic::Request<RouterRequest>,
+	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
+		let target: Target = match request.get_ref().clone().target {
+			Some(t) => t.into(),
+			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
+		};
+		log!("Drop to station `{:?}`", target);
+
+		log!("Enter: 0 for action done, 1 to trigger no station left");
+		let Some(input) = read_i32_stdin() else {
+			return Err(tonic::Status::internal("Failed to read from stdin"));
+		};
+		eprintln!();
+
+		Ok(tonic::Response::new(RouterResponse { status: input }))
+	}
+
+	async fn drive(
+		&self,
+		request: tonic::Request<RouterRequest>,
+	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
+		let target: Target = match request.get_ref().clone().target {
+			Some(t) => t.into(),
+			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
+		};
+		log!("Drive to station `{:?}`", target);
+
+		log!("Enter: 0 for action done, 1 to trigger no station left");
+		let Some(input) = read_i32_stdin() else {
+			return Err(tonic::Status::internal("Failed to read from stdin"));
+		};
+		eprintln!();
+
+		Ok(tonic::Response::new(RouterResponse { status: input }))
 	}
 }
 

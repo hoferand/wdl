@@ -3,7 +3,7 @@ use serde::Deserialize;
 use ast::Identifier;
 use logger::log;
 use logger::Colorize;
-use router::{self, PickupStatus, Target};
+use router::{self, RouterStatus, Target};
 
 use crate::{
 	wdl_std::{call_function, get_handler, id, Arg, ArgType, Env, Source},
@@ -52,7 +52,7 @@ async fn pickup(
 	log!("pickup status: `{:?}`", status);
 
 	if let Some(events) = events {
-		if status == PickupStatus::NoStationLeft {
+		if status == RouterStatus::NoStationLeft {
 			if let Some(callback) = events.val.no_station_left {
 				let ret = call_function(
 					&callback,
@@ -65,7 +65,7 @@ async fn pickup(
 				)
 				.await?;
 
-				log!("Return value: {:?}", ret);
+				log!("Return value of no_station_left handler: {:?}", ret);
 			}
 		}
 	}
@@ -73,10 +73,84 @@ async fn pickup(
 	Ok(())
 }
 
-async fn drop(target: Arg<Target, { id(b"target") }>) {
+async fn drop(
+	Source(src): Source,
+	Env(env): Env,
+	target: Arg<Target, { id(b"target") }>,
+	events: Option<Arg<Events, { id(b"events") }>>,
+) -> Result<(), Error> {
 	log!("drop to {:?}", target.val);
+
+	let status = match router::drop(target.val).await {
+		Some(s) => s,
+		None => {
+			return Err(Error {
+				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
+				src: Some(src),
+			});
+		}
+	};
+
+	log!("drop status: `{:?}`", status);
+
+	if let Some(events) = events {
+		if status == RouterStatus::NoStationLeft {
+			if let Some(callback) = events.val.no_station_left {
+				let ret = call_function(
+					&callback,
+					vec![Value::String("Oh no, no station left for drop!".to_owned())],
+					Identifier("no_station_left".to_owned()),
+					events.span,
+					&env,
+				)
+				.await?;
+
+				log!("Return value of no_station_left handler: {:?}", ret);
+			}
+		}
+	}
+
+	Ok(())
 }
 
-async fn drive(target: Arg<Target, { id(b"target") }>) {
+async fn drive(
+	Source(src): Source,
+	Env(env): Env,
+	target: Arg<Target, { id(b"target") }>,
+	events: Option<Arg<Events, { id(b"events") }>>,
+) -> Result<(), Error> {
 	log!("drive to {:?}", target.val);
+
+	let status = match router::drive(target.val).await {
+		Some(s) => s,
+		None => {
+			return Err(Error {
+				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
+				src: Some(src),
+			});
+		}
+	};
+
+	log!("drive status: `{:?}`", status);
+
+	if let Some(events) = events {
+		if status == RouterStatus::NoStationLeft {
+			if let Some(callback) = events.val.no_station_left {
+				let ret = call_function(
+					&callback,
+					vec![Value::String(
+						"Oh no, no station left for drive!".to_owned(),
+					)],
+					Identifier("no_station_left".to_owned()),
+					events.span,
+					&env,
+				)
+				.await?;
+
+				log!("Return value of no_station_left handler: {:?}", ret);
+			}
+		}
+	}
+
+	Ok(())
 }
