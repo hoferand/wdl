@@ -1,7 +1,7 @@
 mod action;
 mod channel;
-mod debug;
 mod http;
+mod log;
 mod order;
 mod regex;
 mod test;
@@ -13,7 +13,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if let Some(module) = id.scope.first() {
 		return match module.0.as_str() {
 			"action" => action::resolve_id(id),
-			"debug" => debug::resolve_id(id),
+			"log" => log::resolve_id(id),
 			"http" => http::resolve_id(id),
 			"time" => time::resolve_id(id),
 			"regex" => regex::resolve_id(id),
