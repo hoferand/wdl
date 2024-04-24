@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use ast::{Identifier, ScopedIdentifier, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "wdl_type")]
 pub struct FunctionId {
 	pub id: Identifier,
 	pub scope: Vec<Identifier>,

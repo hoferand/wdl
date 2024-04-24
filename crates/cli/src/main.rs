@@ -54,7 +54,7 @@ async fn run(file: &str, vars: Vec<String>) -> ExitCode {
 		};
 
 		let id = Identifier(parts.0.to_owned());
-		let Ok(val) = serde_json::from_str::<serde_json::Value>(parts.1) else {
+		let Ok(val) = serde_json::from_str(parts.1) else {
 			error!(
 				"Invalid variable value `{}`, cannot be deserialized!",
 				parts.1
