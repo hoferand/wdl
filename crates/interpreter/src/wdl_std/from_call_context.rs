@@ -36,9 +36,7 @@ impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 		}
 
 		if let Some(arg) = arg {
-			if arg.val == Value::Null {
-				return Ok(None);
-			}
+			let is_null = arg.val == Value::Null;
 			let arg_clone = arg.clone();
 			let value = T::from_value(arg.val).map_err(|mut err| {
 				err.src = Some(arg.span);
@@ -46,6 +44,8 @@ impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 			})?;
 			if let Some(val) = value {
 				Ok(Some(Arg::new(arg_clone.idx, arg_clone.span, val)))
+			} else if is_null {
+				return Ok(None);
 			} else {
 				Err(Error {
 					kind: ErrorKind::InvalidType {

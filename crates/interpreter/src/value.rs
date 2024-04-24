@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Value {
+	#[serde(rename = "null")]
 	Null,
 	Bool(bool),
 	Number(f64),
