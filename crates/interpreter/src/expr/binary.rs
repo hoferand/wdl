@@ -22,7 +22,7 @@ pub async fn interpret_binary(
 	let right = interpret_expr(&expr.val.right, env, g_env).await?;
 
 	match expr.val.op.val {
-		BinaryOperator::Add => add(&left, &right, &expr.src),
+		BinaryOperator::Add => add(left, right, &expr.src),
 		BinaryOperator::Subtract => sub(&left, &right, &expr.src),
 		BinaryOperator::Multiply => mul(&left, &right, &expr.src),
 		BinaryOperator::Divide => div(&left, &right, &expr.src),
@@ -37,13 +37,23 @@ pub async fn interpret_binary(
 	}
 }
 
-fn add(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
+fn add(left: Value, right: Value, span: &Span) -> Result<Value, Error> {
+	let left_type = left.get_type();
+	let right_type = right.get_type();
 	match (left, right) {
-		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(*n1 + *n2)),
-		(Value::String(s1), v) => Ok(Value::String(s1.to_owned() + &v.to_string())),
+		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(n1 + n2)),
+		(Value::String(s1), v) => Ok(Value::String(s1 + &v.to_string())),
+		(Value::Array(mut a1), Value::Array(mut a2)) => {
+			a1.append(&mut a2);
+			Ok(Value::Array(a1))
+		}
+		(Value::Array(mut a), v) => {
+			a.push(v);
+			Ok(Value::Array(a))
+		}
 		_ => Err(Error {
 			kind: ErrorKind::InvalidType {
-				msg: format!("`{}` + `{}`", left.get_type(), right.get_type()),
+				msg: format!("`{}` + `{}`", left_type, right_type),
 			},
 			src: Some(*span),
 		}),
