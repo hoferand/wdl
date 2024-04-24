@@ -35,8 +35,8 @@ struct HttpResponse {
 
 impl ResultType for HttpResponse {}
 
-async fn get(url: Arg<String, { id(b"url") }>) -> Result<Option<HttpResponse>, Error> {
-	process_response(reqwest::get(parse_url(&url.val)?).await).await
+async fn get(uri: Arg<String, { id(b"uri") }>) -> Result<Option<HttpResponse>, Error> {
+	process_response(reqwest::get(parse_uri(&uri.val)?).await).await
 }
 
 async fn post() -> Result<(), Error> {
@@ -55,9 +55,9 @@ async fn delete() -> Result<(), Error> {
 	todo!()
 }
 
-fn parse_url(url: &str) -> Result<Url, Error> {
+fn parse_uri(uri: &str) -> Result<Url, Error> {
 	// TODO: improve error handling
-	match Url::parse(url) {
+	match Url::parse(uri) {
 		Ok(u) => Ok(u),
 		Err(err) => Err(Error::fatal(err.to_string())),
 	}
