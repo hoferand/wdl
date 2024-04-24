@@ -10,7 +10,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 		return None;
 	}
 
-	match id.id.0.as_str() {
+	match id.id.id.as_str() {
 		"sleep" => Some(get_handler(sleep)),
 		_ => None,
 	}

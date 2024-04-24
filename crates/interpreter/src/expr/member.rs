@@ -19,11 +19,11 @@ pub async fn interpret_member(
 	let id = &expr.val.member;
 
 	if let Value::Object(o) = value {
-		Ok(o.get(&id.val.0).unwrap_or(&Value::Null).clone())
+		Ok(o.get(&id.val.id).unwrap_or(&Value::Null).clone())
 	} else {
 		Err(Error {
 			kind: ErrorKind::InvalidType {
-				msg: format!("`{}`.{}", value.get_type(), id.val.0),
+				msg: format!("`{}`.{}", value.get_type(), id.val.id),
 			},
 			src: Some(expr.src),
 		})

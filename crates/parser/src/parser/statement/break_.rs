@@ -20,6 +20,6 @@ pub(crate) fn parse_break(parser: &mut Parser) -> Result<Node<Span, Break>, Pars
 
 	Ok(Node {
 		src: Span { start, end },
-		val: Break,
+		val: Break {},
 	})
 }

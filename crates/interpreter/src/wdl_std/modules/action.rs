@@ -15,7 +15,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 		return None;
 	}
 
-	match id.id.0.as_str() {
+	match id.id.id.as_str() {
 		"pickup" => Some(get_handler(pickup)),
 		"drop" => Some(get_handler(drop)),
 		"drive" => Some(get_handler(drive)),
@@ -59,7 +59,9 @@ async fn pickup(
 					vec![Value::String(
 						"Oh no, no station left for pickup!".to_owned(),
 					)],
-					Identifier("no_station_left".to_owned()),
+					Identifier {
+						id: "no_station_left".to_owned(),
+					},
 					events.span,
 					&env,
 				)
@@ -99,7 +101,9 @@ async fn drop(
 				let ret = call_function(
 					&callback,
 					vec![Value::String("Oh no, no station left for drop!".to_owned())],
-					Identifier("no_station_left".to_owned()),
+					Identifier {
+						id: "no_station_left".to_owned(),
+					},
 					events.span,
 					&env,
 				)
@@ -141,7 +145,9 @@ async fn drive(
 					vec![Value::String(
 						"Oh no, no station left for drive!".to_owned(),
 					)],
-					Identifier("no_station_left".to_owned()),
+					Identifier {
+						id: "no_station_left".to_owned(),
+					},
 					events.span,
 					&env,
 				)

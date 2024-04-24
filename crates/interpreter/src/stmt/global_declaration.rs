@@ -22,7 +22,7 @@ pub async fn interpret_global_declaration(
 	} else {
 		return Err(Error::fatal(format!(
 			"Missing value for global variable `{}`",
-			id.val.0
+			id.val.id
 		)));
 	}
 

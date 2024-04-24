@@ -11,7 +11,7 @@ use crate::{FunctionId, FunctionValue};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if let Some(module) = id.scope.first() {
-		return match module.0.as_str() {
+		return match module.id.as_str() {
 			"action" => action::resolve_id(id),
 			"log" => log::resolve_id(id),
 			"http" => http::resolve_id(id),

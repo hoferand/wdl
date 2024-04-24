@@ -19,6 +19,8 @@ pub(crate) fn parse_identifier(parser: &mut Parser) -> Result<Node<Span, Identif
 			start: id_token.span.start,
 			end: id_token.span.end,
 		},
-		val: Identifier(id_str.to_owned()),
+		val: Identifier {
+			id: id_str.to_owned(),
+		},
 	})
 }

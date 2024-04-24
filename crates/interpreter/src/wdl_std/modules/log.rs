@@ -8,7 +8,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 		return None;
 	}
 
-	match id.id.0.as_str() {
+	match id.id.id.as_str() {
 		"info" => Some(get_handler(info)),
 		"warning" => Some(get_handler(warning)),
 		"error" => Some(get_handler(error)),

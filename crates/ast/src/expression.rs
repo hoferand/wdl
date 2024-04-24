@@ -28,6 +28,7 @@ use serde::{Deserialize, Serialize};
 use crate::{Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum Expression<S: Source> {
 	Array(Node<S, Array<S>>),
 	Binary(Node<S, Binary<S>>),

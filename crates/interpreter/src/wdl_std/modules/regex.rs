@@ -10,7 +10,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 		return None;
 	}
 
-	match id.id.0.as_str() {
+	match id.id.id.as_str() {
 		"match" => Some(get_handler(match_)),
 		"find" => Some(get_handler(find)),
 		"replace" => Some(get_handler(replace)),

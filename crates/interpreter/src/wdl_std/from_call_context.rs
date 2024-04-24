@@ -15,7 +15,9 @@ impl<T: FromValue, const N: u32> FromCallContext for Arg<T, N> {
 		if let Some(val) = Option::<Arg<T, N>>::from_ctx(ctx)? {
 			Ok(val)
 		} else {
-			let id = Identifier(String::from_utf8_lossy(name(N)).into_owned());
+			let id = Identifier {
+				id: String::from_utf8_lossy(name(N)).into_owned(),
+			};
 			Err(Error {
 				kind: ErrorKind::MissingArgument { id },
 				src: Some(ctx.fn_span),
@@ -26,7 +28,9 @@ impl<T: FromValue, const N: u32> FromCallContext for Arg<T, N> {
 
 impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
-		let id = Identifier(String::from_utf8_lossy(name(N)).into_owned());
+		let id = Identifier {
+			id: String::from_utf8_lossy(name(N)).into_owned(),
+		};
 
 		let mut arg = ctx.args.next();
 

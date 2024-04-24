@@ -32,7 +32,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 			let mut scope = Vec::new();
 			scope.push(Node {
 				src: token.span,
-				val: Identifier(id.to_owned()),
+				val: Identifier { id: id.to_owned() },
 			});
 
 			while let Some(token) = parser.tokens.peek() {
@@ -48,7 +48,9 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 				if let TokenValue::Identifier(id_str) = &id.value {
 					scope.push(Node {
 						src: id.span,
-						val: Identifier(id_str.to_owned()),
+						val: Identifier {
+							id: id_str.to_owned(),
+						},
 					});
 				}
 			}

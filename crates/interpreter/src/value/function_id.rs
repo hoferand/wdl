@@ -34,8 +34,8 @@ impl std::fmt::Display for FunctionId {
 			"{}{}",
 			self.scope
 				.iter()
-				.fold(String::new(), |str, id| str + &id.0 + "::"),
-			self.id.0
+				.fold(String::new(), |str, id| str + &id.id + "::"),
+			self.id.id
 		)
 	}
 }

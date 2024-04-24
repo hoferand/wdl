@@ -25,7 +25,7 @@ pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Span, Let<Span>>, Pa
 
 	let id_node = Node {
 		src: Span { start, end },
-		val: Identifier(id.to_owned()),
+		val: Identifier { id: id.to_owned() },
 	};
 
 	Ok(Node {

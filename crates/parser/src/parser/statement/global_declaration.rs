@@ -20,7 +20,7 @@ pub(crate) fn parse_global_declaration(
 
 	let id_node = Node {
 		src: id_token.span,
-		val: Identifier(id.to_owned()),
+		val: Identifier { id: id.to_owned() },
 	};
 
 	parser.tokens.expect(TokenValue::Equal)?;

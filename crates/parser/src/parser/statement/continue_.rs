@@ -20,6 +20,6 @@ pub(crate) fn parse_continue(parser: &mut Parser) -> Result<Node<Span, Continue>
 
 	Ok(Node {
 		src: Span { start, end },
-		val: Continue,
+		val: Continue {},
 	})
 }

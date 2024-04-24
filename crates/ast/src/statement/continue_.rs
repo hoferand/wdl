@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Continue;
+#[serde(tag = "type")]
+pub struct Continue {}

@@ -24,38 +24,15 @@ pub mod assignment;
 pub use assignment::Assignment;
 pub mod send;
 pub use send::Send;
+pub mod declaration;
+pub use declaration::Declaration;
 
 use serde::{Deserialize, Serialize};
 
 use crate::{Expression, Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Declaration<S: Source> {
-	GlobalDeclaration(Node<S, GlobalDeclaration<S>>),
-	Actions(Node<S, Actions<S>>),
-	FunctionDeclaration(Node<S, FunctionDeclaration<S>>),
-}
-
-impl<S: Source> Declaration<S> {
-	pub fn get_src(&self) -> &S {
-		match self {
-			Declaration::GlobalDeclaration(stmt) => &stmt.src,
-			Declaration::Actions(stmt) => &stmt.src,
-			Declaration::FunctionDeclaration(stmt) => &stmt.src,
-		}
-	}
-
-	pub fn get_type(&self) -> String {
-		match self {
-			Declaration::GlobalDeclaration(_) => "global declaration",
-			Declaration::Actions(_) => "actions",
-			Declaration::FunctionDeclaration(_) => "function declaration",
-		}
-		.to_owned()
-	}
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum Statement<S: Source> {
 	Assignment(Node<S, Assignment<S>>),
 	Expression(Expression<S>),

@@ -53,7 +53,9 @@ async fn run(file: &str, vars: Vec<String>) -> ExitCode {
 			return ExitCode::FAILURE;
 		};
 
-		let id = Identifier(parts.0.to_owned());
+		let id = Identifier {
+			id: parts.0.to_owned(),
+		};
 		let Ok(val) = serde_json::from_str(parts.1) else {
 			error!(
 				"Invalid variable value `{}`, cannot be deserialized!",
@@ -145,7 +147,7 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 	match &error.kind {
 		interpreter::ErrorKind::Fatal(msg) => error!("{}!", msg),
 		interpreter::ErrorKind::VariableAlreadyInUse { id } => {
-			error!("Variable `{}` already in use!", id.0);
+			error!("Variable `{}` already in use!", id.id);
 		}
 		interpreter::ErrorKind::VariableNotFound { id } => {
 			error!("Variable `{}` not found!", id.to_string());
