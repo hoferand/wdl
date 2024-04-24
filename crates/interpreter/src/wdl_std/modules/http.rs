@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
 use reqwest::{header::CONTENT_TYPE, Response, Url};
+use serde::Serialize;
 
 use logger::error;
 use logger::Colorize;
-use serde::Serialize;
 
 use crate::{
 	wdl_std::{get_handler, id, Arg, ResultType},
-	Error, FunctionId, FunctionValue,
+	Error, FunctionId, FunctionValue, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -19,9 +19,6 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	match id.id.0.as_str() {
 		"get" => Some(get_handler(get)),
 		"post" => Some(get_handler(post)),
-		"put" => Some(get_handler(put)),
-		"patch" => Some(get_handler(patch)),
-		"delete" => Some(get_handler(delete)),
 		_ => None,
 	}
 }
@@ -30,7 +27,7 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 struct HttpResponse {
 	status: u16,
 	headers: HashMap<String, String>,
-	body: serde_json::Value,
+	body: Value,
 }
 
 impl ResultType for HttpResponse {}
@@ -39,20 +36,14 @@ async fn get(uri: Arg<String, { id(b"uri") }>) -> Result<Option<HttpResponse>, E
 	process_response(reqwest::get(parse_uri(&uri.val)?).await).await
 }
 
-async fn post() -> Result<(), Error> {
-	todo!()
-}
-
-async fn put() -> Result<(), Error> {
-	todo!()
-}
-
-async fn patch() -> Result<(), Error> {
-	todo!()
-}
-
-async fn delete() -> Result<(), Error> {
-	todo!()
+async fn post(uri: Arg<String, { id(b"uri") }>) -> Result<Option<HttpResponse>, Error> {
+	process_response(
+		reqwest::Client::new()
+			.post(parse_uri(&uri.val)?)
+			.send()
+			.await,
+	)
+	.await
 }
 
 fn parse_uri(uri: &str) -> Result<Url, Error> {
@@ -69,7 +60,7 @@ async fn process_response(
 	let response = match response {
 		Ok(r) => r,
 		Err(err) => {
-			// TODO: crash on builder error
+			// TODO: return error on builder error
 			error!("{}", err.to_string());
 			return Ok(None);
 		}
@@ -88,7 +79,7 @@ async fn process_response(
 	let mut res = HttpResponse {
 		status: response.status().as_u16(),
 		headers,
-		body: serde_json::Value::Null,
+		body: Value::Null,
 	};
 
 	let mut json = false;
@@ -108,14 +99,14 @@ async fn process_response(
 	};
 
 	if json {
-		match serde_json::from_str::<serde_json::Value>(&body) {
+		match serde_json::from_str::<Value>(&body) {
 			Ok(val) => res.body = val,
 			Err(err) => {
 				error!("Failed to json decode body `{}`", err);
 			}
 		};
 	} else {
-		res.body = serde_json::Value::String(body);
+		res.body = Value::String(body);
 	}
 
 	Ok(Some(res))
