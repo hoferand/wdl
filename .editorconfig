@@ -1,0 +1,12 @@
+root = true
+
+[*]
+indent_style = tab
+
+[examples/*]
+indent_style = space
+indent_size = 4
+
+[Cargo.lock]
+indent_style = space
+indent_size = 1
