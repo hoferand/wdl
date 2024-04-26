@@ -22,7 +22,7 @@ pub struct Source(pub Span);
 
 pub const fn id(name: &[u8]) -> u32 {
 	let id = match name {
-		b"millis" => 1,
+		b"ms" => 1,
 		b"regex" => 2,
 		b"haystack" => 3,
 		b"replace" => 4,
@@ -46,7 +46,7 @@ pub const fn id(name: &[u8]) -> u32 {
 
 pub const fn name(id: u32) -> &'static [u8] {
 	let name: &'static [u8] = match id {
-		1 => b"millis",
+		1 => b"ms",
 		2 => b"regex",
 		3 => b"haystack",
 		4 => b"replace",

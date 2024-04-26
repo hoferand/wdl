@@ -16,6 +16,6 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-pub async fn sleep(millis: Arg<f64, { id(b"millis") }>) {
-	tokio::time::sleep(Duration::from_millis(millis.val as u64)).await; // TODO: fix cast
+pub async fn sleep(ms: Arg<f64, { id(b"ms") }>) {
+	tokio::time::sleep(Duration::from_millis(ms.val as u64)).await; // TODO: fix cast
 }
