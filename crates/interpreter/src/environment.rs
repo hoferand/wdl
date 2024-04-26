@@ -18,9 +18,9 @@ use crate::{
 // TODO: split into env and scope
 pub struct Environment {
 	parent: Option<Arc<Environment>>,
-	variables: Arc<RwLock<HashMap<Identifier, Value>>>,
-	functions: Arc<RwLock<HashMap<Identifier, FunctionValue>>>,
-	channels: Arc<RwLock<HashMap<ChannelId, Channel>>>,
+	variables: RwLock<HashMap<Identifier, Value>>,
+	functions: RwLock<HashMap<Identifier, FunctionValue>>,
+	channels: RwLock<HashMap<ChannelId, Channel>>,
 	channel_id: AtomicU32,
 }
 
@@ -34,9 +34,9 @@ impl Environment {
 	pub fn new() -> Self {
 		Environment {
 			parent: None,
-			variables: Arc::new(RwLock::new(HashMap::new())),
-			functions: Arc::new(RwLock::new(HashMap::new())),
-			channels: Arc::new(RwLock::new(HashMap::new())),
+			variables: RwLock::new(HashMap::new()),
+			functions: RwLock::new(HashMap::new()),
+			channels: RwLock::new(HashMap::new()),
 			channel_id: AtomicU32::new(0),
 		}
 	}
@@ -44,9 +44,9 @@ impl Environment {
 	pub fn with_parent(parent: Arc<Environment>) -> Self {
 		Environment {
 			parent: Some(parent),
-			variables: Arc::new(RwLock::new(HashMap::new())),
-			functions: Arc::new(RwLock::new(HashMap::new())),
-			channels: Arc::new(RwLock::new(HashMap::new())),
+			variables: RwLock::new(HashMap::new()),
+			functions: RwLock::new(HashMap::new()),
+			channels: RwLock::new(HashMap::new()),
 			channel_id: AtomicU32::new(0),
 		}
 	}
@@ -93,9 +93,9 @@ impl Environment {
 	}
 
 	#[async_recursion]
-	async fn resolve(&self, id: &Identifier) -> Option<Arc<RwLock<HashMap<Identifier, Value>>>> {
+	async fn resolve(&self, id: &Identifier) -> Option<&RwLock<HashMap<Identifier, Value>>> {
 		if self.variables.read().await.contains_key(id) {
-			Some(Arc::clone(&self.variables))
+			Some(&self.variables)
 		} else if let Some(parent) = &self.parent {
 			parent.resolve(id).await
 		} else {
