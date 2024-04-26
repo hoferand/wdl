@@ -10,11 +10,10 @@ ast = { path = "../ast" }
 router = { path = "../router" }
 logger = { path = "../logger" }
 
+tokio = { version = "1.37.0", features = ["full"] }
 async-recursion = "1.0.5"
 futures = "0.3.29"
 serde = "1.0.197"
 serde_json = "1.0.108"
-tokio = { version = "1.37.0", features = ["full"] }
 regex = "1.10.3"
 reqwest = "0.12.3"
-tonic = "0.11" # TODO: remove
