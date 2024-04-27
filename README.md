@@ -4,7 +4,7 @@
 
 ## Interpreter
 
-The key component of this repository is the interpreter, fully written in Rust. The interpreter, along with other tools for its use, is provided as libraries. Additionally, we provide a CLI to use it. All source files for these components can be found in `/crates`.
+The key component of this repository is the interpreter, fully written in Rust. The interpreter, along with other tools for its use, is provided as libraries. Additionally, we provide a CLI to use it. All source files for these components can be found in `crates/`.
 
 ### Requirements
 
