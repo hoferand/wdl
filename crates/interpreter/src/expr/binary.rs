@@ -44,6 +44,7 @@ fn add(left: Value, right: Value, span: &Span) -> Result<Value, Error> {
 		(Value::Number(n1), Value::Number(n2)) => Ok(Value::Number(n1 + n2)),
 		(Value::String(s1), v) => Ok(Value::String(s1 + &v.to_string())),
 		(Value::Array(mut a1), Value::Array(mut a2)) => {
+			// TODO: introduce own operator for that
 			a1.append(&mut a2);
 			Ok(Value::Array(a1))
 		}

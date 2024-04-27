@@ -82,7 +82,7 @@ impl ToString for Value {
 					}
 					first = false;
 
-					out.push_str(id);
+					out.push_str(id); // TODO: fix ids like "my key"
 					out.push_str(": ");
 					out.push_str(&val.to_string());
 				}
