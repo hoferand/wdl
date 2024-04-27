@@ -10,10 +10,10 @@ All messages (<code>msg</code>) are serialized to strings and truncated to 100 c
 function info(msg: any) -> void
 ```
 
-## warning
+## warn
 
 ```wdl
-function warning(msg: any) -> void
+function warn(msg: any) -> void
 ```
 
 ## error

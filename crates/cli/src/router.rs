@@ -3,8 +3,6 @@ use std::process::ExitCode;
 
 use tonic::transport::Server;
 
-use logger::log;
-use logger::Colorize;
 use router::{
 	proto::{RouterRequest, RouterResponse},
 	Router, RouterServer, Target,
@@ -23,9 +21,9 @@ impl Router for RouterService {
 			Some(t) => t.into(),
 			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
 		};
-		log!("Pickup from station `{:?}`", target);
+		eprintln!("Pickup from station `{:?}`", target);
 
-		log!("Enter: 0 for action done, 1 to trigger no station left");
+		eprintln!("Enter: 0 for action done, 1 to trigger no station left");
 		let Some(input) = read_i32_stdin() else {
 			return Err(tonic::Status::internal("Failed to read from stdin"));
 		};
@@ -42,9 +40,9 @@ impl Router for RouterService {
 			Some(t) => t.into(),
 			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
 		};
-		log!("Drop to station `{:?}`", target);
+		eprintln!("Drop to station `{:?}`", target);
 
-		log!("Enter: 0 for action done, 1 to trigger no station left");
+		eprintln!("Enter: 0 for action done, 1 to trigger no station left");
 		let Some(input) = read_i32_stdin() else {
 			return Err(tonic::Status::internal("Failed to read from stdin"));
 		};
@@ -61,9 +59,9 @@ impl Router for RouterService {
 			Some(t) => t.into(),
 			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
 		};
-		log!("Drive to station `{:?}`", target);
+		eprintln!("Drive to station `{:?}`", target);
 
-		log!("Enter: 0 for action done, 1 to trigger no station left");
+		eprintln!("Enter: 0 for action done, 1 to trigger no station left");
 		let Some(input) = read_i32_stdin() else {
 			return Err(tonic::Status::internal("Failed to read from stdin"));
 		};

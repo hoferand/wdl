@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
 use async_recursion::async_recursion;
+use log::error;
 
 use ast::{Node, Span, Spawn};
-use logger::error;
-use logger::Colorize;
 
 use crate::{Environment, Error, Value};
 
@@ -24,6 +23,7 @@ pub async fn interpret_spawn(
 	let g_env_async = g_env.clone();
 	tokio::spawn(async move {
 		match interpret_expr(&expr_async, &env_async, &g_env_async).await {
+			// TODO: improve error handling
 			Ok(value) => ch_async.send(value).await,
 			Err(err) => {
 				error!("{:?}", err);

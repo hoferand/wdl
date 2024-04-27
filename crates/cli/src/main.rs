@@ -1,18 +1,17 @@
-mod router;
-use router::router;
-
 use std::collections::HashMap;
 use std::process::ExitCode;
 
 use clap::Parser;
+use colored::Colorize;
+use log::{error, info, warn, LevelFilter};
+use simplelog::{ColorChoice, Config, TermLogger, TerminalMode}; // cspell:disable-line
 use tokio::fs;
 use tokio::fs::read_to_string;
 
 use ast::{Identifier, Location};
-use logger::error;
-use logger::log;
-use logger::warning;
-use logger::Colorize;
+
+mod router;
+use router::router;
 
 #[derive(Debug, Parser)]
 enum Cli {
@@ -33,6 +32,14 @@ enum Cli {
 
 #[tokio::main]
 async fn main() -> ExitCode {
+	TermLogger::init(
+		LevelFilter::Trace,
+		Config::default(),
+		TerminalMode::Stderr,
+		ColorChoice::Auto,
+	)
+	.unwrap();
+
 	match Cli::parse() {
 		Cli::Run { file, variables } => run(&file, variables).await,
 		Cli::Compile { file } => compile(&file).await,
@@ -171,10 +178,10 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			error!("Named argument `{}` unknown!", id);
 		}
 		interpreter::ErrorKind::OrderDone => {
-			log!("Order done!");
+			info!("Order done!");
 		}
 		interpreter::ErrorKind::OrderCancel => {
-			warning!("Order cancelled!")
+			warn!("Order cancelled!")
 		}
 	}
 

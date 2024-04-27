@@ -1,7 +1,5 @@
+use log::info;
 use serde::Deserialize;
-
-use logger::log;
-use logger::Colorize;
 
 use crate::{
 	wdl_std::{get_handler, id, Arg, ArgType},
@@ -39,6 +37,6 @@ enum Either {
 impl<'de> ArgType<'de> for MyStruct {}
 
 async fn test(arg1: Option<Arg<bool, { id(b"arg") }>>, arg: Arg<MyStruct, { id(b"arg") }>) {
-	log!("{:?}", arg.val);
-	log!("{:?}", arg1.map(|e| e.val));
+	info!("{:?}", arg.val);
+	info!("{:?}", arg1.map(|e| e.val));
 }

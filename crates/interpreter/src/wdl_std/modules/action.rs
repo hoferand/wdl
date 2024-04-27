@@ -1,8 +1,7 @@
+use log::info;
 use serde::Deserialize;
 
 use ast::Identifier;
-use logger::log;
-use logger::Colorize;
 use router::{self, RouterStatus, Target};
 
 use crate::{
@@ -37,7 +36,7 @@ async fn pickup(
 	target: Arg<Target, { id(b"target") }>,
 	events: Option<Arg<Events, { id(b"events") }>>,
 ) -> Result<(), Error> {
-	log!("pickup from {:?}", target.val);
+	info!("pickup from {:?}", target.val);
 
 	let status = match router::pickup(target.val).await {
 		Some(s) => s,
@@ -49,7 +48,7 @@ async fn pickup(
 		}
 	};
 
-	log!("pickup status: `{:?}`", status);
+	info!("pickup status: `{:?}`", status);
 
 	if let Some(events) = events {
 		if status == RouterStatus::NoStationLeft {
@@ -67,7 +66,7 @@ async fn pickup(
 				)
 				.await?;
 
-				log!("Return value of no_station_left handler: {:?}", ret);
+				info!("Return value of no_station_left handler: {:?}", ret);
 			}
 		}
 	}
@@ -81,7 +80,7 @@ async fn drop(
 	target: Arg<Target, { id(b"target") }>,
 	events: Option<Arg<Events, { id(b"events") }>>,
 ) -> Result<(), Error> {
-	log!("drop to {:?}", target.val);
+	info!("drop to {:?}", target.val);
 
 	let status = match router::drop(target.val).await {
 		Some(s) => s,
@@ -93,7 +92,7 @@ async fn drop(
 		}
 	};
 
-	log!("drop status: `{:?}`", status);
+	info!("drop status: `{:?}`", status);
 
 	if let Some(events) = events {
 		if status == RouterStatus::NoStationLeft {
@@ -109,7 +108,7 @@ async fn drop(
 				)
 				.await?;
 
-				log!("Return value of no_station_left handler: {:?}", ret);
+				info!("Return value of no_station_left handler: {:?}", ret);
 			}
 		}
 	}
@@ -123,7 +122,7 @@ async fn drive(
 	target: Arg<Target, { id(b"target") }>,
 	events: Option<Arg<Events, { id(b"events") }>>,
 ) -> Result<(), Error> {
-	log!("drive to {:?}", target.val);
+	info!("drive to {:?}", target.val);
 
 	let status = match router::drive(target.val).await {
 		Some(s) => s,
@@ -135,7 +134,7 @@ async fn drive(
 		}
 	};
 
-	log!("drive status: `{:?}`", status);
+	info!("drive status: `{:?}`", status);
 
 	if let Some(events) = events {
 		if status == RouterStatus::NoStationLeft {
@@ -153,7 +152,7 @@ async fn drive(
 				)
 				.await?;
 
-				log!("Return value of no_station_left handler: {:?}", ret);
+				info!("Return value of no_station_left handler: {:?}", ret);
 			}
 		}
 	}

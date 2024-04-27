@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
+use log::error;
 use reqwest::{header::CONTENT_TYPE, Response, Url};
 use serde::Serialize;
-
-use logger::error;
-use logger::Colorize;
 
 use crate::{
 	wdl_std::{get_handler, id, Arg, ResultType},

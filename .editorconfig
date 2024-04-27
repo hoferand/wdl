@@ -7,6 +7,10 @@ indent_style = tab
 indent_style = space
 indent_size = 4
 
+[lang-doc/**]
+indent_style = space
+indent_size = 4
+
 [Cargo.lock]
 indent_style = space
 indent_size = 1

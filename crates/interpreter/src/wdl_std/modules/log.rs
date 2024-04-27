@@ -10,14 +10,14 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 
 	match id.id.id.as_str() {
 		"info" => Some(get_handler(info)),
-		"warning" => Some(get_handler(warning)),
+		"warn" => Some(get_handler(warn)),
 		"error" => Some(get_handler(error)),
 		_ => None,
 	}
 }
 
 pub async fn info(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
-	println!(
+	eprintln!(
 		"INFO[{}:{}]: {}",
 		src.start.line + 1,
 		src.start.column,
@@ -25,9 +25,9 @@ pub async fn info(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
 	);
 }
 
-pub async fn warning(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
-	println!(
-		"WARNING[{}:{}]: {}",
+pub async fn warn(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
+	eprintln!(
+		"WARN[{}:{}]: {}",
 		src.start.line + 1,
 		src.start.column,
 		truncate(msg.val.to_string(), 100),
@@ -35,7 +35,7 @@ pub async fn warning(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
 }
 
 pub async fn error(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
-	println!(
+	eprintln!(
 		"ERROR[{}:{}]: {}",
 		src.start.line + 1,
 		src.start.column,

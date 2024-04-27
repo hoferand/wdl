@@ -1,10 +1,8 @@
-use logger::error;
-use logger::Colorize;
+use log::error;
 
-use crate::RouterStatus;
 use crate::{
 	proto::{self, RouterRequest},
-	RouterClient, Target,
+	RouterClient, RouterStatus, Target,
 };
 
 pub async fn drive(target: Target) -> Option<RouterStatus> {
