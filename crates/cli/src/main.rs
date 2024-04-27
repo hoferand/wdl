@@ -33,7 +33,7 @@ enum Cli {
 #[tokio::main]
 async fn main() -> Result<ExitCode, Box<dyn Error>> {
 	TermLogger::init(
-		LevelFilter::Trace,
+		LevelFilter::Info,
 		Config::default(),
 		TerminalMode::Stderr,
 		ColorChoice::Auto,

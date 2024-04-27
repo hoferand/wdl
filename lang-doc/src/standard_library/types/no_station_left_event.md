@@ -1,0 +1,7 @@
+# NoStationLeftEvent
+
+```wdl
+{
+    type: "NoStationLeftEvent"
+}
+```

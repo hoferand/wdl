@@ -2,6 +2,6 @@
 
 ```wdl
 {
-    no_station_left: ?|event: string| -> any
+    no_station_left: ?|event: NoStationLeftEvent| -> any
 }
 ```

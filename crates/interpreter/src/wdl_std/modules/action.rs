@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use log::info;
 use serde::Deserialize;
 
@@ -53,11 +55,14 @@ async fn pickup(
 	if let Some(events) = events {
 		if status == RouterStatus::NoStationLeft {
 			if let Some(callback) = events.val.no_station_left {
+				let mut event = HashMap::new();
+				event.insert(
+					"type".to_owned(),
+					Value::String("NoStationLeftEvent".to_owned()),
+				);
 				let ret = call_function(
 					&callback,
-					vec![Value::String(
-						"Oh no, no station left for pickup!".to_owned(),
-					)],
+					vec![Value::Object(event)],
 					Identifier {
 						id: "no_station_left".to_owned(),
 					},
@@ -97,9 +102,14 @@ async fn drop(
 	if let Some(events) = events {
 		if status == RouterStatus::NoStationLeft {
 			if let Some(callback) = events.val.no_station_left {
+				let mut event = HashMap::new();
+				event.insert(
+					"type".to_owned(),
+					Value::String("NoStationLeftEvent".to_owned()),
+				);
 				let ret = call_function(
 					&callback,
-					vec![Value::String("Oh no, no station left for drop!".to_owned())],
+					vec![Value::Object(event)],
 					Identifier {
 						id: "no_station_left".to_owned(),
 					},
@@ -139,11 +149,14 @@ async fn drive(
 	if let Some(events) = events {
 		if status == RouterStatus::NoStationLeft {
 			if let Some(callback) = events.val.no_station_left {
+				let mut event = HashMap::new();
+				event.insert(
+					"type".to_owned(),
+					Value::String("NoStationLeftEvent".to_owned()),
+				);
 				let ret = call_function(
 					&callback,
-					vec![Value::String(
-						"Oh no, no station left for drive!".to_owned(),
-					)],
+					vec![Value::Object(event)],
 					Identifier {
 						id: "no_station_left".to_owned(),
 					},
