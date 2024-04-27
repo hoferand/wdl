@@ -18,6 +18,7 @@ hljs.registerLanguage(
           keyword:
             "if else while continue break return actions spawn par let global",
           literal: "true false null",
+          built_in: "any void bool number string Target Events Channel"
         },
         illegal: "</",
         contains: [
@@ -41,6 +42,7 @@ hljs.registerLanguage(
             excludeEnd: !0,
             contains: [e.UNDERSCORE_TITLE_MODE],
           },
+          { begin: e.IDENT_RE + "::", keywords: { built_in: "action order http regex log channel time" } },
         ],
       };
     };
