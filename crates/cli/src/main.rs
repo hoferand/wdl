@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::process::ExitCode;
+use std::{collections::HashMap, error::Error};
 
 use clap::Parser;
 use colored::Colorize;
@@ -31,7 +31,7 @@ enum Cli {
 }
 
 #[tokio::main]
-async fn main() -> ExitCode {
+async fn main() -> Result<ExitCode, Box<dyn Error>> {
 	TermLogger::init(
 		LevelFilter::Trace,
 		Config::default(),
@@ -43,13 +43,13 @@ async fn main() -> ExitCode {
 	match Cli::parse() {
 		Cli::Run { file, variables } => run(&file, variables).await,
 		Cli::Compile { file } => compile(&file).await,
-		Cli::Check { file } => check(&file).await,
 		Cli::Fmt { .. } => todo!(),
+		Cli::Check { file } => check(&file).await,
 		Cli::Router => router().await,
 	}
 }
 
-async fn run(file: &str, vars: Vec<String>) -> ExitCode {
+async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> {
 	let mut variables = HashMap::new();
 	for var in vars {
 		let Some(parts) = var.split_once('=') else {
@@ -57,7 +57,7 @@ async fn run(file: &str, vars: Vec<String>) -> ExitCode {
 				"Variable malformed `{}`, expected format <identifier>=<JSON value>!",
 				var
 			);
-			return ExitCode::FAILURE;
+			return Ok(ExitCode::FAILURE);
 		};
 
 		let id = Identifier {
@@ -68,24 +68,18 @@ async fn run(file: &str, vars: Vec<String>) -> ExitCode {
 				"Invalid variable value `{}`, cannot be deserialized!",
 				parts.1
 			);
-			return ExitCode::FAILURE;
+			return Ok(ExitCode::FAILURE);
 		};
 
 		variables.insert(id, val);
 	}
 
-	let src_code = match read_to_string(file).await {
-		Ok(content) => content,
-		Err(err) => {
-			error!("Failed to read source file, {}!", err.kind());
-			return ExitCode::FAILURE;
-		}
-	};
+	let src_code = read_to_string(file).await?;
 	let workflow = match parser::get_ast(&src_code) {
 		Ok(wf) => wf,
 		Err(error) => {
 			print_parser_error(&error, &src_code);
-			return ExitCode::FAILURE;
+			return Ok(ExitCode::FAILURE);
 		}
 	};
 
@@ -93,61 +87,43 @@ async fn run(file: &str, vars: Vec<String>) -> ExitCode {
 		Ok(o) => o,
 		Err(error) => {
 			print_interpreter_error(&error, &src_code);
-			return ExitCode::FAILURE;
+			return Ok(ExitCode::FAILURE);
 		}
 	};
 
 	if let Err(error) = interpreter::run_order(order).await {
 		print_interpreter_error(&error, &src_code);
-		return ExitCode::FAILURE;
+		return Ok(ExitCode::FAILURE);
 	}
 
-	ExitCode::SUCCESS
+	Ok(ExitCode::SUCCESS)
 }
 
-async fn compile(file: &str) -> ExitCode {
-	let src_code = match read_to_string(file).await {
-		Ok(content) => content,
-		Err(err) => {
-			error!("Failed to read source file, {}!", err.kind());
-			return ExitCode::FAILURE;
-		}
-	};
+async fn compile(file: &str) -> Result<ExitCode, Box<dyn Error>> {
+	let src_code = read_to_string(file).await?;
 	let workflow = match parser::get_ast(&src_code) {
 		Ok(wf) => wf,
 		Err(error) => {
 			print_parser_error(&error, &src_code);
-			return ExitCode::FAILURE;
+			return Ok(ExitCode::FAILURE);
 		}
 	};
 
-	let Ok(json) = serde_json::to_string_pretty(&workflow) else {
-		error!("Failed to stringify compiled workflow!");
-		return ExitCode::FAILURE;
-	};
+	let json = serde_json::to_string_pretty(&workflow)?;
 
-	if fs::write(format!("{}.compiled", file), json).await.is_err() {
-		error!("Failed to write compiled workflow to file!");
-		return ExitCode::FAILURE;
-	}
+	fs::write(format!("{}.compiled", file), json).await?;
 
-	ExitCode::SUCCESS
+	Ok(ExitCode::SUCCESS)
 }
 
-async fn check(file: &str) -> ExitCode {
-	let src_code = match read_to_string(file).await {
-		Ok(content) => content,
-		Err(err) => {
-			error!("Failed to read source file, {}!", err.kind());
-			return ExitCode::FAILURE;
-		}
-	};
+async fn check(file: &str) -> Result<ExitCode, Box<dyn Error>> {
+	let src_code = read_to_string(file).await?;
 	if let Err(error) = parser::get_ast(&src_code) {
 		print_parser_error(&error, &src_code);
-		return ExitCode::FAILURE;
+		return Ok(ExitCode::FAILURE);
 	};
 
-	ExitCode::SUCCESS
+	Ok(ExitCode::SUCCESS)
 }
 
 fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
@@ -181,7 +157,7 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			info!("Order done!");
 		}
 		interpreter::ErrorKind::OrderCancel => {
-			warn!("Order cancelled!")
+			warn!("Order canceled!")
 		}
 	}
 

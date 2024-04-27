@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::io::{self, BufRead};
 use std::process::ExitCode;
 
@@ -71,23 +72,17 @@ impl Router for RouterService {
 	}
 }
 
-pub async fn router() -> ExitCode {
-	let Ok(addr) = router::URL.parse() else {
-		return ExitCode::FAILURE;
-	};
+pub async fn router() -> Result<ExitCode, Box<dyn Error>> {
+	let addr = router::URL.parse()?;
 
 	let router = RouterService;
 
-	if Server::builder()
+	Server::builder()
 		.add_service(RouterServer::new(router))
 		.serve(addr)
-		.await
-		.is_err()
-	{
-		return ExitCode::FAILURE;
-	}
+		.await?;
 
-	ExitCode::SUCCESS
+	Ok(ExitCode::SUCCESS)
 }
 
 fn read_i32_stdin() -> Option<i32> {
