@@ -37,8 +37,7 @@ async fn main() -> Result<ExitCode, Box<dyn Error>> {
 		Config::default(),
 		TerminalMode::Stderr,
 		ColorChoice::Auto,
-	)
-	.unwrap();
+	)?;
 
 	match Cli::parse() {
 		Cli::Run { file, variables } => run(&file, variables).await,
