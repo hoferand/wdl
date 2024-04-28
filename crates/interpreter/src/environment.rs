@@ -7,7 +7,10 @@ use std::{
 };
 
 use log::error;
-use tokio::sync::{mpsc::Sender, Mutex, RwLock};
+use tokio::{
+	sync::{mpsc::Sender, Mutex, RwLock},
+	task::JoinHandle,
+};
 
 use ast::{Identifier, Node, Span};
 
@@ -19,6 +22,7 @@ use crate::{
 pub struct Environment {
 	pub global_scope: Arc<Scope>,
 	error_ch: Mutex<Option<Sender<Error>>>, // TODO: remove Option
+	handles: Mutex<Vec<JoinHandle<Result<(), Error>>>>,
 	functions: RwLock<HashMap<Identifier, FunctionValue>>,
 	channels: RwLock<HashMap<ChannelId, Channel>>,
 	channel_id: AtomicU32,
@@ -29,10 +33,19 @@ impl Environment {
 		Environment {
 			global_scope,
 			error_ch: Mutex::new(None),
+			handles: Mutex::new(Vec::new()),
 			functions: RwLock::new(HashMap::new()),
 			channels: RwLock::new(HashMap::new()),
 			channel_id: AtomicU32::new(0),
 		}
+	}
+
+	pub async fn push_handle(&self, handle: JoinHandle<Result<(), Error>>) {
+		self.handles.lock().await.push(handle);
+	}
+
+	pub async fn pop_handle(&self) -> Option<JoinHandle<Result<(), Error>>> {
+		self.handles.lock().await.pop()
 	}
 
 	pub async fn set_error_ch(&self, ch: Sender<Error>) {

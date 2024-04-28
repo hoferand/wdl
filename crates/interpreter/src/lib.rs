@@ -22,9 +22,9 @@ mod expr;
 mod function_value;
 use function_value::FunctionValue;
 mod scope;
+use scope::Scope;
 mod stmt;
 mod wdl_std;
-use scope::Scope;
 
 pub async fn start_workflow(
 	ast: Workflow<Span>,
@@ -58,7 +58,22 @@ pub async fn run_order(order: Order) -> Result<(), Error> {
 	let fut = stmt::interpret_actions(&order.workflow.actions, &order.env.global_scope, &order.env);
 
 	select! {
-		ret = fut => return ret,
+		ret = fut => {
+			if ret.is_ok() {
+				while let Some(handle) = order.env.pop_handle().await{
+					if let Ok(val) = handle.await {
+						if let Err(err) = val {
+							return Err(err);
+						}
+					} else {
+						error!("Failed to finish background task!");
+						// TODO: panic?
+					}
+				}
+			}
+
+			return ret;
+		},
 		val = err_rx.recv() => {
 			if let Some(err) = val {
 				return Err(err);

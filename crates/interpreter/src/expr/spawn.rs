@@ -20,15 +20,19 @@ pub async fn interpret_spawn(
 	let expr_async = expr.val.expr.clone();
 	let scope_async = scope.clone();
 	let env_async = env.clone();
-	tokio::spawn(async move {
+	let handle = tokio::spawn(async move {
 		match interpret_expr(&expr_async, &scope_async, &env_async).await {
 			Ok(value) => ch_async.send(value).await,
 			Err(err) => {
-				env_async.send_error(err).await;
-				ch_async.send(Value::Null).await
+				env_async.send_error(err.clone()).await;
+				ch_async.send(Value::Null).await;
+				return Err(err);
 			}
 		};
+		return Ok(());
 	});
+
+	env.push_handle(handle).await;
 
 	Ok(Value::Channel(ch_id))
 }
