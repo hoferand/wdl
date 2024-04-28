@@ -4,19 +4,19 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Offset, Span};
 
-use crate::{Environment, Error, ErrorKind, Value};
+use crate::{Environment, Error, ErrorKind, Scope, Value};
 
 use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_offset(
 	expr: &Node<Span, Offset<Span>>,
+	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
-	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let value = interpret_expr(&expr.val.value, env, g_env).await?;
+	let value = interpret_expr(&expr.val.value, scope, env).await?;
 
-	let offset = interpret_expr(&expr.val.offset, env, g_env).await?;
+	let offset = interpret_expr(&expr.val.offset, scope, env).await?;
 
 	let val = match (&value, &offset) {
 		(Value::Array(a), Value::Number(n)) => a.get(*n as usize).unwrap_or(&Value::Null).clone(), // TODO: fix cast

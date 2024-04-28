@@ -4,15 +4,15 @@ use async_recursion::async_recursion;
 
 use ast::{Node, ScopedIdentifier, Span};
 
-use crate::{wdl_std::resolve_id, Environment, Error, ErrorKind, Value};
+use crate::{wdl_std::resolve_id, Error, ErrorKind, Scope, Value};
 
 #[async_recursion]
 pub async fn interpret_identifier(
 	expr: &Node<Span, ScopedIdentifier<Span>>,
-	env: &Arc<Environment>,
+	scope: &Arc<Scope>,
 ) -> Result<Value, Error> {
 	if expr.val.scope.is_empty() {
-		if let Some(value) = env.get(&expr.val.id).await {
+		if let Some(value) = scope.get(&expr.val.id).await {
 			return Ok(value);
 		}
 	}

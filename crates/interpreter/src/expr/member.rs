@@ -4,17 +4,17 @@ use async_recursion::async_recursion;
 
 use ast::{Member, Node, Span};
 
-use crate::{Environment, Error, ErrorKind, Value};
+use crate::{Environment, Error, ErrorKind, Scope, Value};
 
 use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_member(
 	expr: &Node<Span, Member<Span>>,
+	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
-	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let value = interpret_expr(&expr.val.object, env, g_env).await?;
+	let value = interpret_expr(&expr.val.object, scope, env).await?;
 
 	let id = &expr.val.member;
 

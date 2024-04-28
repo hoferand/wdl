@@ -1,20 +1,21 @@
 {
-    "version": "0.2",
-    "language": "en",
-    "words": [
-        "arity",
-        "boolify",
-        "vals",
-        "curr",
-        "peekable",
-        "reqwest",
-        "stationarea",
-        "stationareas",
-        "newtype",
-        "proto",
-        "protos",
-        "mdbook",
-        "clippy"
-    ],
-    "flagWords": []
+	"version": "0.2",
+	"language": "en",
+	"words": [
+		"arity",
+		"boolify",
+		"vals",
+		"curr",
+		"peekable",
+		"reqwest",
+		"stationarea",
+		"stationareas",
+		"newtype",
+		"proto",
+		"protos",
+		"mdbook",
+		"clippy",
+		"oneshot"
+	],
+	"flagWords": []
 }

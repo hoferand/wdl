@@ -4,22 +4,22 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Span, Unary, UnaryOperator};
 
-use crate::{Environment, Error, ErrorKind, Value};
+use crate::{Environment, Error, ErrorKind, Scope, Value};
 
 use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_unary(
 	expr: &Node<Span, Unary<Span>>,
+	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
-	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let right = interpret_expr(&expr.val.right, env, g_env).await?;
+	let right = interpret_expr(&expr.val.right, scope, env).await?;
 
 	match expr.val.op.val {
 		UnaryOperator::Negate => negate(&right, &expr.src),
 		UnaryOperator::Flip => Ok(Value::Bool(!right.boolify())),
-		UnaryOperator::Receive => receive(right, &expr.src, g_env).await,
+		UnaryOperator::Receive => receive(right, &expr.src, env).await,
 	}
 }
 
@@ -35,11 +35,11 @@ fn negate(val: &Value, span: &Span) -> Result<Value, Error> {
 	}
 }
 
-pub async fn receive(ch: Value, _span: &Span, g_env: &Arc<Environment>) -> Result<Value, Error> {
+pub async fn receive(ch: Value, _span: &Span, env: &Arc<Environment>) -> Result<Value, Error> {
 	// TODO: improve error messages
 	match ch {
 		Value::Channel(ch_id) => {
-			let Some(ch) = g_env.get_ch(&ch_id).await else {
+			let Some(ch) = env.get_ch(&ch_id).await else {
 				return Err(Error::fatal(format!("Channel `{}` not found", ch_id.id)));
 			};
 			if let Some(v) = ch.receive().await {

@@ -1,7 +1,22 @@
-mod actions;
+use std::sync::Arc;
+
+use async_recursion::async_recursion;
+
+use ast::{Span, Statement};
+
+use crate::{Environment, Error, Interrupt, Scope};
+
+use super::expr::interpret_expr;
+
+pub mod global_declaration;
+pub use global_declaration::interpret_global_declaration;
+pub mod function_declaration;
+pub use function_declaration::interpret_function_declaration;
+pub mod actions;
 pub use actions::interpret_actions;
-mod block;
+pub mod block;
 pub use block::interpret_block;
+
 mod par;
 use par::interpret_par;
 mod if_;
@@ -14,10 +29,6 @@ mod continue_;
 use continue_::interpret_continue;
 mod return_;
 use return_::interpret_return;
-mod function_declaration;
-pub use function_declaration::interpret_function_declaration;
-mod global_declaration;
-pub use global_declaration::interpret_global_declaration;
 mod let_;
 use let_::interpret_let;
 mod assignment;
@@ -25,39 +36,29 @@ use assignment::interpret_assignment;
 mod send;
 use send::interpret_send;
 
-use std::sync::Arc;
-
-use async_recursion::async_recursion;
-
-use ast::{Span, Statement};
-
-use crate::{Environment, Error, Interrupt};
-
-use super::expr::interpret_expr;
-
 #[async_recursion]
 pub async fn interpret_stmt(
 	stmt: &Statement<Span>,
+	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
-	g_env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
 	match stmt {
-		Statement::Assignment(stmt) => interpret_assignment(stmt, env, g_env).await,
+		Statement::Assignment(stmt) => interpret_assignment(stmt, scope, env).await,
 		Statement::Expression(expr) => {
-			interpret_expr(expr, env, g_env).await?;
+			interpret_expr(expr, scope, env).await?;
 			Ok(Interrupt::None)
 		}
-		Statement::Block(block) => interpret_block(block, env, g_env).await,
+		Statement::Block(block) => interpret_block(block, scope, env).await,
 		Statement::Break(_) => interpret_break(),
 		Statement::Continue(_) => interpret_continue(),
-		Statement::If(if_) => interpret_if(if_, env, g_env).await,
-		Statement::Let(let_) => interpret_let(let_, env, g_env).await,
+		Statement::If(if_) => interpret_if(if_, scope, env).await,
+		Statement::Let(let_) => interpret_let(let_, scope, env).await,
 		Statement::Par(par) => {
-			interpret_par(par, env, g_env).await?;
+			interpret_par(par, scope, env).await?;
 			Ok(Interrupt::None)
 		}
-		Statement::Return(return_) => interpret_return(return_, env, g_env).await,
-		Statement::Send(stmt) => interpret_send(stmt, env, g_env).await,
-		Statement::While(while_) => interpret_while(while_, env, g_env).await,
+		Statement::Return(return_) => interpret_return(return_, scope, env).await,
+		Statement::Send(stmt) => interpret_send(stmt, scope, env).await,
+		Statement::While(while_) => interpret_while(while_, scope, env).await,
 	}
 }

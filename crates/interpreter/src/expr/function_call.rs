@@ -7,7 +7,7 @@ use ast::{FunctionCall, Identifier, Node, Span};
 use crate::{
 	stmt,
 	wdl_std::{ArgumentValue, CallContext},
-	Environment, Error, ErrorKind, FunctionId, FunctionValue, Interrupt, Value,
+	Environment, Error, ErrorKind, FunctionId, FunctionValue, Interrupt, Scope, Value,
 };
 
 use super::interpret_expr;
@@ -15,10 +15,10 @@ use super::interpret_expr;
 #[async_recursion]
 pub async fn interpret_function_call(
 	expr: &Node<Span, FunctionCall<Span>>,
+	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
-	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let function_id = match interpret_expr(&expr.val.function, env, g_env).await? {
+	let function_id = match interpret_expr(&expr.val.function, scope, env).await? {
 		Value::Function(f) => f,
 		v => {
 			return Err(Error {
@@ -33,7 +33,7 @@ pub async fn interpret_function_call(
 	let mut args = Vec::new();
 	let mut named_args = HashMap::new();
 	for (idx, arg) in expr.val.args.iter().enumerate() {
-		let val = interpret_expr(&arg.val.val, env, g_env).await?;
+		let val = interpret_expr(&arg.val.val, scope, env).await?;
 
 		if let Some(id) = &arg.val.id {
 			named_args.insert(
@@ -59,7 +59,7 @@ pub async fn interpret_function_call(
 		args,
 		named_args,
 		true,
-		g_env,
+		env,
 	)
 	.await
 }
@@ -71,26 +71,26 @@ pub async fn run_function(
 	args: Vec<ArgumentValue>,
 	mut named_args: HashMap<Identifier, ArgumentValue>,
 	strict: bool,
-	g_env: &Arc<Environment>,
+	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let Some(function_val) = g_env.get_fn(fn_id).await else {
+	let Some(function_val) = env.get_fn(fn_id).await else {
 		return Err(Error::fatal(format!("Function `{}` not found", fn_id)));
 	};
 
 	let val;
 	match function_val {
 		FunctionValue::Custom(function) => {
-			let inner_env = Arc::new(Environment::with_parent(Arc::clone(g_env)));
+			let inner_scope = Arc::new(Scope::with_parent(Arc::clone(&env.global_scope)));
 
 			let mut vals = args.into_iter();
 			for id in function.parameter.iter() {
 				if let Some(val) = vals.next() {
 					// positional argument
-					inner_env.declare(id.val.id.clone(), val.val).await?;
+					inner_scope.declare(id.val.id.clone(), val.val).await?;
 				} else if let Some(val) = named_args.get(&id.val.id.val).cloned() {
 					// named argument
 					named_args.remove(&id.val.id.val);
-					inner_env.declare(id.val.id.clone(), val.val).await?;
+					inner_scope.declare(id.val.id.clone(), val.val).await?;
 				} else {
 					// parameter missing
 					return Err(Error {
@@ -123,7 +123,7 @@ pub async fn run_function(
 				});
 			}
 
-			match stmt::interpret_block(&function.body, &inner_env, g_env).await? {
+			match stmt::interpret_block(&function.body, &inner_scope, env).await? {
 				Interrupt::None => val = Value::Null,
 				Interrupt::Return(ret_val) => val = ret_val,
 				int @ (Interrupt::Continue | Interrupt::Break) => {
@@ -140,7 +140,7 @@ pub async fn run_function(
 				.call_with_ctx(
 					CallContext {
 						fn_span,
-						env: Arc::clone(g_env),
+						env: Arc::clone(env),
 						args,
 						named_args,
 					},

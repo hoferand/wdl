@@ -1,3 +1,14 @@
+use std::sync::Arc;
+
+use async_recursion::async_recursion;
+
+use ast::{Expression, Span};
+
+use crate::{scope::Scope, Environment, Error, Value};
+
+pub mod function_call;
+pub use function_call::{interpret_function_call, run_function};
+
 mod literal;
 use literal::interpret_literal;
 mod binary;
@@ -10,8 +21,6 @@ mod group;
 use group::interpret_group;
 mod identifier;
 use identifier::interpret_identifier;
-pub mod function_call;
-pub use function_call::{interpret_function_call, run_function};
 mod array;
 use array::interpret_array;
 mod offset;
@@ -23,32 +32,24 @@ use object::interpret_object;
 mod spawn;
 use spawn::interpret_spawn;
 
-use std::sync::Arc;
-
-use async_recursion::async_recursion;
-
-use ast::{Expression, Span};
-
-use crate::{Environment, Error, Value};
-
 #[async_recursion]
 pub async fn interpret_expr(
 	expr: &Expression<Span>,
+	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
-	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	match expr {
-		Expression::Array(expr) => interpret_array(expr, env, g_env).await,
-		Expression::Binary(expr) => interpret_binary(expr, env, g_env).await,
-		Expression::FunctionCall(expr) => interpret_function_call(expr, env, g_env).await,
-		Expression::Group(expr) => interpret_group(expr, env, g_env).await,
-		Expression::Identifier(expr) => interpret_identifier(expr, env).await,
+		Expression::Array(expr) => interpret_array(expr, scope, env).await,
+		Expression::Binary(expr) => interpret_binary(expr, scope, env).await,
+		Expression::FunctionCall(expr) => interpret_function_call(expr, scope, env).await,
+		Expression::Group(expr) => interpret_group(expr, scope, env).await,
+		Expression::Identifier(expr) => interpret_identifier(expr, scope).await,
 		Expression::Literal(expr) => interpret_literal(expr),
-		Expression::Logical(expr) => interpret_logical(expr, env, g_env).await,
-		Expression::Member(expr) => interpret_member(expr, env, g_env).await,
-		Expression::Object(expr) => interpret_object(expr, env, g_env).await,
-		Expression::Offset(expr) => interpret_offset(expr, env, g_env).await,
-		Expression::Spawn(expr) => interpret_spawn(expr, env, g_env).await,
-		Expression::Unary(expr) => interpret_unary(expr, env, g_env).await,
+		Expression::Logical(expr) => interpret_logical(expr, scope, env).await,
+		Expression::Member(expr) => interpret_member(expr, scope, env).await,
+		Expression::Object(expr) => interpret_object(expr, scope, env).await,
+		Expression::Offset(expr) => interpret_offset(expr, scope, env).await,
+		Expression::Spawn(expr) => interpret_spawn(expr, scope, env).await,
+		Expression::Unary(expr) => interpret_unary(expr, scope, env).await,
 	}
 }

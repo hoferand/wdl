@@ -4,22 +4,22 @@ use async_recursion::async_recursion;
 
 use ast::{Binary, BinaryOperator, Node, Span};
 
-use crate::{Environment, Error, ErrorKind, Value};
+use crate::{Environment, Error, ErrorKind, Scope, Value};
 
 use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_binary(
 	expr: &Node<Span, Binary<Span>>,
+	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
-	g_env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let left = interpret_expr(&expr.val.left, env, g_env).await?;
+	let left = interpret_expr(&expr.val.left, scope, env).await?;
 	if expr.val.op.val == BinaryOperator::NullCoalescing && left != Value::Null {
 		return Ok(left);
 	};
 
-	let right = interpret_expr(&expr.val.right, env, g_env).await?;
+	let right = interpret_expr(&expr.val.right, scope, env).await?;
 
 	match expr.val.op.val {
 		BinaryOperator::Add => add(left, right, &expr.src),

@@ -9,7 +9,7 @@ use crate::{expr::interpret_expr, Environment, Error, Interrupt, Value};
 #[async_recursion]
 pub async fn interpret_global_declaration(
 	stmt: &Node<Span, GlobalDeclaration<Span>>,
-	g_env: &Arc<Environment>,
+	env: &Arc<Environment>,
 	input_value: Option<Value>,
 ) -> Result<Interrupt, Error> {
 	let id = stmt.val.id.clone();
@@ -18,7 +18,7 @@ pub async fn interpret_global_declaration(
 	if let Some(val) = input_value {
 		value = val;
 	} else if let Some(expr) = &stmt.val.value {
-		value = interpret_expr(expr, g_env, g_env).await?;
+		value = interpret_expr(expr, &env.global_scope, env).await?;
 	} else {
 		return Err(Error::fatal(format!(
 			"Missing value for global variable `{}`",
@@ -26,7 +26,7 @@ pub async fn interpret_global_declaration(
 		)));
 	}
 
-	g_env.declare(id, value).await?;
+	env.global_scope.declare(id, value).await?;
 
 	Ok(Interrupt::None)
 }

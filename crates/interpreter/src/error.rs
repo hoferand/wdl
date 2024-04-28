@@ -1,6 +1,6 @@
 use ast::{Identifier, ScopedIdentifier, Span};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Error {
 	pub kind: ErrorKind,
 	pub src: Option<Span>, // TODO: replace by generic Source type
@@ -15,7 +15,7 @@ impl Error {
 	}
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ErrorKind {
 	Fatal(String),
 	VariableAlreadyInUse { id: Identifier },
