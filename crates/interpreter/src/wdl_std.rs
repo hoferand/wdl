@@ -1,3 +1,16 @@
+use std::{collections::HashMap, sync::Arc};
+
+use ast::{Identifier, Span};
+
+use crate::{expr::run_function, Environment, Error, ErrorKind, FunctionId, FunctionValue, Value};
+
+pub(crate) mod call_context;
+pub(crate) use call_context::*;
+pub(crate) mod modules;
+pub(crate) use modules::resolve_id;
+pub(crate) mod std_function;
+pub(crate) use std_function::StdFunction;
+
 mod from_call_context;
 use from_call_context::FromCallContext;
 mod handler_function;
@@ -14,19 +27,6 @@ mod result_type;
 use result_type::ResultType;
 mod from_value;
 use from_value::FromValue;
-
-pub(crate) mod call_context;
-pub(crate) use call_context::*;
-pub(crate) mod modules;
-pub(crate) use modules::resolve_id;
-pub(crate) mod std_function;
-pub(crate) use std_function::StdFunction;
-
-use std::{collections::HashMap, sync::Arc};
-
-use ast::{Identifier, Span};
-
-use crate::{expr::run_function, Environment, Error, ErrorKind, FunctionId, FunctionValue, Value};
 
 fn get_handler<H, T>(fun: H) -> FunctionValue
 where

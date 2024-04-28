@@ -1,3 +1,7 @@
+use serde::{Deserialize, Serialize};
+
+use crate::{Expression, Node, Source};
+
 pub mod block;
 pub use block::Block;
 pub mod function_declaration;
@@ -26,10 +30,6 @@ pub mod send;
 pub use send::Send;
 pub mod declaration;
 pub use declaration::Declaration;
-
-use serde::{Deserialize, Serialize};
-
-use crate::{Expression, Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]

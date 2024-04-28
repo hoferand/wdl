@@ -1,33 +1,33 @@
-mod global_declaration;
-pub(crate) use global_declaration::parse_global_declaration;
-mod actions;
-pub(crate) use actions::parse_actions;
-mod block;
-pub(crate) use block::parse_block;
-mod return_;
-pub(crate) use return_::parse_return;
-mod break_;
-pub(crate) use break_::parse_break;
-mod continue_;
-pub(crate) use continue_::parse_continue;
-mod while_;
-pub(crate) use while_::parse_while;
-mod else_;
-pub(crate) use else_::parse_else;
-mod if_;
-pub(crate) use if_::parse_if;
-mod par;
-pub(crate) use par::parse_par;
-mod let_;
-pub(crate) use let_::parse_let;
-mod function_declaration;
-pub(crate) use function_declaration::parse_function_declaration;
-
 use ast::{Assignment, Declaration, Expression, Node, Send, Span, Statement};
 
 use crate::{Parser, ParserError, TokenValue};
 
 use super::expression::parse_expression;
+
+pub(crate) mod global_declaration;
+pub(crate) use global_declaration::parse_global_declaration;
+pub(crate) mod actions;
+pub(crate) use actions::parse_actions;
+pub(crate) mod block;
+pub(crate) use block::parse_block;
+pub(crate) mod return_;
+pub(crate) use return_::parse_return;
+pub(crate) mod break_;
+pub(crate) use break_::parse_break;
+pub(crate) mod continue_;
+pub(crate) use continue_::parse_continue;
+pub(crate) mod while_;
+pub(crate) use while_::parse_while;
+pub(crate) mod else_;
+pub(crate) use else_::parse_else;
+pub(crate) mod if_;
+pub(crate) use if_::parse_if;
+pub(crate) mod par;
+pub(crate) use par::parse_par;
+pub(crate) mod let_;
+pub(crate) use let_::parse_let;
+pub(crate) mod function_declaration;
+pub(crate) use function_declaration::parse_function_declaration;
 
 pub(crate) fn parse_declaration(
 	parser: &mut Parser,

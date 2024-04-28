@@ -1,3 +1,7 @@
+use serde::{Deserialize, Serialize};
+
+use crate::{Node, Source};
+
 pub mod literal;
 pub use literal::Literal;
 pub mod binary;
@@ -22,10 +26,6 @@ pub mod scoped_identifier;
 pub use scoped_identifier::ScopedIdentifier;
 pub mod spawn;
 pub use spawn::Spawn;
-
-use serde::{Deserialize, Serialize};
-
-use crate::{Node, Source};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]

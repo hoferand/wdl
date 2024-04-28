@@ -1,5 +1,10 @@
+use ast::{Actions, Declaration, Node, Span, Workflow};
+
+use crate::Token;
+
 pub mod parser_error;
 pub use parser_error::ParserError;
+
 mod token_stream;
 use token_stream::TokenStream;
 mod parser_state;
@@ -10,10 +15,6 @@ mod statement;
 use statement::*;
 mod function;
 mod identifier;
-
-use ast::{Actions, Declaration, Node, Span, Workflow};
-
-use crate::Token;
 
 pub(crate) struct Parser<'t> {
 	tokens: TokenStream<'t>,

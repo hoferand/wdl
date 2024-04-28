@@ -1,6 +1,3 @@
-pub mod lexer_error;
-pub use lexer_error::LexerError;
-
 use std::{iter::Peekable, str::Chars};
 
 use unicode_ident::{is_xid_continue, is_xid_start};
@@ -8,6 +5,9 @@ use unicode_ident::{is_xid_continue, is_xid_start};
 use ast::{Location, Span};
 
 use crate::{Token, TokenValue};
+
+pub mod lexer_error;
+pub use lexer_error::LexerError;
 
 pub(crate) struct Lexer<'c> {
 	chars: Peekable<Chars<'c>>,

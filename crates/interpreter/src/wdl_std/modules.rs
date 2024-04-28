@@ -1,3 +1,5 @@
+use crate::{FunctionId, FunctionValue};
+
 mod action;
 mod channel;
 mod http;
@@ -6,8 +8,6 @@ mod order;
 mod regex;
 mod test;
 mod time;
-
-use crate::{FunctionId, FunctionValue};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if let Some(module) = id.scope.first() {
