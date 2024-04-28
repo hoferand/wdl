@@ -20,6 +20,7 @@ pub async fn interpret_spawn(
 	let expr_async = expr.val.expr.clone();
 	let scope_async = scope.clone();
 	let env_async = env.clone();
+
 	let handle = tokio::spawn(async move {
 		match interpret_expr(&expr_async, &scope_async, &env_async).await {
 			Ok(value) => ch_async.send(value).await,
@@ -29,7 +30,8 @@ pub async fn interpret_spawn(
 				return Err(err);
 			}
 		};
-		return Ok(());
+
+		Ok(())
 	});
 
 	env.push_handle(handle).await;

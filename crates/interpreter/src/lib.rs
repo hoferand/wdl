@@ -62,9 +62,7 @@ pub async fn run_order(order: Order) -> Result<(), Error> {
 			if ret.is_ok() {
 				while let Some(handle) = order.env.pop_handle().await{
 					if let Ok(val) = handle.await {
-						if let Err(err) = val {
-							return Err(err);
-						}
+						val?;
 					} else {
 						error!("Failed to finish background task!");
 						// TODO: panic?
@@ -72,11 +70,11 @@ pub async fn run_order(order: Order) -> Result<(), Error> {
 				}
 			}
 
-			return ret;
+			ret
 		},
 		val = err_rx.recv() => {
 			if let Some(err) = val {
-				return Err(err);
+				Err(err)
 			} else {
 				error!("Error channel closed!");
 				// TODO: panic?

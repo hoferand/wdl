@@ -14,7 +14,7 @@ pub async fn interpret_block(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
-	let inner_scope = Arc::new(Scope::with_parent(Arc::clone(&scope)));
+	let inner_scope = Arc::new(Scope::with_parent(Arc::clone(scope)));
 
 	for stmt in &stmt.val.stmts {
 		let ret = interpret_stmt(stmt, &inner_scope, env).await?;
