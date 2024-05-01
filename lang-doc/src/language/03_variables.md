@@ -47,5 +47,5 @@ actions {
     // This raise an error because `var3`
     // is not declared inside this scope.
     var3 = 56;
-} // <- `var2` gets deleted at this `{`
+} // <- `var2` gets deleted at this `}`
 ```
