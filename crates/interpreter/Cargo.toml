@@ -10,7 +10,7 @@ ast = { path = "../ast" }
 router = { path = "../router" }
 
 log = "0.4.21"
-tokio = { version = "1.37.0", features = ["full"] }
+tokio = { version = "1.37", features = ["macros"] }
 async-recursion = "1.0.5"
 futures = "0.3.29"
 serde = "1.0.197"
