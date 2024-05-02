@@ -30,23 +30,23 @@ struct HttpResponse {
 
 impl ResultType for HttpResponse {}
 
-async fn get(uri: Arg<String, { id(b"uri") }>) -> Result<Option<HttpResponse>, Error> {
-	process_response(reqwest::get(parse_uri(&uri.val)?).await).await
+async fn get(url: Arg<String, { id(b"url") }>) -> Result<Option<HttpResponse>, Error> {
+	process_response(reqwest::get(parse_url(&url.val)?).await).await
 }
 
-async fn post(uri: Arg<String, { id(b"uri") }>) -> Result<Option<HttpResponse>, Error> {
+async fn post(url: Arg<String, { id(b"url") }>) -> Result<Option<HttpResponse>, Error> {
 	process_response(
 		reqwest::Client::new()
-			.post(parse_uri(&uri.val)?)
+			.post(parse_url(&url.val)?)
 			.send()
 			.await,
 	)
 	.await
 }
 
-fn parse_uri(uri: &str) -> Result<Url, Error> {
+fn parse_url(url: &str) -> Result<Url, Error> {
 	// TODO: improve error handling
-	match Url::parse(uri) {
+	match Url::parse(url) {
 		Ok(u) => Ok(u),
 		Err(err) => Err(Error::fatal(err.to_string())),
 	}
