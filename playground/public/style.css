@@ -1,0 +1,56 @@
+html {
+	font-family: "Courier New", Courier, monospace;
+}
+
+#app {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#playground {
+	width: 100%;
+	max-width: 1024px;
+	display: flex;
+	flex-direction: column;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+}
+
+#editor {
+	flex-grow: 1;
+	margin-right: 1vmin;
+	display: flex;
+	flex-direction: column;
+}
+
+#editor-container {
+	height: 500px;
+	border: 1px solid grey;
+}
+
+#router {
+	width: 400px;
+}
+
+#output {
+	margin-top: 1vmin;
+}
+
+.container {
+	border: 1px solid black;
+	border-radius: 10px;
+	padding: 10px;
+}
+
+.container > h2 {
+	margin-top: 0;
+}
+
+#output-area {
+	height: 200px;
+}

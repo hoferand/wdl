@@ -1,0 +1,8 @@
+{
+	"name": "wdl-playground",
+	"version": "0.1.0",
+	"description": "",
+	"dependencies": {
+		"monaco-editor": "^0.48.0"
+	}
+}
