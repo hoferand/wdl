@@ -189,7 +189,7 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 						error!("Unexpected end of file!");
 					}
 					parser::LexerError::InvalidEscape { char, loc } => {
-						error!("Invalid character escape `\\{}`", char);
+						error!("Invalid character escape `\\{}`!", char);
 						print_error_location(
 							&Location {
 								line: loc.line,
