@@ -193,11 +193,11 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 						print_error_location(
 							&Location {
 								line: loc.line,
-								column: loc.column - 1,
+								column: loc.column - 2,
 							},
 							&Location {
 								line: loc.line,
-								column: loc.column + 1,
+								column: loc.column,
 							},
 							src_code,
 						);
