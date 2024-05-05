@@ -40,7 +40,8 @@ async function check(src) {
 	} else {
 		document.getElementById("output-area").innerText = "";
 		for (error of json.errors) {
-			document.getElementById("output-area").innerText += error.title;
+			document.getElementById("output-area").innerText +=
+				"ERROR: " + error.title;
 			if (error.pos) {
 				const pos = error.pos;
 				document.getElementById("output-area").innerText +=
