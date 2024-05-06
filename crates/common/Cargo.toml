@@ -1,0 +1,10 @@
+[package]
+name = "common"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ast = { path = "../ast" }
+parser = { path = "../parser" }
+
+serde = { version = "1.0.200", features = ["derive"] }

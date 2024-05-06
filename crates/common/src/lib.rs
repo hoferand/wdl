@@ -1,48 +1,38 @@
 use ast::{Location, Span};
-use axum::{routing::post, Json, Router};
 use serde::Serialize;
-use serde_json::{json, Value};
-use tower_http::services::ServeDir;
 
-#[tokio::main]
-async fn main() {
-	let app = Router::new()
-		.route("/check", post(check))
-		.nest_service(
-			"/monaco-editor",
-			ServeDir::new("node_modules/monaco-editor"),
-		)
-		.nest_service("/", ServeDir::new("public"));
-
-	let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-	axum::serve(listener, app).await.unwrap();
-}
-
-async fn check(src_code: String) -> Json<Value> {
+pub fn check_src(src_code: String) -> Status {
 	if let Err(error) = parser::get_ast(&src_code) {
-		Json(json!({
-			"status": "error",
-			"errors": convert_parser_error(error, &src_code)
-		}))
+		Status {
+			status: "error".to_owned(),
+			errors: Some(convert_parser_error(error, &src_code)),
+		}
 	} else {
-		Json(json!({
-			"status": "ok"
-		}))
+		Status {
+			status: "ok".to_owned(),
+			errors: None,
+		}
 	}
 }
 
 #[derive(Debug, Serialize)]
-#[serde(tag = "type")]
-struct Error {
-	title: String,
-	pos: Option<Position>,
+pub struct Status {
+	pub status: String,
+	pub errors: Option<Vec<Error>>,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "type")]
-struct Position {
-	span: Span,
-	span_str: String,
+pub struct Error {
+	pub title: String,
+	pub pos: Option<Position>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(tag = "type")]
+pub struct Position {
+	pub span: Span,
+	pub span_str: String,
 }
 
 fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {

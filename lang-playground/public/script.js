@@ -1,8 +1,12 @@
+import init, { check_src } from "./wasm/wasm.js";
+
 var editor = null;
 
-window.addEventListener("load", (event) => {
+window.addEventListener("load", async (event) => {
+	await init();
+
 	require.config({
-		paths: { vs: "monaco-editor/min/vs" },
+		paths: { vs: "npm_modules/monaco-editor/min/vs" },
 	});
 
 	require(["vs/editor/editor.main"], function () {
@@ -25,21 +29,16 @@ window.addEventListener("load", (event) => {
 	});
 });
 
-const debounced_check = debounce(check);
+const debounced_check = debounce(check, 100);
 async function check(src) {
-	const response = await fetch("http://localhost:3000/check", {
-		method: "POST",
-		body: src,
-	});
-
-	let json = await response.json();
+	let status = check_src(src);
 
 	let errors = [];
-	if (json.status === "ok") {
+	if (status.status === "ok") {
 		document.getElementById("output-area").innerText = "No problems found";
 	} else {
 		document.getElementById("output-area").innerText = "";
-		for (error of json.errors) {
+		for (let error of status.errors) {
 			document.getElementById("output-area").innerText +=
 				"ERROR: " + error.title;
 			if (error.pos) {

@@ -15,7 +15,8 @@
 		"protos",
 		"mdbook",
 		"clippy",
-		"oneshot"
+		"oneshot",
+		"bindgen"
 	],
 	"flagWords": []
 }
