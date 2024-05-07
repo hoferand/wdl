@@ -2,7 +2,7 @@ import init, { check_src } from "./wasm/wasm.js";
 
 var editor = null;
 
-window.addEventListener("load", async (event) => {
+window.addEventListener("load", async (_event) => {
 	await init();
 
 	require.config({
@@ -27,6 +27,10 @@ window.addEventListener("load", async (event) => {
 
 		check(editor.getValue());
 	});
+});
+
+document.getElementById("run-btn").addEventListener("click", async (_event) => {
+	console.log("run workflow");
 });
 
 const debounced_check = debounce(check, 100);

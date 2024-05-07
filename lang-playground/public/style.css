@@ -47,7 +47,7 @@ html {
 	padding: 10px;
 }
 
-.container > h2 {
+.container h2 {
 	margin-top: 0;
 }
 
@@ -61,4 +61,22 @@ span.blue {
 
 span.red {
 	color: red;
+}
+
+button {
+	width: 70px;
+	height: 35px;
+	background-color: #eee;
+	border: 1px solid grey;
+	border-radius: 5px;
+	padding: 5px;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #ccc;
+}
+
+#run-btn {
+	margin-left: auto;
 }

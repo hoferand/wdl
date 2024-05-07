@@ -172,7 +172,7 @@ fn print_parser_error(error: &parser::Error, src_code: &str) {
 	for error in convert_parser_error(error, src_code, Target::ANSI) {
 		error!("{}", error.title);
 		if let Some(pos) = error.pos {
-			eprintln!("{}", pos.span_str)
+			eprintln!("{}", pos.span_str);
 		}
 	}
 }
