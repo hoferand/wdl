@@ -33,18 +33,19 @@ const debounced_check = debounce(check, 100);
 async function check(src) {
 	let status = check_src(src);
 
+	const output = document.getElementById("output-area");
+
 	let errors = [];
 	if (status.status === "ok") {
-		document.getElementById("output-area").innerText = "No problems found";
+		output.innerHTML = "No problems found";
 	} else {
-		document.getElementById("output-area").innerText = "";
+		output.innerHTML = "";
 		for (let error of status.errors) {
-			document.getElementById("output-area").innerText +=
-				"ERROR: " + error.title;
+			output.innerHTML += '<span class="red">ERROR:</span> ';
+			output.innerHTML += html_escape(error);
 			if (error.pos) {
 				const pos = error.pos;
-				document.getElementById("output-area").innerText +=
-					"\n" + pos.span_str + "\n";
+				output.innerHTML += "\n" + pos.span_str + "\n";
 
 				errors.push({
 					startLineNumber: pos.span.start.line + 1,
@@ -58,6 +59,13 @@ async function check(src) {
 		}
 	}
 	monaco.editor.setModelMarkers(editor.getModel(), "owner", errors);
+}
+
+function html_escape(str) {
+	return str.title.replace(
+		/[\u00A0-\u9999<>\&]/g,
+		(i) => "&#" + i.charCodeAt(0) + ";"
+	);
 }
 
 function debounce(func, timeout = 300) {

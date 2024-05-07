@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 ast = { path = "../ast" }
+colored = "2.1.0"
+html-escape = "0.2.13"
 parser = { path = "../parser" }
 
 serde = { version = "1.0.200", features = ["derive"] }

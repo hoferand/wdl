@@ -1,6 +1,7 @@
 use axum::{routing::post, Json, Router};
-use common::Status;
 use tower_http::services::ServeDir;
+
+use common::{Status, Target};
 
 #[tokio::main]
 async fn main() {
@@ -20,5 +21,5 @@ async fn main() {
 }
 
 async fn check(src_code: String) -> Json<Status> {
-	Json(common::check_src(src_code))
+	Json(common::check_src(src_code, Target::HTML))
 }

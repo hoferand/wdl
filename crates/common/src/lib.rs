@@ -1,11 +1,15 @@
-use ast::{Location, Span};
 use serde::Serialize;
 
-pub fn check_src(src_code: String) -> Status {
+use ast::{Location, Span};
+
+pub mod colored_string;
+pub use colored_string::*;
+
+pub fn check_src(src_code: String, target: Target) -> Status {
 	if let Err(error) = parser::get_ast(&src_code) {
 		Status {
 			status: "error".to_owned(),
-			errors: Some(convert_parser_error(error, &src_code)),
+			errors: Some(convert_parser_error(&error, &src_code, target)),
 		}
 	} else {
 		Status {
@@ -35,7 +39,7 @@ pub struct Position {
 	pub span_str: String,
 }
 
-fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
+pub fn convert_parser_error(error: &parser::Error, src_code: &str, target: Target) -> Vec<Error> {
 	let mut ret = Vec::new();
 	match error {
 		parser::Error::Lexer(errors) => {
@@ -43,7 +47,7 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 				ret.push(match err {
 					parser::LexerError::InvalidCharacter { char, loc } => {
 						let span = Span {
-							start: loc,
+							start: *loc,
 							end: Location {
 								line: loc.line,
 								column: loc.column + 1,
@@ -54,15 +58,25 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 							title: format!("Invalid character `{}` found!", char),
 							pos: Some(Position {
 								span,
-								span_str: create_error_location(&span.start, &span.end, src_code),
+								span_str: create_error_location(
+									&span.start,
+									&span.end,
+									src_code,
+									target,
+								),
 							}),
 						}
 					}
 					parser::LexerError::InvalidNumber { src, span } => Error {
 						title: format!("Invalid number `{}` found!", src),
 						pos: Some(Position {
-							span,
-							span_str: create_error_location(&span.start, &span.end, src_code),
+							span: *span,
+							span_str: create_error_location(
+								&span.start,
+								&span.end,
+								src_code,
+								target,
+							),
 						}),
 					},
 					parser::LexerError::UnexpectedEndOfFile => {
@@ -80,10 +94,15 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 						};
 
 						Error {
-							title: format!("Unexpected end of file!"),
+							title: "Unexpected end of file!".to_owned(),
 							pos: Some(Position {
 								span,
-								span_str: create_error_location(&span.start, &span.end, src_code),
+								span_str: create_error_location(
+									&span.start,
+									&span.end,
+									src_code,
+									target,
+								),
 							}),
 						}
 					}
@@ -103,7 +122,12 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 							title: format!("Invalid character escape `\\{}`!", char),
 							pos: Some(Position {
 								span,
-								span_str: create_error_location(&span.start, &span.end, src_code),
+								span_str: create_error_location(
+									&span.start,
+									&span.end,
+									src_code,
+									target,
+								),
 							}),
 						}
 					}
@@ -118,8 +142,8 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 			parser::ParserError::Positional { msg, span } => Error {
 				title: format!("{}!", msg),
 				pos: Some(Position {
-					span,
-					span_str: create_error_location(&span.start, &span.end, src_code),
+					span: *span,
+					span_str: create_error_location(&span.start, &span.end, src_code, target),
 				}),
 			},
 			parser::ParserError::UnexpectedToken {
@@ -142,8 +166,8 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 				Error {
 					title: format!("{}!", msg),
 					pos: Some(Position {
-						span,
-						span_str: create_error_location(&span.start, &span.end, src_code),
+						span: *span,
+						span_str: create_error_location(&span.start, &span.end, src_code, target),
 					}),
 				}
 			}
@@ -151,17 +175,22 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 				actions1: _,
 				actions2,
 			} => Error {
-				title: format!("Only one `actions` block is allowed!"),
+				title: "Only one `actions` block is allowed!".to_owned(),
 				pos: Some(Position {
-					span: actions2,
-					span_str: create_error_location(&actions2.start, &actions2.end, src_code),
+					span: *actions2,
+					span_str: create_error_location(
+						&actions2.start,
+						&actions2.end,
+						src_code,
+						target,
+					),
 				}),
 			},
 			parser::ParserError::ExpectedSemicolon { span } => Error {
-				title: format!("Expected semicolon `;`!"),
+				title: "Expected semicolon `;`!".to_owned(),
 				pos: Some(Position {
-					span,
-					span_str: create_error_location(&span.start, &span.end, src_code),
+					span: *span,
+					span_str: create_error_location(&span.start, &span.end, src_code, target),
 				}),
 			},
 			parser::ParserError::UnexpectedEoF => {
@@ -179,10 +208,10 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 				};
 
 				Error {
-					title: format!("ERROR: Unexpected end of file!"),
+					title: "ERROR: Unexpected end of file!".to_owned(),
 					pos: Some(Position {
 						span,
-						span_str: create_error_location(&span.start, &span.end, src_code),
+						span_str: create_error_location(&span.start, &span.end, src_code, target),
 					}),
 				}
 			}
@@ -192,14 +221,21 @@ fn convert_parser_error(error: parser::Error, src_code: &str) -> Vec<Error> {
 	ret
 }
 
-fn create_error_location(start: &Location, end: &Location, src: &str) -> String {
+pub fn create_error_location(
+	start: &Location,
+	end: &Location,
+	src: &str,
+	target: Target,
+) -> String {
 	let mut ret = String::new();
 
 	let mut lines: Vec<&str> = src.lines().collect();
 	lines.push("");
 
+	let pipe = ColoredString::blue("|", target);
+
 	let number_padding = (end.line + 1).to_string().len();
-	ret += &format!("{:>pad$}\n", "|", pad = number_padding + 2);
+	ret += &format!("{:>pad$}\n", pipe, pad = number_padding + 2);
 
 	let show_lines = 3;
 	let mut skipped = false;
@@ -209,13 +245,23 @@ fn create_error_location(start: &Location, end: &Location, src: &str) -> String 
 		{
 			if !skipped {
 				skipped = true;
-				ret += &format!("{:>pad$} {}\n", "|", "...", pad = number_padding + 2);
+				ret += &format!(
+					"{:>pad$} {}\n",
+					pipe,
+					ColoredString::blue("...", target),
+					pad = number_padding + 2
+				);
 			}
 		} else if let Some(line) = lines.get(line_number) {
+			let line = match target {
+				Target::None => line.to_owned().to_owned(),
+				Target::ANSI => line.to_owned().to_owned(),
+				Target::HTML => html_escape::encode_text(line).to_string(),
+			};
 			ret += &format!(
 				"{:<pad$} {:} {}\n",
-				(line_number + 1).to_string(),
-				"|",
+				ColoredString::blue((line_number + 1).to_string(), target),
+				pipe,
 				line,
 				pad = number_padding,
 			);
@@ -232,14 +278,14 @@ fn create_error_location(start: &Location, end: &Location, src: &str) -> String 
 		// TODO: fix tab ident
 		ret += &format!(
 			"{:>pad$} {}{}\n",
-			"|",
+			pipe,
 			" ".repeat(start.column),
-			"^".repeat(end.column - start.column),
+			ColoredString::red("^".repeat(end.column - start.column), target),
 			pad = number_padding + 2
 		);
 	}
 
-	ret += &format!("{:>pad$}", "|", pad = number_padding + 2);
+	ret += &format!("{:>pad$}", pipe, pad = number_padding + 2);
 
 	ret
 }

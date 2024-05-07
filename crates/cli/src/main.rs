@@ -2,13 +2,13 @@ use std::process::ExitCode;
 use std::{collections::HashMap, error::Error};
 
 use clap::Parser;
-use colored::Colorize;
 use log::{error, info, warn, LevelFilter};
 use simplelog::{ColorChoice, Config, TermLogger, TerminalMode}; // cspell:disable-line
 use tokio::fs;
 use tokio::fs::read_to_string;
 
-use ast::{Identifier, Location};
+use ast::Identifier;
+use common::{convert_parser_error, create_error_location, Target};
 
 mod router;
 use router::router;
@@ -161,140 +161,18 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 	}
 
 	if let Some(ref span) = error.src {
-		print_error_location(&span.start, &span.end, src_code);
+		eprintln!(
+			"{}",
+			create_error_location(&span.start, &span.end, src_code, Target::ANSI)
+		);
 	}
 }
 
 fn print_parser_error(error: &parser::Error, src_code: &str) {
-	match error {
-		parser::Error::Lexer(errors) => {
-			for err in errors {
-				match err {
-					parser::LexerError::InvalidCharacter { char, loc } => {
-						error!("Invalid character `{}` found!", char);
-						print_error_location(
-							loc,
-							&Location {
-								line: loc.line,
-								column: loc.column + 1,
-							},
-							src_code,
-						);
-					}
-					parser::LexerError::InvalidNumber { src, span } => {
-						error!("Invalid number `{}` found!", src);
-						print_error_location(&span.start, &span.end, src_code);
-					}
-					parser::LexerError::UnexpectedEndOfFile => {
-						error!("Unexpected end of file!");
-					}
-					parser::LexerError::InvalidEscape { char, loc } => {
-						error!("Invalid character escape `\\{}`!", char);
-						print_error_location(
-							&Location {
-								line: loc.line,
-								column: loc.column - 2,
-							},
-							&Location {
-								line: loc.line,
-								column: loc.column,
-							},
-							src_code,
-						);
-					}
-				}
-			}
-		}
-		parser::Error::Parser(err) => match err {
-			parser::ParserError::Fatal(msg) => error!("{}!", msg),
-			parser::ParserError::Positional { msg, span } => {
-				error!("{}!", msg);
-				print_error_location(&span.start, &span.end, src_code);
-			}
-			parser::ParserError::UnexpectedToken {
-				src,
-				span,
-				expected,
-			} => {
-				let mut msg = format!("Unexpected token `{}`", src);
-				if expected.len() == 1 {
-					msg += &format!(", expected `{}`", expected[0]);
-				} else if !expected.is_empty() {
-					msg += ", expected one of [";
-					msg += &expected
-						.iter()
-						.map(|e| format!("`{}`", e))
-						.collect::<Vec<String>>()
-						.join(", ");
-					msg += "]";
-				}
-				error!("{}!", msg);
-				print_error_location(&span.start, &span.end, src_code);
-			}
-			parser::ParserError::SecondActions { actions1, actions2 } => {
-				error!("Multiple actions blocks found!");
-				eprintln!("First block:");
-				print_error_location(&actions1.start, &actions1.end, src_code);
-				eprintln!("Second block:");
-				print_error_location(&actions2.start, &actions2.end, src_code);
-			}
-			parser::ParserError::ExpectedSemicolon { span } => {
-				error!("Expected semicolon `;`!");
-				print_error_location(&span.start, &span.end, src_code);
-			}
-			parser::ParserError::UnexpectedEoF => error!("Unexpected end of file!"),
-		},
-	}
-}
-
-fn print_error_location(start: &Location, end: &Location, src: &str) {
-	let mut lines: Vec<&str> = src.lines().collect();
-	lines.push("");
-
-	let number_padding = (end.line + 1).to_string().len();
-	eprintln!("{:>pad$}", "|".blue(), pad = number_padding + 2);
-
-	let show_lines = 3;
-	let mut skipped = false;
-	for line_number in start.line..=end.line {
-		if (end.line - start.line) > show_lines * 2
-			&& !(line_number - start.line < show_lines || end.line - line_number < show_lines)
-		{
-			if !skipped {
-				skipped = true;
-				eprintln!(
-					"{:>pad$} {}",
-					"|".blue(),
-					"...".blue(),
-					pad = number_padding + 2
-				);
-			}
-		} else if let Some(line) = lines.get(line_number) {
-			eprintln!(
-				"{:<pad$} {:} {}",
-				(line_number + 1).to_string().blue(),
-				"|".blue(),
-				line,
-				pad = number_padding,
-			);
-		} else {
-			error!(
-				"Internal error, line number `{}` does not exist!",
-				line_number + 1
-			);
+	for error in convert_parser_error(error, src_code, Target::ANSI) {
+		error!("{}", error.title);
+		if let Some(pos) = error.pos {
+			eprintln!("{}", pos.span_str)
 		}
 	}
-
-	if start.line == end.line {
-		// TODO: fix tab ident
-		eprintln!(
-			"{:>pad$} {}{}",
-			"|".blue(),
-			" ".repeat(start.column),
-			"^".repeat(end.column - start.column).red(),
-			pad = number_padding + 2
-		);
-	}
-
-	eprintln!("{:>pad$}", "|".blue(), pad = number_padding + 2);
 }

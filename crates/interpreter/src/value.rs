@@ -50,6 +50,7 @@ impl Value {
 	}
 }
 
+// TODO: implement Display instead
 impl ToString for Value {
 	fn to_string(&self) -> String {
 		match self {

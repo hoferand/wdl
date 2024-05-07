@@ -54,3 +54,11 @@ html {
 #output-area {
 	height: 200px;
 }
+
+span.blue {
+	color: blue;
+}
+
+span.red {
+	color: red;
+}
