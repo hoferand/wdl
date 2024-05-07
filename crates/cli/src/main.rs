@@ -132,7 +132,7 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			error!("Variable `{}` already in use!", id.id);
 		}
 		interpreter::ErrorKind::VariableNotFound { id } => {
-			error!("Variable `{}` not found!", id.to_string());
+			error!("Variable `{}` not found!", id);
 		}
 		interpreter::ErrorKind::InvalidType { msg } => {
 			error!("Invalid types, {}!", msg);

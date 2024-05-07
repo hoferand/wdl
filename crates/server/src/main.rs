@@ -74,10 +74,10 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		let error = convert_interpreter_error(&err, &src_code, Target::HTML);
 		match err.kind {
 			interpreter::ErrorKind::OrderDone => {
-				socket.emit("done", error.pos.unwrap()).ok(); // TODO: unwrap
+				socket.emit("done", error.pos.unwrap()).ok(); // TODO: remove unwrap
 			}
 			interpreter::ErrorKind::OrderCancel => {
-				socket.emit("canceled", error.pos.unwrap()).ok(); // TODO: unwrap
+				socket.emit("canceled", error.pos.unwrap()).ok(); // TODO: remove unwrap
 			}
 			_ => {
 				socket
@@ -101,14 +101,12 @@ pub fn convert_interpreter_error(
 			format!("Variable `{}` already in use!", id.id)
 		}
 		interpreter::ErrorKind::VariableNotFound { id } => {
-			format!("Variable `{}` not found!", id.to_string())
+			format!("Variable `{}` not found!", id)
 		}
 		interpreter::ErrorKind::InvalidType { msg } => {
 			format!("Invalid types, {}!", msg)
 		}
-		interpreter::ErrorKind::DivisionByZero => {
-			format!("Division by zero!")
-		}
+		interpreter::ErrorKind::DivisionByZero => "Division by zero!".to_owned(),
 		interpreter::ErrorKind::ArityMismatch { expected, given } => {
 			format!(
 				"Invalid count of function call parameter, expected `{}`, given `{}`!",
@@ -123,11 +121,11 @@ pub fn convert_interpreter_error(
 		}
 		interpreter::ErrorKind::OrderDone => {
 			// TODO: should be no error
-			format!("Order done!")
+			"Order done!".to_owned()
 		}
 		interpreter::ErrorKind::OrderCancel => {
 			// TODO: should be no error
-			format!("Order canceled!")
+			"Order canceled!".to_owned()
 		}
 	};
 
