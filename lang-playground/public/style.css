@@ -63,6 +63,10 @@ span.red {
 	color: red;
 }
 
+span.orange {
+	color: orange;
+}
+
 button {
 	width: 70px;
 	height: 35px;

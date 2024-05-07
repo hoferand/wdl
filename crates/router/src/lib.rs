@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 pub mod target;
 pub use target::*;
 pub mod pickup;
@@ -16,7 +18,7 @@ pub use proto::router_server::*;
 
 pub const URL: &str = "0.0.0.0:3003";
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RouterStatus {
 	Done,
 	NoStationLeft,

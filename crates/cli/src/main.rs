@@ -156,7 +156,7 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 			info!("Order done!");
 		}
 		interpreter::ErrorKind::OrderCancel => {
-			warn!("Order canceled!")
+			warn!("Order canceled!");
 		}
 	}
 

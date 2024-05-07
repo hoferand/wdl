@@ -16,7 +16,8 @@
 		"mdbook",
 		"clippy",
 		"oneshot",
-		"bindgen"
+		"bindgen",
+		"socketioxide"
 	],
 	"flagWords": []
 }
