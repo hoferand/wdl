@@ -4,12 +4,13 @@ use std::{collections::HashMap, error::Error};
 use clap::Parser;
 use log::{error, info, warn, LevelFilter};
 use simplelog::{ColorChoice, Config, TermLogger, TerminalMode}; // cspell:disable-line
-use tokio::fs;
-use tokio::fs::read_to_string;
+use tokio::fs::{self, read_to_string};
+use tokio::sync::mpsc;
 
 use ::router::RouterClientGrpc;
 use ast::Identifier;
 use common::{convert_parser_error, create_error_location, Target};
+use interpreter::UserLog;
 
 mod router;
 use router::router;
@@ -83,10 +84,19 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 		}
 	};
 
+	let (user_log_sender, mut user_log_receiver) = mpsc::channel::<UserLog>(10);
+
+	let log_handle = tokio::spawn(async move {
+		while let Some(log) = user_log_receiver.recv().await {
+			eprintln!("[{}]{}", log.level, log.msg);
+		}
+	});
+
 	let order = match interpreter::start_workflow(
 		workflow,
 		variables,
 		interpreter::Router::Grpc(RouterClientGrpc),
+		user_log_sender,
 	)
 	.await
 	{
@@ -97,7 +107,13 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 		}
 	};
 
-	if let Err(error) = interpreter::run_order(order).await {
+	let ret = interpreter::run_order(order).await;
+
+	if let Err(err) = log_handle.await {
+		error!("Failed to wait for log receiver: `{}`", err);
+	};
+
+	if let Err(error) = ret {
 		print_interpreter_error(&error, &src_code);
 		return Ok(ExitCode::FAILURE);
 	}

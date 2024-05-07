@@ -1,7 +1,10 @@
 use std::{collections::HashMap, sync::Arc};
 
 use log::error;
-use tokio::{select, sync::mpsc};
+use tokio::{
+	select,
+	sync::mpsc::{self, Sender},
+};
 
 use ast::{Identifier, Span, Workflow};
 
@@ -11,6 +14,8 @@ pub mod error;
 pub use error::*;
 pub mod value;
 pub use value::*;
+pub mod user_log;
+pub use user_log::*;
 
 mod environment;
 use environment::Environment;
@@ -31,9 +36,10 @@ pub async fn start_workflow(
 	ast: Workflow<Span>,
 	vars: HashMap<Identifier, Value>,
 	router: Router,
+	user_log_ch: Sender<UserLog>,
 ) -> Result<Order, Error> {
 	let global_scope = Arc::new(Scope::new());
-	let env = Arc::new(Environment::new(global_scope, router));
+	let env = Arc::new(Environment::new(global_scope, router, user_log_ch));
 
 	// global declarations
 	for global_decl in &ast.globals {

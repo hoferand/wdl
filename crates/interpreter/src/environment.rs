@@ -17,12 +17,13 @@ use router::{RouterClient, RouterClientGrpc, RouterClientWs};
 
 use crate::{
 	wdl_std::resolve_id, Channel, ChannelId, Error, ErrorKind, FunctionId, FunctionValue, Scope,
-	Value,
+	UserLog, Value,
 };
 
 pub struct Environment {
 	pub global_scope: Arc<Scope>,
 	pub router: Router,
+	user_log_ch: Mutex<Sender<UserLog>>,
 	error_ch: Mutex<Option<Sender<Error>>>, // TODO: remove Option
 	handles: Mutex<Vec<JoinHandle<Result<(), Error>>>>,
 	functions: RwLock<HashMap<Identifier, FunctionValue>>,
@@ -31,10 +32,11 @@ pub struct Environment {
 }
 
 impl Environment {
-	pub fn new(global_scope: Arc<Scope>, router: Router) -> Self {
+	pub fn new(global_scope: Arc<Scope>, router: Router, user_log_ch: Sender<UserLog>) -> Self {
 		Environment {
 			global_scope,
 			router,
+			user_log_ch: Mutex::new(user_log_ch),
 			error_ch: Mutex::new(None),
 			handles: Mutex::new(Vec::new()),
 			functions: RwLock::new(HashMap::new()),
@@ -66,6 +68,16 @@ impl Environment {
 			}
 		} else {
 			error!("Error channel missing, cannot send error `{:?}`", err);
+			// TODO: panic?
+		}
+	}
+
+	pub async fn send_log(&self, log: UserLog) {
+		if let Err(send_err) = self.user_log_ch.lock().await.send(log.clone()).await {
+			error!(
+				"Failed to send user log over channel `{}` `{:?}`",
+				send_err, log
+			);
 			// TODO: panic?
 		}
 	}

@@ -1,6 +1,6 @@
 use crate::{
-	wdl_std::{get_handler, id, Arg, Source},
-	FunctionId, FunctionValue, Value,
+	wdl_std::{get_handler, id, Arg, Env, Source},
+	FunctionId, FunctionValue, UserLog, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -16,31 +16,34 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-pub async fn info(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
-	eprintln!(
-		"INFO[{}:{}]: {}",
+pub async fn info(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
+	env.send_log(UserLog::info(format!(
+		"[{}:{}]: {}",
 		src.start.line + 1,
 		src.start.column,
-		truncate(msg.val.to_string(), 100),
-	);
+		truncate(msg.val.to_string(), 100)
+	)))
+	.await;
 }
 
-pub async fn warn(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
-	eprintln!(
-		"WARN[{}:{}]: {}",
+pub async fn warn(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
+	env.send_log(UserLog::warn(format!(
+		"[{}:{}]: {}",
 		src.start.line + 1,
 		src.start.column,
-		truncate(msg.val.to_string(), 100),
-	);
+		truncate(msg.val.to_string(), 100)
+	)))
+	.await;
 }
 
-pub async fn error(Source(src): Source, msg: Arg<Value, { id(b"msg") }>) {
-	eprintln!(
-		"ERROR[{}:{}]: {}",
+pub async fn error(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
+	env.send_log(UserLog::error(format!(
+		"[{}:{}]: {}",
 		src.start.line + 1,
 		src.start.column,
-		truncate(msg.val.to_string(), 100),
-	);
+		truncate(msg.val.to_string(), 100)
+	)))
+	.await;
 }
 
 /// `len` must be >= 3

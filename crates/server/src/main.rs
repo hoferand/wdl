@@ -62,19 +62,25 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 
 	let (sender, mut receiver, router) = RouterClientWs::new();
 
-	let order =
-		match interpreter::start_workflow(ast, HashMap::new(), interpreter::Router::Ws(router))
-			.await
-		{
-			Ok(o) => o,
-			Err(error) => {
-				let errors = vec![convert_interpreter_error(&error, &src_code, Target::HTML)];
-				socket
-					.emit("error", serde_json::to_string(&errors).unwrap())
-					.ok();
-				return;
-			}
-		};
+	let (log_sender, mut log_receiver) = mpsc::channel(10);
+
+	let order = match interpreter::start_workflow(
+		ast,
+		HashMap::new(),
+		interpreter::Router::Ws(router),
+		log_sender,
+	)
+	.await
+	{
+		Ok(o) => o,
+		Err(error) => {
+			let errors = vec![convert_interpreter_error(&error, &src_code, Target::HTML)];
+			socket
+				.emit("error", serde_json::to_string(&errors).unwrap())
+				.ok();
+			return;
+		}
+	};
 
 	let (exit_sender, exit_receiver) = mpsc::channel::<()>(3);
 
@@ -88,6 +94,9 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 					return;
 				}
 				request = receiver.recv() => {
+					if request.is_none() {
+						return;
+					}
 					match async_socket
 						.timeout(Duration::from_secs(600))
 						.emit_with_ack::<_, Vec<String>>("router_request", request)
@@ -117,7 +126,18 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		}
 	});
 
-	if let Err(err) = interpreter::run_order(order).await {
+	let async_socket = socket.clone();
+	let log_handle = tokio::spawn(async move {
+		while let Some(log) = log_receiver.recv().await {
+			async_socket.emit("log", log).ok();
+		}
+	});
+
+	let ret = interpreter::run_order(order).await;
+	exit_sender.send(()).await.ok();
+	log_handle.await.unwrap();
+
+	if let Err(err) = ret {
 		let error = convert_interpreter_error(&err, &src_code, Target::HTML);
 		match err.kind {
 			interpreter::ErrorKind::OrderDone => {
@@ -135,8 +155,6 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	} else {
 		socket.emit("done", Value::Null).ok();
 	}
-
-	exit_sender.send(()).await.ok();
 }
 
 pub fn convert_interpreter_error(

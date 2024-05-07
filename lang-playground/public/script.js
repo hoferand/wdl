@@ -41,6 +41,7 @@ window.addEventListener("load", async (_event) => {
 
 document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	if (socket) {
+		router_request.style.display = "none";
 		close_socket();
 		output_area.innerHTML += info("Order canceled by user.\n");
 		return;
@@ -58,12 +59,14 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	});
 
 	socket.on("log", (log) => {
-		if (log.level == "info") {
+		if (log.level == "Info") {
 			output_area.innerHTML += info(html_escape(log.msg)) + "\n";
-		} else if (log.level == "warn") {
+		} else if (log.level == "Warn") {
 			output_area.innerHTML += warn(html_escape(log.msg)) + "\n";
-		} else if (log.level == "error") {
+		} else if (log.level == "Error") {
 			output_area.innerHTML += error(html_escape(log.msg)) + "\n";
+		} else {
+			throw "Invalid log level received!";
 		}
 	});
 
@@ -159,14 +162,23 @@ function close_socket() {
 }
 
 function info(msg) {
+	if (msg[0] == "[") {
+		return '<span class="blue">[INFO]</span>' + msg;
+	}
 	return '<span class="blue">[INFO]</span>: ' + msg;
 }
 
 function warn(msg) {
+	if (msg[0] == "[") {
+		return '<span class="orange">[WARN]</span>' + msg;
+	}
 	return '<span class="orange">[WARN]</span>: ' + msg;
 }
 
 function error(msg) {
+	if (msg[0] == "[") {
+		return '<span class="red">[ERROR]</span>' + msg;
+	}
 	return '<span class="red">[ERROR]</span>: ' + msg;
 }
 
