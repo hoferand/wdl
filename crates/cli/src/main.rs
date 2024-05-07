@@ -7,6 +7,7 @@ use simplelog::{ColorChoice, Config, TermLogger, TerminalMode}; // cspell:disabl
 use tokio::fs;
 use tokio::fs::read_to_string;
 
+use ::router::RouterClientGrpc;
 use ast::Identifier;
 use common::{convert_parser_error, create_error_location, Target};
 
@@ -82,7 +83,13 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 		}
 	};
 
-	let order = match interpreter::start_workflow(workflow, variables).await {
+	let order = match interpreter::start_workflow(
+		workflow,
+		variables,
+		interpreter::Router::Grpc(RouterClientGrpc),
+	)
+	.await
+	{
 		Ok(o) => o,
 		Err(error) => {
 			print_interpreter_error(&error, &src_code);

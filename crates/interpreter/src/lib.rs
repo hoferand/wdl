@@ -14,6 +14,7 @@ pub use value::*;
 
 mod environment;
 use environment::Environment;
+pub use environment::Router;
 mod interrupt;
 use interrupt::Interrupt;
 mod channel;
@@ -29,9 +30,10 @@ mod wdl_std;
 pub async fn start_workflow(
 	ast: Workflow<Span>,
 	vars: HashMap<Identifier, Value>,
+	router: Router,
 ) -> Result<Order, Error> {
 	let global_scope = Arc::new(Scope::new());
-	let env = Arc::new(Environment::new(global_scope));
+	let env = Arc::new(Environment::new(global_scope, router));
 
 	// global declarations
 	for global_decl in &ast.globals {

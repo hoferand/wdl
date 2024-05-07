@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use axum::{routing::post, Json, Router};
 use serde_json::Value;
@@ -6,10 +6,14 @@ use socketioxide::{
 	extract::{Data, SocketRef},
 	SocketIo,
 };
+use tokio::{
+	select,
+	sync::{mpsc, Mutex},
+};
 use tower_http::services::ServeDir;
 
 use common::{Status, Target};
-use router::RouterStatus;
+use router::{RouterClientWs, RouterStatus};
 
 #[tokio::main]
 async fn main() {
@@ -41,10 +45,6 @@ async fn run(socket: SocketRef) {
 	eprintln!("Socket.IO connected: {:?} {:?}", socket.ns(), socket.id);
 
 	socket.on("start", run_workflow);
-
-	socket.on("router_response", |Data::<RouterStatus>(data)| {
-		eprintln!("Received router status: {:?}", data);
-	});
 }
 
 async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
@@ -59,16 +59,63 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 			return;
 		}
 	};
-	let order = match interpreter::start_workflow(ast, HashMap::new()).await {
-		Ok(o) => o,
-		Err(error) => {
-			let errors = vec![convert_interpreter_error(&error, &src_code, Target::HTML)];
-			socket
-				.emit("error", serde_json::to_string(&errors).unwrap())
-				.ok();
-			return;
+
+	let (sender, mut receiver, router) = RouterClientWs::new();
+
+	let order =
+		match interpreter::start_workflow(ast, HashMap::new(), interpreter::Router::Ws(router))
+			.await
+		{
+			Ok(o) => o,
+			Err(error) => {
+				let errors = vec![convert_interpreter_error(&error, &src_code, Target::HTML)];
+				socket
+					.emit("error", serde_json::to_string(&errors).unwrap())
+					.ok();
+				return;
+			}
+		};
+
+	let (exit_sender, exit_receiver) = mpsc::channel::<()>(3);
+
+	let async_socket = socket.clone();
+	let arc_receiver = Arc::new(Mutex::new(exit_receiver));
+	tokio::spawn(async move {
+		loop {
+			let mut exit_receiver = arc_receiver.lock().await;
+			select! {
+				_ = exit_receiver.recv() => {
+					return;
+				}
+				request = receiver.recv() => {
+					match async_socket
+						.timeout(Duration::from_secs(600))
+						.emit_with_ack::<_, Vec<String>>("router_request", request)
+						.unwrap()
+						.await
+					{
+						Ok(ack) => match ack.data[0].as_str() {
+							"Done" => sender.send(RouterStatus::Done).await.unwrap(),
+							"NoStationLeft" => sender.send(RouterStatus::NoStationLeft).await.unwrap(),
+							status => {
+								async_socket.emit("error", format!("[{{\"title\": \"Internal error, received invalid router status `{}`!\"}}]", status)).ok();
+								return;
+							}
+						},
+						Err(err) => {
+							async_socket
+								.emit(
+									"error",
+									format!("[{{\"title\": \"Router error `{}`!\"}}]", err),
+								)
+								.ok();
+							return;
+						}
+					};
+				}
+			}
 		}
-	};
+	});
 
 	if let Err(err) = interpreter::run_order(order).await {
 		let error = convert_interpreter_error(&err, &src_code, Target::HTML);
@@ -88,6 +135,8 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	} else {
 		socket.emit("done", Value::Null).ok();
 	}
+
+	exit_sender.send(()).await.ok();
 }
 
 pub fn convert_interpreter_error(

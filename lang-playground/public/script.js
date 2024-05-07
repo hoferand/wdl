@@ -52,26 +52,27 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 	socket.on("log", (log) => {
 		if (log.level == "info") {
-			output_area.innerHTML += info(html_escape(log.msg));
+			output_area.innerHTML += info(html_escape(log.msg)) + "\n";
 		} else if (log.level == "warn") {
-			output_area.innerHTML += warn(html_escape(log.msg));
+			output_area.innerHTML += warn(html_escape(log.msg)) + "\n";
 		} else if (log.level == "error") {
-			output_area.innerHTML += error(html_escape(log.msg));
+			output_area.innerHTML += error(html_escape(log.msg)) + "\n";
 		}
 	});
 
-	socket.on("router_request", (request) => {
+	socket.on("router_request", (request, callback) => {
 		// TODO: show buttons and send request
 		console.log(request);
-		socket.emit("router_response", "Done");
-		//socket.emit("router_response", "NoStationLeft");
+		callback(prompt("Received " + request.action + " action"));
 	});
 
 	socket.on("error", (errors) => {
 		errors = JSON.parse(errors);
 		print_errors(errors, output_area);
 		close_socket();
-		output_area.innerHTML += error("Order canceled due to error(s).\n");
+		output_area.innerHTML += error(
+			"Order canceled due to previous error(s).\n"
+		);
 	});
 
 	socket.on("done", (pos) => {
@@ -96,7 +97,7 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 		output_area.innerHTML += warn("Order canceled.\n");
 		if (pos) {
 			output_area.innerHTML += pos.span_str + "\n";
-			const editor_warn = {
+			const editor_warning = {
 				startLineNumber: pos.span.start.line + 1,
 				startColumn: pos.span.start.column + 1,
 				endLineNumber: pos.span.end.line + 1,
@@ -104,7 +105,9 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 				message: "Order canceled.",
 				severity: monaco.MarkerSeverity.Warning,
 			};
-			monaco.editor.setModelMarkers(editor.getModel(), "owner", [editor_warn]);
+			monaco.editor.setModelMarkers(editor.getModel(), "owner", [
+				editor_warning,
+			]);
 		}
 	});
 
@@ -151,10 +154,10 @@ async function check(src) {
 function print_errors(errors, output) {
 	let editor_errors = [];
 	for (let error2 of errors) {
-		output.innerHTML += error(html_escape(error2.title));
+		output.innerHTML += error(html_escape(error2.title)) + "\n";
 		if (error2.pos) {
 			const pos = error2.pos;
-			output.innerHTML += "\n" + pos.span_str + "\n";
+			output.innerHTML += pos.span_str + "\n";
 
 			editor_errors.push({
 				startLineNumber: pos.span.start.line + 1,

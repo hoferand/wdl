@@ -4,7 +4,7 @@ use log::info;
 use serde::Deserialize;
 
 use ast::Identifier;
-use router::{self, RouterStatus, Target};
+use router::{self, RouterClient, RouterStatus, Target};
 
 use crate::{
 	wdl_std::{call_function, get_handler, id, Arg, ArgType, Env, Source},
@@ -40,7 +40,7 @@ async fn pickup(
 ) -> Result<(), Error> {
 	info!("pickup from {:?}", target.val);
 
-	let status = match router::pickup(target.val).await {
+	let status = match env.router.pickup(target.val).await {
 		Some(s) => s,
 		None => {
 			return Err(Error {
@@ -87,7 +87,7 @@ async fn drop(
 ) -> Result<(), Error> {
 	info!("drop to {:?}", target.val);
 
-	let status = match router::drop(target.val).await {
+	let status = match env.router.drop(target.val).await {
 		Some(s) => s,
 		None => {
 			return Err(Error {
@@ -134,7 +134,7 @@ async fn drive(
 ) -> Result<(), Error> {
 	info!("drive to {:?}", target.val);
 
-	let status = match router::drive(target.val).await {
+	let status = match env.router.drive(target.val).await {
 		Some(s) => s,
 		None => {
 			return Err(Error {

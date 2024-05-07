@@ -13,6 +13,7 @@ use tokio::{
 };
 
 use ast::{Identifier, Node, Span};
+use router::{RouterClient, RouterClientGrpc, RouterClientWs};
 
 use crate::{
 	wdl_std::resolve_id, Channel, ChannelId, Error, ErrorKind, FunctionId, FunctionValue, Scope,
@@ -21,6 +22,7 @@ use crate::{
 
 pub struct Environment {
 	pub global_scope: Arc<Scope>,
+	pub router: Router,
 	error_ch: Mutex<Option<Sender<Error>>>, // TODO: remove Option
 	handles: Mutex<Vec<JoinHandle<Result<(), Error>>>>,
 	functions: RwLock<HashMap<Identifier, FunctionValue>>,
@@ -29,9 +31,10 @@ pub struct Environment {
 }
 
 impl Environment {
-	pub fn new(global_scope: Arc<Scope>) -> Self {
+	pub fn new(global_scope: Arc<Scope>, router: Router) -> Self {
 		Environment {
 			global_scope,
+			router,
 			error_ch: Mutex::new(None),
 			handles: Mutex::new(Vec::new()),
 			functions: RwLock::new(HashMap::new()),
@@ -112,5 +115,33 @@ impl Environment {
 
 	pub async fn get_ch(&self, id: &ChannelId) -> Option<Channel> {
 		self.channels.read().await.get(id).cloned()
+	}
+}
+
+pub enum Router {
+	Grpc(RouterClientGrpc),
+	Ws(RouterClientWs),
+}
+
+impl RouterClient for Router {
+	async fn pickup(&self, target: router::Target) -> Option<router::RouterStatus> {
+		match self {
+			Router::Grpc(router) => router.pickup(target).await,
+			Router::Ws(router) => router.pickup(target).await,
+		}
+	}
+
+	async fn drop(&self, target: router::Target) -> Option<router::RouterStatus> {
+		match self {
+			Router::Grpc(router) => router.drop(target).await,
+			Router::Ws(router) => router.drop(target).await,
+		}
+	}
+
+	async fn drive(&self, target: router::Target) -> Option<router::RouterStatus> {
+		match self {
+			Router::Grpc(router) => router.drive(target).await,
+			Router::Ws(router) => router.drive(target).await,
+		}
 	}
 }
