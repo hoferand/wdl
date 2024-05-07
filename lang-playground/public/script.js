@@ -5,7 +5,12 @@ let editor = null;
 
 let socket = null;
 
+let response_callback = null;
+
 const output_area = document.getElementById("output-area");
+const target_area = document.getElementById("target-area");
+const router_request = document.getElementById("router-request");
+const action_text = document.getElementById("action-text");
 
 window.addEventListener("load", async (_event) => {
 	await init();
@@ -41,6 +46,8 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 		return;
 	}
 
+	monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
+
 	document.getElementById("run-btn").innerHTML = "Stop";
 
 	output_area.innerHTML = info("Start order.\n");
@@ -61,9 +68,19 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	});
 
 	socket.on("router_request", (request, callback) => {
-		// TODO: show buttons and send request
-		console.log(request);
-		callback(prompt("Received " + request.action + " action"));
+		console.log("Received router request:", request);
+		response_callback = callback;
+		const action = request.action;
+		action_text.innerText =
+			action.charAt(0).toUpperCase() + action.slice(1) + " from:";
+		target_area.innerText = JSON.stringify(
+			request.target,
+			(_key, value) => {
+				if (value !== null) return value;
+			},
+			4
+		);
+		router_request.style.display = "block";
 	});
 
 	socket.on("error", (errors) => {
@@ -113,6 +130,26 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 	socket.emit("start", editor.getValue());
 });
+
+document.getElementById("done-btn").addEventListener("click", (_event) => {
+	router_request.style.display = "none";
+	if (response_callback) {
+		response_callback("Done");
+	} else {
+		throw "Response callback not set!";
+	}
+});
+
+document
+	.getElementById("no-station-left-btn")
+	.addEventListener("click", (_event) => {
+		router_request.style.display = "none";
+		if (response_callback) {
+			response_callback("NoStationLeft");
+		} else {
+			throw "Response callback not set!";
+		}
+	});
 
 function close_socket() {
 	console.log("close socket");

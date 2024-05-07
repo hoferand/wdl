@@ -48,7 +48,7 @@ async fn run(socket: SocketRef) {
 }
 
 async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
-	eprintln!("Received workflow [{}]: {}", socket.id, src_code);
+	eprintln!("Received workflow [{}]:\n{}", socket.id, src_code);
 	let ast = match parser::get_ast(&src_code.clone()) {
 		Ok(ast) => ast,
 		Err(err) => {

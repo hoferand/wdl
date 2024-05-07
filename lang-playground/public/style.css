@@ -84,3 +84,8 @@ button:hover {
 #run-btn {
 	margin-left: auto;
 }
+
+#no-station-left-btn {
+	width: 120px;
+	margin-left: auto;
+}
