@@ -1,6 +1,6 @@
 # Variables
 
-Variables are dynamically typed and can be used to store [values](./01_values.md), [functions](./03_functions.md), and [channels](./07_channels.md) of any type for later reuse. The values of variables can be changed through an assignment operation. The language supports both _global_ and _local_ variables.
+Variables are dynamically typed and can be used to store [values](./02_values.md), [functions](./04_functions.md), and [channels](./05_channels.md) of any type for later reuse. The values of variables can be changed through an assignment operation. The language supports both _global_ and _local_ variables.
 
 ## Global
 
