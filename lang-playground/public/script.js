@@ -54,7 +54,11 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	output_area.innerHTML = info("Start order.\n");
 
 	console.log("open socket");
-	socket = io("ws://localhost:3000/run", {
+	let proto = "ws://";
+	if (window.location.protocol === "https:") {
+		proto = "wss://";
+	}
+	socket = io(proto + window.location.host + "/run", {
 		reconnectionDelayMax: 10000,
 	});
 

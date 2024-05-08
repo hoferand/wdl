@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
-use axum::{routing::post, Json, Router};
+use axum::{http::Method, routing::post, Json, Router};
 use serde_json::Value;
 use socketioxide::{
 	extract::{Data, SocketRef},
@@ -10,31 +10,39 @@ use tokio::{
 	select,
 	sync::{mpsc, Mutex},
 };
-use tower_http::services::ServeDir;
+use tower::ServiceBuilder;
+use tower_http::{
+	cors::{Any, CorsLayer},
+	services::ServeDir,
+};
 
 use common::{Status, Target};
 use router::{RouterClientWs, RouterStatus};
 
-#[tokio::main]
-async fn main() {
+#[shuttle_runtime::main]
+async fn main() -> shuttle_axum::ShuttleAxum {
 	let (layer, io) = SocketIo::new_layer();
 
 	io.ns("/run", run);
 
-	let app = Router::new()
+	let cors = CorsLayer::new()
+		.allow_methods([Method::GET, Method::POST])
+		.allow_origin(Any);
+
+	let service = ServiceBuilder::new().layer(cors).layer(layer);
+
+	let router = Router::new()
 		.route("/check", post(check))
 		.nest_service(
 			"/npm_modules",
 			ServeDir::new("lang-playground/node_modules"),
 		)
 		.nest_service("/wasm", ServeDir::new("lang-playground/wasm"))
+		.nest_service("/doc", ServeDir::new("lang-doc/book"))
 		.nest_service("/", ServeDir::new("lang-playground/public"))
-		.layer(layer);
+		.layer(service);
 
-	println!("Open localhost:3000/index.html");
-
-	let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-	axum::serve(listener, app).await.unwrap();
+	Ok(router.into())
 }
 
 async fn check(src_code: String) -> Json<Status> {

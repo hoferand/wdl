@@ -1,19 +1,10 @@
 #!/bin/bash
 
-# build wasm functions
-echo "build wasm..."
-cd crates/wasm
-wasm-pack build -t web -d ../../lang-playground/wasm --release
-cd ../..
+# build
+./build-playground.sh
 
-# install npm packages
-echo "install npm packages..."
-cd lang-playground
-npm install
-cd ..
+# deploy server
+echo "start server ..."
+cargo shuttle run
 
-# start server
-echo "start server..."
-cargo run --bin server --release
-
-# open `localhost:3000/index.html` in your browser
+# open `127.0.0.1:8000` in your browser
