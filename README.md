@@ -23,6 +23,10 @@ The CLI can be used with `cargo run`. Currently, the CLI supports 4 subcommands:
 - `router`: Can be used to simulate the router, which executes the actions physically.
   - e.g. `cargo run -- router`
 
+## Playground
+
+The playground is available at `wdl-playground.shuttleapp.rs`, and the corresponding documentation can be found at `wdl-playground.shuttleapp.rs/doc/` (note the importance of the trailing `/`).
+
 ## Language Support
 
 For easier usage, we provide a minimal [Visual Studio Code](https://code.visualstudio.com/) extension that offers syntax highlighting for the source files. All source files for this extension can be found in `lang-support/`. For easy usage, we provide an NPM command, just run `npm run deploy` inside the `lang-support/` folder. Alternatively, the source files can be copied to `~/.vscode/extensions/wdl-lang-support/` manually.
