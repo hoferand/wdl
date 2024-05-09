@@ -82,7 +82,7 @@ button:hover {
 }
 
 #run-btn {
-	margin-left: auto;
+	margin-left: 10px;
 }
 
 #no-station-left-btn {
@@ -93,4 +93,18 @@ button:hover {
 pre {
 	overflow: auto;
 	margin-bottom: 0;
+}
+
+#doc-btn {
+	margin-left: 10px;
+	margin-left: auto;
+}
+
+#doc-img {
+	width: 35px;
+	height: 35px;
+}
+
+#doc-img:hover {
+	transform: scale(1.1);
 }
