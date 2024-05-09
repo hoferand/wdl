@@ -89,3 +89,8 @@ button:hover {
 	width: 120px;
 	margin-left: auto;
 }
+
+pre {
+	overflow: auto;
+	margin-bottom: 0;
+}

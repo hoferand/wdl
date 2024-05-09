@@ -5,8 +5,8 @@ use reqwest::{header::CONTENT_TYPE, Response, Url};
 use serde::Serialize;
 
 use crate::{
-	wdl_std::{get_handler, id, Arg, ResultType},
-	Error, FunctionId, FunctionValue, Value,
+	wdl_std::{get_handler, id, Arg, Env, ResultType, Source},
+	Error, FunctionId, FunctionValue, UserLog, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -30,18 +30,60 @@ struct HttpResponse {
 
 impl ResultType for HttpResponse {}
 
-async fn get(url: Arg<String, { id(b"url") }>) -> Result<Option<HttpResponse>, Error> {
-	process_response(reqwest::get(parse_url(&url.val)?).await).await
+async fn get(
+	url: Arg<String, { id(b"url") }>,
+	Env(env): Env,
+	Source(src): Source,
+) -> Result<Option<HttpResponse>, Error> {
+	env.send_log(UserLog::info(
+		format!("Send GET request to `{}`.", url.val),
+		Some(src),
+	))
+	.await;
+
+	let ret = process_response(reqwest::get(parse_url(&url.val)?).await).await?;
+
+	env.send_log(UserLog::info(
+		format!(
+			"Response: {}.",
+			serde_json::to_string(&ret).unwrap_or("<internal error>".to_owned())
+		),
+		Some(src),
+	))
+	.await;
+
+	Ok(ret)
 }
 
-async fn post(url: Arg<String, { id(b"url") }>) -> Result<Option<HttpResponse>, Error> {
-	process_response(
+async fn post(
+	url: Arg<String, { id(b"url") }>,
+	Env(env): Env,
+	Source(src): Source,
+) -> Result<Option<HttpResponse>, Error> {
+	env.send_log(UserLog::info(
+		format!("Send POST request to `{}`.", url.val),
+		Some(src),
+	))
+	.await;
+
+	let ret = process_response(
 		reqwest::Client::new()
 			.post(parse_url(&url.val)?)
 			.send()
 			.await,
 	)
-	.await
+	.await?;
+
+	env.send_log(UserLog::info(
+		format!(
+			"Response: {}.",
+			serde_json::to_string(&ret).unwrap_or("<internal error>".to_owned())
+		),
+		Some(src),
+	))
+	.await;
+
+	Ok(ret)
 }
 
 fn parse_url(url: &str) -> Result<Url, Error> {
