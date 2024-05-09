@@ -80,8 +80,12 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 		console.log("Received router request:", request);
 		response_callback = callback;
 		const action = request.action;
-		action_text.innerText =
-			action.charAt(0).toUpperCase() + action.slice(1) + " from:";
+		action_text.innerText = action.charAt(0).toUpperCase() + action.slice(1);
+		if (action === "pickup") {
+			action_text.innerText += " from:";
+		} else {
+			action_text.innerText += " to:";
+		}
 		target_area.innerText = JSON.stringify(
 			request.target,
 			(_key, value) => {
