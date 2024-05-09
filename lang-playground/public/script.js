@@ -364,6 +364,8 @@ function define_wdl() {
 			string: [[/"/, "string", "@string_body"]],
 			string_body: [
 				[/"/, "string", "@pop"],
+				[/(\\n|\\"|\\\\)/, "string.escape"],
+				[/\\./, "string.escape.invalid"],
 				[/./, "string"],
 			],
 		},
@@ -407,6 +409,10 @@ function define_wdl() {
 			{
 				token: "support.function",
 				foreground: "#795d26",
+			},
+			{
+				token: "string.escape",
+				foreground: "#ee0000",
 			},
 		],
 	});
