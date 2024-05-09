@@ -1,4 +1,7 @@
-use std::{collections::HashMap, fmt::Debug};
+use std::{
+	collections::HashMap,
+	fmt::{Debug, Display},
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -50,48 +53,53 @@ impl Value {
 	}
 }
 
-// TODO: implement Display instead
-impl ToString for Value {
-	fn to_string(&self) -> String {
+impl Display for Value {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			Self::Null => "null".to_owned(),
-			Self::Bool(b) => b.to_string(),
-			Self::Number(n) => n.to_string(),
-			Self::String(s) => s.to_owned(),
+			Self::Null => write!(f, "null"),
+			Self::Bool(b) => write!(f, "{b}"),
+			Self::Number(n) => write!(f, "{n}"),
+			Self::String(s) => {
+				if f.alternate() {
+					write!(f, "\"{s}\"")
+				} else {
+					write!(f, "{s}")
+				}
+			}
 			Self::Array(a) => {
-				let mut out = String::new();
-				out.push('[');
+				write!(f, "[")?;
+
 				let mut first = true;
 				for val in a {
 					if !first {
-						out.push_str(", ");
+						write!(f, ", ")?;
 					}
 					first = false;
 
-					out.push_str(&val.to_string());
+					write!(f, "{:#}", val)?;
 				}
-				out.push(']');
-				out
+
+				write!(f, "]")
 			}
 			Self::Object(o) => {
-				let mut out = String::new();
-				out.push('{');
+				write!(f, "{{")?;
+
 				let mut first = true;
 				for (id, val) in o {
 					if !first {
-						out.push_str(", ");
+						write!(f, ", ")?;
 					}
 					first = false;
 
-					out.push_str(id); // TODO: fix ids like "my key"
-					out.push_str(": ");
-					out.push_str(&val.to_string());
+					write!(f, "\"{}\"", id)?;
+					write!(f, ": ")?;
+					write!(f, "{:#}", val)?;
 				}
-				out.push('}');
-				out
+
+				write!(f, "}}")
 			}
-			Self::Function(fn_id) => format!("<function `{}`>", fn_id),
-			Self::Channel(ch_id) => format!("<channel `{}`>", ch_id.id),
+			Self::Function(fn_id) => write!(f, "<function `{}`>", fn_id),
+			Self::Channel(ch_id) => write!(f, "<channel `{}`>", ch_id.id),
 		}
 	}
 }
