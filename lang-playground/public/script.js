@@ -66,11 +66,11 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 	socket.on("log", (log) => {
 		if (log.level == "Info") {
-			output_area.innerHTML += info(html_escape(log.msg)) + "\n";
+			output_area.innerHTML += info(format_log(log)) + "\n";
 		} else if (log.level == "Warn") {
-			output_area.innerHTML += warn(html_escape(log.msg)) + "\n";
+			output_area.innerHTML += warn(format_log(log)) + "\n";
 		} else if (log.level == "Error") {
-			output_area.innerHTML += error(html_escape(log.msg)) + "\n";
+			output_area.innerHTML += error(format_log(log)) + "\n";
 		} else {
 			throw "Invalid log level received!";
 		}
@@ -140,6 +140,20 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 	socket.emit("start", editor.getValue());
 });
+
+function format_log(log) {
+	let ret = "";
+
+	if (log.span) {
+		ret += `[${log.span.start.line + 1}:${log.span.start.column}]`;
+	}
+	if (log.user) {
+		ret += "[user]";
+	}
+	ret += ": " + log.msg;
+
+	return html_escape(ret);
+}
 
 document.getElementById("done-btn").addEventListener("click", (_event) => {
 	router_request.style.display = "none";

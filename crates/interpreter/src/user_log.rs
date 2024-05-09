@@ -2,31 +2,41 @@ use std::fmt::Display;
 
 use serde::Serialize;
 
+use ast::Span;
+
 #[derive(Debug, Clone, Serialize)]
 pub struct UserLog {
 	pub msg: String,
 	pub level: UserLogLevel,
+	pub user: bool,
+	pub span: Option<Span>,
 }
 
 impl UserLog {
-	pub fn info(msg: impl Into<String>) -> Self {
+	pub fn info(msg: impl Into<String>, span: Option<Span>) -> Self {
 		Self {
 			msg: msg.into(),
 			level: UserLogLevel::Info,
+			user: false,
+			span,
 		}
 	}
 
-	pub fn warn(msg: impl Into<String>) -> Self {
+	pub fn warn(msg: impl Into<String>, span: Option<Span>) -> Self {
 		Self {
 			msg: msg.into(),
 			level: UserLogLevel::Warn,
+			user: false,
+			span,
 		}
 	}
 
-	pub fn error(msg: impl Into<String>) -> Self {
+	pub fn error(msg: impl Into<String>, span: Option<Span>) -> Self {
 		Self {
 			msg: msg.into(),
 			level: UserLogLevel::Error,
+			user: false,
+			span,
 		}
 	}
 }

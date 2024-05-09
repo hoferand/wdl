@@ -1,6 +1,6 @@
 use crate::{
 	wdl_std::{get_handler, id, Arg, Env, Source},
-	FunctionId, FunctionValue, UserLog, Value,
+	FunctionId, FunctionValue, UserLog, UserLogLevel, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -17,32 +17,32 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 }
 
 pub async fn info(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
-	env.send_log(UserLog::info(format!(
-		"[{}:{}]: {}",
-		src.start.line + 1,
-		src.start.column,
-		truncate(msg.val.to_string(), 100)
-	)))
+	env.send_log(UserLog {
+		msg: truncate(msg.val.to_string(), 100),
+		level: UserLogLevel::Info,
+		user: true,
+		span: Some(src),
+	})
 	.await;
 }
 
 pub async fn warn(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
-	env.send_log(UserLog::warn(format!(
-		"[{}:{}]: {}",
-		src.start.line + 1,
-		src.start.column,
-		truncate(msg.val.to_string(), 100)
-	)))
+	env.send_log(UserLog {
+		msg: truncate(msg.val.to_string(), 100),
+		level: UserLogLevel::Warn,
+		user: true,
+		span: Some(src),
+	})
 	.await;
 }
 
 pub async fn error(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
-	env.send_log(UserLog::error(format!(
-		"[{}:{}]: {}",
-		src.start.line + 1,
-		src.start.column,
-		truncate(msg.val.to_string(), 100)
-	)))
+	env.send_log(UserLog {
+		msg: truncate(msg.val.to_string(), 100),
+		level: UserLogLevel::Error,
+		user: true,
+		span: Some(src),
+	})
 	.await;
 }
 
