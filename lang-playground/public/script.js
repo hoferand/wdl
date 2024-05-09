@@ -10,6 +10,7 @@ let response_callback = null;
 const output_area = document.getElementById("output-area");
 const target_area = document.getElementById("target-area");
 const router_request = document.getElementById("router-request");
+const router_wait = document.getElementById("router-wait");
 const action_text = document.getElementById("action-text");
 
 window.addEventListener("load", async (_event) => {
@@ -42,6 +43,7 @@ window.addEventListener("load", async (_event) => {
 document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	if (socket) {
 		router_request.style.display = "none";
+		router_wait.style.display = "block";
 		close_socket();
 		output_area.innerHTML += info("Order canceled by user.\n");
 		return;
@@ -87,6 +89,7 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 			},
 			4
 		);
+		router_wait.style.display = "none";
 		router_request.style.display = "block";
 	});
 
@@ -140,6 +143,7 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 document.getElementById("done-btn").addEventListener("click", (_event) => {
 	router_request.style.display = "none";
+	router_wait.style.display = "block";
 	if (response_callback) {
 		response_callback("Done");
 	} else {
@@ -151,6 +155,7 @@ document
 	.getElementById("no-station-left-btn")
 	.addEventListener("click", (_event) => {
 		router_request.style.display = "none";
+		router_wait.style.display = "block";
 		if (response_callback) {
 			response_callback("NoStationLeft");
 		} else {
