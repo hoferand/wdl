@@ -42,8 +42,6 @@ window.addEventListener("load", async (_event) => {
 
 document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	if (socket) {
-		router_request.style.display = "none";
-		router_wait.style.display = "block";
 		close_socket();
 		output_area.innerHTML += info("Order canceled by user.\n");
 		return;
@@ -160,8 +158,7 @@ function format_log(log) {
 }
 
 document.getElementById("done-btn").addEventListener("click", (_event) => {
-	router_request.style.display = "none";
-	router_wait.style.display = "block";
+	hide_router();
 	if (response_callback) {
 		response_callback("Done");
 	} else {
@@ -172,8 +169,7 @@ document.getElementById("done-btn").addEventListener("click", (_event) => {
 document
 	.getElementById("no-station-left-btn")
 	.addEventListener("click", (_event) => {
-		router_request.style.display = "none";
-		router_wait.style.display = "block";
+		hide_router();
 		if (response_callback) {
 			response_callback("NoStationLeft");
 		} else {
@@ -182,10 +178,16 @@ document
 	});
 
 function close_socket() {
+	hide_router();
 	console.log("close socket");
 	socket.close();
 	socket = null;
 	document.getElementById("run-btn").innerHTML = "Start";
+}
+
+function hide_router() {
+	router_request.style.display = "none";
+	router_wait.style.display = "block";
 }
 
 function info(msg) {
