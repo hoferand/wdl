@@ -53,6 +53,8 @@ async fn run(socket: SocketRef) {
 	eprintln!("Socket.IO connected: {:?} {:?}", socket.ns(), socket.id);
 
 	socket.on("start", run_workflow);
+
+	// TODO: check if socket must be closed manually
 }
 
 async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
