@@ -91,7 +91,7 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Sp
 					if !id.val.scope.is_empty() {
 						// TODO: improve error message
 						return Err(ParserError::Fatal(
-							"It is not allowed to assign values to scoped identifiers!".to_owned(),
+							"It is not allowed to assign values to scoped identifiers".to_owned(),
 						));
 					}
 

@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use log::error;
+use log::{error, info};
 use tokio::{
 	select,
 	sync::mpsc::{self, Sender},
@@ -59,6 +59,7 @@ pub async fn start_workflow(
 	Ok(Order { workflow: ast, env })
 }
 
+// TODO: maybe return vector of errors (background tasks)
 pub async fn run_order(order: Order) -> Result<(), Error> {
 	let (err_tx, mut err_rx) = mpsc::channel(1);
 	order.env.set_error_ch(err_tx).await;
@@ -68,8 +69,13 @@ pub async fn run_order(order: Order) -> Result<(), Error> {
 	select! {
 		ret = fut => {
 			if ret.is_ok() {
+				err_rx.close();
+				info!("Main flow finished, error channel closed, waiting for background tasks to finish!");
 				while let Some(handle) = order.env.pop_handle().await{
 					if let Ok(val) = handle.await {
+						if let Err(err) = &val {
+							info!("Background task returned error: {:?}", err);
+						}
 						val?;
 					} else {
 						error!("Failed to finish background task!");

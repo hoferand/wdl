@@ -6,7 +6,7 @@ use std::{
 	},
 };
 
-use log::error;
+use log::{error, warn};
 use tokio::{
 	sync::{mpsc::Sender, Mutex, RwLock},
 	task::JoinHandle,
@@ -60,11 +60,10 @@ impl Environment {
 	pub async fn send_error(&self, err: Error) {
 		if let Some(ch) = self.error_ch.lock().await.as_ref() {
 			if let Err(send_err) = ch.send(err.clone()).await {
-				error!(
-					"Failed to send error over channel `{}` `{:?}`",
+				warn!(
+					"Failed to send error over channel, send error `{}`, error `{:?}`",
 					send_err, err
 				);
-				// TODO: panic?
 			}
 		} else {
 			error!("Error channel missing, cannot send error `{:?}`", err);
@@ -78,7 +77,6 @@ impl Environment {
 				"Failed to send user log over channel `{}` `{:?}`",
 				send_err, log
 			);
-			// TODO: panic?
 		}
 	}
 
