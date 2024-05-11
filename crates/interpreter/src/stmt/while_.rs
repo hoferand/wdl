@@ -23,6 +23,11 @@ pub async fn interpret_while(
 			Interrupt::Break => break,
 			ret @ Interrupt::Return(_) => return Ok(ret),
 		}
+
+		#[cfg(feature = "playground")]
+		{
+			tokio::time::sleep(std::time::Duration::from_millis(500)).await; // to reduce damage of infinite loops
+		}
 	}
 
 	Ok(Interrupt::None)

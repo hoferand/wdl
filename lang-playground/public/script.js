@@ -43,7 +43,7 @@ window.addEventListener("load", async (_event) => {
 document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	if (socket) {
 		close_socket();
-		output_area.innerHTML += info("Order canceled by user.\n");
+		output_area.innerHTML += warn("Order canceled by user.\n");
 		return;
 	}
 
@@ -99,9 +99,7 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 		errors = JSON.parse(errors);
 		print_errors(errors, output_area);
 		close_socket();
-		output_area.innerHTML += error(
-			"Order canceled due to previous error(s).\n"
-		);
+		output_area.innerHTML += warn("Order canceled due to previous error(s).\n");
 	});
 
 	socket.on("done", (pos) => {

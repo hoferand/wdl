@@ -17,6 +17,7 @@ use tower_http::{
 };
 
 use common::{Status, Target};
+use interpreter::UserLog;
 use router::{RouterClientWs, RouterStatus};
 
 #[shuttle_runtime::main]
@@ -139,7 +140,13 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	let async_socket = socket.clone();
 	let log_handle = tokio::spawn(async move {
 		while let Some(log) = log_receiver.recv().await {
-			async_socket.emit("log", log).ok();
+			let send_log = UserLog {
+				msg: truncate(log.msg, 100), // to save network traffic
+				level: log.level,
+				user: log.user,
+				span: log.span,
+			};
+			async_socket.emit("log", send_log).ok();
 		}
 	});
 
@@ -217,4 +224,14 @@ pub fn convert_interpreter_error(
 	}
 
 	common::Error { title, pos }
+}
+
+// TODO: do not replicate function
+/// `len` must be >= 3
+fn truncate(s: String, len: usize) -> String {
+	if s.chars().count() <= len {
+		return s;
+	}
+
+	s.chars().take(len - 3).collect::<String>() + "..."
 }

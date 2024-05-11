@@ -4,9 +4,11 @@ use log::error;
 use reqwest::{header::CONTENT_TYPE, Response, Url};
 use serde::Serialize;
 
+use ast::Span;
+
 use crate::{
 	wdl_std::{get_handler, id, Arg, Env, ResultType, Source},
-	Error, FunctionId, FunctionValue, UserLog, Value,
+	Error, ErrorKind, FunctionId, FunctionValue, UserLog, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -41,7 +43,7 @@ async fn get(
 	))
 	.await;
 
-	let ret = process_response(reqwest::get(parse_url(&url.val)?).await).await?;
+	let ret = process_response(reqwest::get(parse_url(&url.val, url.span)?).await).await?;
 
 	env.send_log(UserLog::info(
 		format!(
@@ -68,7 +70,7 @@ async fn post(
 
 	let ret = process_response(
 		reqwest::Client::new()
-			.post(parse_url(&url.val)?)
+			.post(parse_url(&url.val, url.span)?)
 			.send()
 			.await,
 	)
@@ -86,12 +88,37 @@ async fn post(
 	Ok(ret)
 }
 
-fn parse_url(url: &str) -> Result<Url, Error> {
-	// TODO: improve error handling
-	match Url::parse(url) {
-		Ok(u) => Ok(u),
-		Err(err) => Err(Error::fatal(err.to_string())),
+fn parse_url(url: &str, src: Span) -> Result<Url, Error> {
+	let url = match Url::parse(url) {
+		Ok(u) => u,
+		Err(err) => {
+			return Err(Error {
+				kind: ErrorKind::Fatal(err.to_string()),
+				src: Some(src),
+			});
+		}
+	};
+
+	#[cfg(feature = "playground")]
+	{
+		let mut error = true;
+		if let Some(host) = url.host_str() {
+			if host == "dummyjson.com" {
+				error = false;
+			}
+		}
+		if error {
+			return Err(Error {
+				kind: ErrorKind::Fatal(
+					"Only requests to `dummyjson.com` are allowed on this playground! For example `https://dummyjson.com/products/1`"
+						.to_owned(),
+				),
+				src: Some(src),
+			});
+		}
 	}
+
+	Ok(url)
 }
 
 async fn process_response(
