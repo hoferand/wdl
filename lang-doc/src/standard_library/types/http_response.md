@@ -3,7 +3,7 @@
 ```wdl
 {
     status: number,
-    headers: [string -> string],
+    headers: { string -> string },
     body: any
 }
 ```

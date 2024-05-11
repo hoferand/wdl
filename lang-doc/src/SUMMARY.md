@@ -22,4 +22,3 @@
         -   [Target](./standard_library/types/target.md)
         -   [Events](./standard_library/types/events.md)
         -   [HttpResponse](./standard_library/types/http_response.md)
-        -   [Channel](./standard_library/types/channel.md)

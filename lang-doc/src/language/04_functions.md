@@ -22,7 +22,7 @@ function sum(left, right) {
 }
 ```
 
-## Usage
+## Call
 
 After declaring a function, it can be used through a function call. The return value can be used directly in an expression or can be assigned to a variable. Input variables can be either placed in the correct order or can be named. Positional and named arguments can be used in the same call, but first all positional arguments have to be placed, and after that, the named ones can be placed.
 

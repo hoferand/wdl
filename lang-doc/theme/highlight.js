@@ -18,7 +18,7 @@ hljs.registerLanguage(
           keyword:
             "if else while continue break return actions spawn par let global",
           literal: "true false null",
-          built_in: "any void bool number string Target Events Channel"
+          built_in: "any void bool number string channel Target Events NoStationLeftEvent HttpResponse"
         },
         illegal: "</",
         contains: [
