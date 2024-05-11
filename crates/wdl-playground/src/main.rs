@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc, time::Duration};
+use std::{collections::HashMap, time::Duration};
 
 use axum::{http::Method, routing::post, Json, Router};
 use serde_json::Value;
@@ -6,10 +6,7 @@ use socketioxide::{
 	extract::{Data, SocketRef},
 	SocketIo,
 };
-use tokio::{
-	select,
-	sync::{mpsc, Mutex},
-};
+use tokio::{select, sync::mpsc};
 use tower::ServiceBuilder;
 use tower_http::{
 	cors::{Any, CorsLayer},
@@ -93,13 +90,11 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		}
 	};
 
-	let (exit_sender, exit_receiver) = mpsc::channel::<()>(3);
+	let (exit_sender, mut exit_receiver) = mpsc::channel::<()>(3);
 
 	let async_socket = socket.clone();
-	let arc_receiver = Arc::new(Mutex::new(exit_receiver));
 	tokio::spawn(async move {
 		loop {
-			let mut exit_receiver = arc_receiver.lock().await;
 			select! {
 				_ = exit_receiver.recv() => {
 					return;
