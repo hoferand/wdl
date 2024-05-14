@@ -66,18 +66,18 @@ _Char_ can be any valid Unicode character, with the exception that `"` and `\` m
 
 _Expression_ can be one of:
 
-| Syntax                                                            | Name              |
-| ----------------------------------------------------------------- | ----------------- |
-| _Value_                                                           | Value             |
-| _ScopedIdentifier_                                                | Variable          |
-| `<-` _Expression_                                                 | Receive           |
-| _UnaryOperator_ _Expression_                                      | Unary expression  |
-| _Expression_ _BinaryOperator_ _Expression_                        | Binary expression |
-| `(` _Expression_ `)`                                              | Group             |
-| _Expression_ `[` _Expression_ `]`                                 | Index             |
-| _Expression_ `.` _Identifier_                                     | Member            |
-| _Expression_ `(` ( ( _Identifier_ `:` )? _Expression_ `,` )\* `)` | Call              |
-| `spawn` _Expression_                                              | Spawn             |
+| Syntax                                                            | Name     |
+| ----------------------------------------------------------------- | -------- |
+| _Value_                                                           | Value    |
+| _ScopedIdentifier_                                                | Variable |
+| `<-` _Expression_                                                 | Receive  |
+| _UnaryOperator_ _Expression_                                      | Unary    |
+| _Expression_ _BinaryOperator_ _Expression_                        | Binary   |
+| `(` _Expression_ `)`                                              | Group    |
+| _Expression_ `[` _Expression_ `]`                                 | Index    |
+| _Expression_ `.` _Identifier_                                     | Member   |
+| _Expression_ `(` ( ( _Identifier_ `:` )? _Expression_ `,` )\* `)` | Call     |
+| `spawn` _Expression_                                              | Spawn    |
 
 _UnaryOperator_ ::= `-` | `!`
 
