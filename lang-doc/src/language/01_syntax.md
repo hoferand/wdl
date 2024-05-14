@@ -75,7 +75,7 @@ _Expression_ can be one of:
 | _Expression_ _BinaryOperator_ _Expression_                        | Binary expression |
 | `(` _Expression_ `)`                                              | Group             |
 | _Expression_ `[` _Expression_ `]`                                 | Index             |
-| _Expression_ `.` _Expression_                                     | Member            |
+| _Expression_ `.` _Identifier_                                     | Member            |
 | _Expression_ `(` ( ( _Identifier_ `:` )? _Expression_ `,` )\* `)` | Call              |
 | `spawn` _Expression_                                              | Spawn             |
 
