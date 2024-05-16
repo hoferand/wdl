@@ -28,7 +28,7 @@ function post(url: string) -> HttpResponse|null
 **Example**
 
 ```wdl
-let response = http::post("http://example.org/");
+let response = http::post("https://example.org/");
 
 if response {
     log::info(response.body);

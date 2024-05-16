@@ -89,7 +89,7 @@ To run time-consuming tasks in the background, the `spawn` operator can be used.
 
 ```wdl
 actions {
-    let res_ch = spawn http::get("example.org/get-target");
+    let res_ch = spawn http::get("http://example.org/get-target");
     // do something else
     let result = <-res_ch; // this blocks until the response arrives
     // now `result` holds the HTTP response
