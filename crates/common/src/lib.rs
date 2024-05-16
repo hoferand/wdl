@@ -5,7 +5,7 @@ use ast::{Location, Span};
 pub mod colored_string;
 pub use colored_string::*;
 
-pub fn check_src(src_code: String, target: Target) -> Status {
+pub fn check_src(src_code: String, target: ColorMode) -> Status {
 	if let Err(error) = parser::get_ast(&src_code) {
 		Status {
 			status: "error".to_owned(),
@@ -39,7 +39,11 @@ pub struct Position {
 	pub span_str: String,
 }
 
-pub fn convert_parser_error(error: &parser::Error, src_code: &str, target: Target) -> Vec<Error> {
+pub fn convert_parser_error(
+	error: &parser::Error,
+	src_code: &str,
+	target: ColorMode,
+) -> Vec<Error> {
 	let mut ret = Vec::new();
 	match error {
 		parser::Error::Lexer(errors) => {
@@ -225,7 +229,7 @@ pub fn create_error_location(
 	start: &Location,
 	end: &Location,
 	src: &str,
-	target: Target,
+	target: ColorMode,
 ) -> String {
 	let mut ret = String::new();
 
@@ -254,9 +258,9 @@ pub fn create_error_location(
 			}
 		} else if let Some(line) = lines.get(line_number) {
 			let line = match target {
-				Target::None => line.to_owned().to_owned(),
-				Target::ANSI => line.to_owned().to_owned(),
-				Target::HTML => html_escape::encode_text(line).to_string(),
+				ColorMode::None => line.to_owned().to_owned(),
+				ColorMode::ANSI => line.to_owned().to_owned(),
+				ColorMode::HTML => html_escape::encode_text(line).to_string(),
 			};
 			ret += &format!(
 				"{:<pad$} {:} {}\n",

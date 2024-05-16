@@ -9,7 +9,7 @@ use tokio::sync::mpsc;
 
 use ::router::RouterClientGrpc;
 use ast::Identifier;
-use common::{convert_parser_error, create_error_location, Target};
+use common::{convert_parser_error, create_error_location, ColorMode};
 use interpreter::UserLog;
 
 mod router;
@@ -186,13 +186,13 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 	if let Some(ref span) = error.src {
 		eprintln!(
 			"{}",
-			create_error_location(&span.start, &span.end, src_code, Target::ANSI)
+			create_error_location(&span.start, &span.end, src_code, ColorMode::ANSI)
 		);
 	}
 }
 
 fn print_parser_error(error: &parser::Error, src_code: &str) {
-	for error in convert_parser_error(error, src_code, Target::ANSI) {
+	for error in convert_parser_error(error, src_code, ColorMode::ANSI) {
 		error!("{}", error.title);
 		if let Some(pos) = error.pos {
 			eprintln!("{}", pos.span_str);

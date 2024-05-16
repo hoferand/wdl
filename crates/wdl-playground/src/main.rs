@@ -13,7 +13,7 @@ use tower_http::{
 	services::ServeDir,
 };
 
-use common::{Status, Target};
+use common::{ColorMode, Status};
 use interpreter::UserLog;
 use router::{RouterClientWs, RouterStatus};
 
@@ -44,7 +44,7 @@ async fn main() -> shuttle_axum::ShuttleAxum {
 }
 
 async fn check(src_code: String) -> Json<Status> {
-	Json(common::check_src(src_code, Target::HTML))
+	Json(common::check_src(src_code, ColorMode::HTML))
 }
 
 async fn run(socket: SocketRef) {
@@ -60,7 +60,7 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	let ast = match parser::get_ast(&src_code.clone()) {
 		Ok(ast) => ast,
 		Err(err) => {
-			let errors = common::convert_parser_error(&err, &src_code, Target::HTML);
+			let errors = common::convert_parser_error(&err, &src_code, ColorMode::HTML);
 			socket
 				.emit("error", serde_json::to_string(&errors).unwrap())
 				.ok();
@@ -82,7 +82,11 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	{
 		Ok(o) => o,
 		Err(error) => {
-			let errors = vec![convert_interpreter_error(&error, &src_code, Target::HTML)];
+			let errors = vec![convert_interpreter_error(
+				&error,
+				&src_code,
+				ColorMode::HTML,
+			)];
 			socket
 				.emit("error", serde_json::to_string(&errors).unwrap())
 				.ok();
@@ -150,7 +154,7 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	log_handle.await.unwrap();
 
 	if let Err(err) = ret {
-		let error = convert_interpreter_error(&err, &src_code, Target::HTML);
+		let error = convert_interpreter_error(&err, &src_code, ColorMode::HTML);
 		match err.kind {
 			interpreter::ErrorKind::OrderDone => {
 				socket.emit("done", error.pos.unwrap()).ok(); // TODO: remove unwrap
@@ -172,7 +176,7 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 pub fn convert_interpreter_error(
 	error: &interpreter::Error,
 	src_code: &str,
-	target: Target,
+	target: ColorMode,
 ) -> common::Error {
 	let title = match &error.kind {
 		interpreter::ErrorKind::Fatal(msg) => format!("{}!", msg),

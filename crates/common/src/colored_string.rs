@@ -7,12 +7,12 @@ use colored::Colorize;
 
 pub struct ColoredString {
 	text: String,
-	target: Target,
+	target: ColorMode,
 	color: Color,
 }
 
 impl ColoredString {
-	pub fn blue(text: impl Into<String>, target: Target) -> Self {
+	pub fn blue(text: impl Into<String>, target: ColorMode) -> Self {
 		Self {
 			text: text.into(),
 			target,
@@ -20,7 +20,7 @@ impl ColoredString {
 		}
 	}
 
-	pub fn red(text: impl Into<String>, target: Target) -> Self {
+	pub fn red(text: impl Into<String>, target: ColorMode) -> Self {
 		Self {
 			text: text.into(),
 			target,
@@ -29,6 +29,7 @@ impl ColoredString {
 	}
 }
 
+// this is necessary for padding in format strings to work correctly.
 impl Deref for ColoredString {
 	type Target = str;
 
@@ -40,12 +41,12 @@ impl Deref for ColoredString {
 impl Display for ColoredString {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self.target {
-			Target::None => <String as fmt::Display>::fmt(&self.text, f),
-			Target::ANSI => match self.color {
+			ColorMode::None => <String as fmt::Display>::fmt(&self.text, f),
+			ColorMode::ANSI => match self.color {
 				Color::Blue => <colored::ColoredString as fmt::Display>::fmt(&self.text.blue(), f),
 				Color::Red => <colored::ColoredString as fmt::Display>::fmt(&self.text.red(), f),
 			},
-			Target::HTML => {
+			ColorMode::HTML => {
 				write!(f, "<span class=\"{}\">", self.color.get_css_class())?;
 				<String as fmt::Display>::fmt(&self.text, f)?;
 				write!(f, "</span>")
@@ -55,7 +56,7 @@ impl Display for ColoredString {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum Target {
+pub enum ColorMode {
 	None,
 	ANSI,
 	HTML,
