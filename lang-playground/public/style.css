@@ -16,6 +16,14 @@ html {
 	flex-direction: column;
 }
 
+#title {
+	margin-right: auto;
+}
+
+#editor-headline {
+	margin-bottom: 0;
+}
+
 .row {
 	display: flex;
 	flex-direction: row;
@@ -96,8 +104,13 @@ pre {
 }
 
 #doc-btn {
+	height: 35px;
 	margin-left: 10px;
 	margin-left: auto;
+}
+
+#editor-row {
+	margin-bottom: 10px;
 }
 
 #doc-img {
