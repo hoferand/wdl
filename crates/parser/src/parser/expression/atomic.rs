@@ -8,7 +8,16 @@ use super::parse_expression;
 
 pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let Some(token) = parser.tokens.next() else {
-		return Err(ParserError::UnexpectedEoF);
+		return Err(ParserError::unexpected_eof(vec![
+			TokenValue::Null.get_type(),
+			TokenValue::Bool(false).get_type(),
+			TokenValue::Number(0.0).get_type(),
+			TokenValue::String(String::new()).get_type(),
+			TokenValue::Identifier(String::new()).get_type(),
+			TokenValue::ParenOpen.get_type(),
+			TokenValue::BracketOpen.get_type(),
+			TokenValue::CurlyOpen.get_type(),
+		]));
 	};
 
 	let expr = match &token.value {
@@ -42,7 +51,10 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 				parser.tokens.expect(TokenValue::ColonColon)?;
 
 				let Some(id) = parser.tokens.next() else {
-					return Err(ParserError::UnexpectedEoF);
+					return Err(ParserError::unexpected_eof(vec![TokenValue::Identifier(
+						String::new(),
+					)
+					.get_type()]));
 				};
 
 				if let TokenValue::Identifier(id_str) = &id.value {
@@ -116,21 +128,24 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 				}
 
 				let Some(key_token) = parser.tokens.next() else {
-					return Err(ParserError::UnexpectedEoF);
+					return Err(ParserError::unexpected_eof(vec![
+						TokenValue::Identifier(String::new()).get_type(),
+						TokenValue::String(String::new()).get_type(),
+					]));
 				};
 
 				let key = match &key_token.value {
 					TokenValue::Identifier(id) => id,
 					TokenValue::String(s) => s,
 					_ => {
-						return Err(ParserError::UnexpectedToken {
-							src: key_token.src.clone(),
-							span: key_token.span,
-							expected: vec![
-								TokenValue::Identifier(String::new()).type_str(),
-								TokenValue::String(String::new()).type_str(),
+						return Err(ParserError::unexpected_token(
+							key_token.src.clone(),
+							vec![
+								TokenValue::Identifier(String::new()).get_type(),
+								TokenValue::String(String::new()).get_type(),
 							],
-						});
+							key_token.span,
+						));
 					}
 				}
 				.to_owned();
@@ -152,20 +167,20 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserErro
 			})
 		}
 		_ => {
-			return Err(ParserError::UnexpectedToken {
-				src: token.src.clone(),
-				span: token.span,
-				expected: vec![
-					TokenValue::Null.type_str(),
-					TokenValue::Bool(false).type_str(),
-					TokenValue::Number(0.0).type_str(),
-					TokenValue::String(String::new()).type_str(),
-					TokenValue::Identifier(String::new()).type_str(),
-					TokenValue::ParenOpen.type_str(),
-					TokenValue::BracketOpen.type_str(),
-					TokenValue::CurlyOpen.type_str(),
+			return Err(ParserError::unexpected_token(
+				token.src.clone(),
+				vec![
+					TokenValue::Null.get_type(),
+					TokenValue::Bool(false).get_type(),
+					TokenValue::Number(0.0).get_type(),
+					TokenValue::String(String::new()).get_type(),
+					TokenValue::Identifier(String::new()).get_type(),
+					TokenValue::ParenOpen.get_type(),
+					TokenValue::BracketOpen.get_type(),
+					TokenValue::CurlyOpen.get_type(),
 				],
-			});
+				token.span,
+			));
 		}
 	};
 

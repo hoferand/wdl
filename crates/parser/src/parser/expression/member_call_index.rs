@@ -24,26 +24,23 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 					let val = parse_expression(parser)?;
 					if let Expression::Variable(id) = id {
 						if !id.val.scope.is_empty() {
-							return Err(ParserError::Positional {
-								msg: format!(
+							return Err(ParserError::fatal(
+								format!(
 									"Cannot use scoped identifier `{}` as named argument",
 									id.val
 								),
-								span: id.span,
-							});
+								Some(id.span),
+							));
 						}
 
 						if names.contains(&id.val.id.val) {
-							return Err(ParserError::Positional {
-								msg: format!(
-									"Same named argument `{}` multiple times",
-									id.val.id.val
-								),
-								span: Span {
+							return Err(ParserError::fatal(
+								format!("Same named argument `{}` multiple times", id.val.id.val),
+								Some(Span {
 									start: id.span.start,
 									end: val.get_span().end,
-								},
-							});
+								}),
+							));
 						}
 						names.push(id.val.id.val.clone());
 
@@ -61,11 +58,11 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 							},
 						});
 					} else {
-						return Err(ParserError::UnexpectedToken {
-							src: token.src,
-							span: token.span,
-							expected: vec![], // TODO
-						});
+						return Err(ParserError::unexpected_token(
+							token.src,
+							Vec::new(), // TODO
+							token.span,
+						));
 					}
 				} else if !named {
 					args.push(Node {
@@ -73,11 +70,10 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 						val: Argument { id: None, val: id },
 					});
 				} else {
-					return Err(ParserError::Positional {
-						msg: "Positional arguments are not allowed after named arguments"
-							.to_owned(),
-						span: *id.get_span(),
-					});
+					return Err(ParserError::fatal(
+						"Positional arguments are not allowed after named arguments".to_owned(),
+						Some(*id.get_span()),
+					));
 				}
 
 				if parser.tokens.want(TokenValue::Comma).is_none() {

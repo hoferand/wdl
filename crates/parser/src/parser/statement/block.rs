@@ -18,10 +18,10 @@ pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Block>, ParserErro
 		}
 
 		let Some(stmt) = parse_statement(parser)? else {
-			return Err(ParserError::UnexpectedEoF);
+			return Err(ParserError::unexpected_eof(vec![
+				TokenValue::CurlyClose.get_type()
+			]));
 		};
-
-		// TODO: add checks: break only in loops, etc
 
 		stmts.push(stmt);
 	}

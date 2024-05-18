@@ -1,12 +1,13 @@
 use ast::Workflow;
 
-pub mod lexer;
-pub use lexer::*;
-pub mod parser;
-pub use parser::*;
-pub mod error;
+mod error;
 pub use error::Error;
-
+mod lexer;
+pub use lexer::lexer_error::*;
+use lexer::*;
+mod parser;
+pub use parser::parser_error::*;
+use parser::*;
 mod token;
 use token::*;
 

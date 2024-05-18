@@ -64,17 +64,17 @@ pub enum TokenValue {
 	Return,
 	Spawn,
 
-	EoF,
-
 	// Needed for auto formatting
 	Whitespace,
 	EmptyLine,
 	SingleLineComment(String),
 	MultiLineComment(String),
+
+	EoF,
 }
 
 impl TokenValue {
-	pub fn type_str(&self) -> String {
+	pub fn get_type(&self) -> String {
 		match self {
 			TokenValue::Null => "null",
 			TokenValue::Bool(_) => "<bool>",

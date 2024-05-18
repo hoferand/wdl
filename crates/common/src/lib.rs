@@ -48,178 +48,88 @@ pub fn convert_parser_error(
 	match error {
 		parser::Error::Lexer(errors) => {
 			for err in errors {
-				ret.push(match err {
-					parser::LexerError::InvalidCharacter { char, loc } => {
-						let span = Span {
-							start: *loc,
-							end: Location {
-								line: loc.line,
-								column: loc.column + 1,
-							},
-						};
-
-						Error {
-							title: format!("Invalid character `{}` found!", char),
-							pos: Some(Position {
-								span,
-								span_str: create_error_location(
-									&span.start,
-									&span.end,
-									src_code,
-									target,
-								),
-							}),
-						}
+				let title = match &err.kind {
+					parser::LexerErrorKind::InvalidCharacter { char } => {
+						format!("Invalid character `{}` found!", char)
 					}
-					parser::LexerError::InvalidNumber { src, span } => Error {
-						title: format!("Invalid number `{}` found!", src),
-						pos: Some(Position {
-							span: *span,
-							span_str: create_error_location(
-								&span.start,
-								&span.end,
-								src_code,
-								target,
-							),
-						}),
-					},
-					parser::LexerError::UnexpectedEndOfFile => {
-						let last_line = src_code.lines().last().unwrap_or("").to_owned();
-						let start = Location {
-							line: src_code.lines().count() - 1,
-							column: last_line.chars().count(),
-						};
-						let span = Span {
-							start,
-							end: Location {
-								line: start.line,
-								column: start.column + 1,
-							},
-						};
-
-						Error {
-							title: "Unexpected end of file!".to_owned(),
-							pos: Some(Position {
-								span,
-								span_str: create_error_location(
-									&span.start,
-									&span.end,
-									src_code,
-									target,
-								),
-							}),
-						}
+					parser::LexerErrorKind::InvalidNumber { src } => {
+						format!("Invalid number `{}` found!", src)
 					}
-					parser::LexerError::InvalidEscape { char, loc } => {
-						let span = Span {
-							start: Location {
-								line: loc.line,
-								column: loc.column - 2,
-							},
-							end: Location {
-								line: loc.line,
-								column: loc.column,
-							},
-						};
-
-						Error {
-							title: format!("Invalid character escape `\\{}`!", char),
-							pos: Some(Position {
-								span,
-								span_str: create_error_location(
-									&span.start,
-									&span.end,
-									src_code,
-									target,
-								),
-							}),
-						}
+					parser::LexerErrorKind::InvalidEscape { char } => {
+						format!("Invalid character escape `\\{}`!", char)
 					}
+					parser::LexerErrorKind::UnterminatedString => "Missing `\"`!".to_owned(),
+					parser::LexerErrorKind::UnterminatedComment => "Missing `*/`!".to_owned(),
+				};
+
+				ret.push(Error {
+					title,
+					pos: Some(Position {
+						span: err.span,
+						span_str: create_error_location(
+							&err.span.start,
+							&err.span.end,
+							src_code,
+							target,
+						),
+					}),
 				})
 			}
 		}
-		parser::Error::Parser(err) => ret.push(match err {
-			parser::ParserError::Fatal(msg) => Error {
-				title: format!("{}!", msg),
-				pos: None,
-			},
-			parser::ParserError::Positional { msg, span } => Error {
-				title: format!("{}!", msg),
-				pos: Some(Position {
-					span: *span,
-					span_str: create_error_location(&span.start, &span.end, src_code, target),
-				}),
-			},
-			parser::ParserError::UnexpectedToken {
-				src,
-				span,
-				expected,
-			} => {
-				let mut msg = format!("Unexpected token `{}`", src);
-				if expected.len() == 1 {
-					msg += &format!(", expected `{}`", expected[0]);
-				} else if !expected.is_empty() {
-					msg += ", expected one of [";
-					msg += &expected
-						.iter()
-						.map(|e| format!("`{}`", e))
-						.collect::<Vec<String>>()
-						.join(", ");
-					msg += "]";
+		parser::Error::Parser(err) => {
+			let mut span = err.span;
+			let title = match &err.kind {
+				parser::ParserErrorKind::Fatal(msg) => format!("{}!", msg),
+				parser::ParserErrorKind::UnexpectedToken { src, expected } => {
+					let mut msg = format!("Unexpected token `{}`", src);
+					if expected.len() == 1 {
+						msg += &format!(", expected `{}`", expected[0]);
+					} else if !expected.is_empty() {
+						msg += ", expected one of [";
+						msg += &expected
+							.iter()
+							.map(|e| format!("`{}`", e))
+							.collect::<Vec<String>>()
+							.join(", ");
+						msg += "]";
+					}
+					msg.push('!');
+					msg
 				}
-				Error {
-					title: format!("{}!", msg),
-					pos: Some(Position {
-						span: *span,
-						span_str: create_error_location(&span.start, &span.end, src_code, target),
-					}),
-				}
-			}
-			parser::ParserError::SecondActions {
-				actions1: _,
-				actions2,
-			} => Error {
-				title: "Only one `actions` block is allowed!".to_owned(),
-				pos: Some(Position {
-					span: *actions2,
-					span_str: create_error_location(
-						&actions2.start,
-						&actions2.end,
-						src_code,
-						target,
-					),
-				}),
-			},
-			parser::ParserError::ExpectedSemicolon { span } => Error {
-				title: "Expected semicolon `;`!".to_owned(),
-				pos: Some(Position {
-					span: *span,
-					span_str: create_error_location(&span.start, &span.end, src_code, target),
-				}),
-			},
-			parser::ParserError::UnexpectedEoF => {
-				let last_line = src_code.lines().last().unwrap_or("").to_owned();
-				let start = Location {
-					line: src_code.lines().count() - 1,
-					column: last_line.chars().count(),
-				};
-				let span = Span {
-					start,
-					end: Location {
-						line: start.line,
-						column: start.column + 1,
-					},
-				};
+				parser::ParserErrorKind::SecondActions {
+					actions1: _,
+					actions2: _,
+				} => "Only one `actions` block is allowed!".to_owned(),
+				parser::ParserErrorKind::ExpectedSemicolon => "Expected semicolon `;`!".to_owned(),
+				parser::ParserErrorKind::UnexpectedEoF { expected: _ } => {
+					let last_line = src_code.lines().last().unwrap_or("").to_owned();
+					let start = Location {
+						line: src_code.lines().count() - 1,
+						column: last_line.chars().count(),
+					};
+					span = Some(Span {
+						start,
+						end: Location {
+							line: start.line,
+							column: start.column + 1,
+						},
+					});
 
-				Error {
-					title: "ERROR: Unexpected end of file!".to_owned(),
-					pos: Some(Position {
-						span,
-						span_str: create_error_location(&span.start, &span.end, src_code, target),
-					}),
+					"Unexpected end of file!".to_owned()
 				}
-			}
-		}),
+				parser::ParserErrorKind::NoActions => "No actions block found!".to_owned(),
+				parser::ParserErrorKind::InvalidAssign { id } => {
+					format!("It is not allowed to assign a value to `{}`!", id)
+				}
+			};
+			ret.push(Error {
+				title,
+				pos: span.map(|span| Position {
+					span,
+					span_str: create_error_location(&span.start, &span.end, src_code, target),
+				}),
+			});
+		}
 	}
 
 	ret

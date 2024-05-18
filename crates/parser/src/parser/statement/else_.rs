@@ -8,7 +8,10 @@ pub(crate) fn parse_else(parser: &mut Parser) -> Result<Node<Else>, ParserError>
 	let start = parser.tokens.expect(TokenValue::Else)?.span.start;
 
 	let Some(peek) = parser.tokens.peek() else {
-		return Err(ParserError::UnexpectedEoF);
+		return Err(ParserError::unexpected_eof(vec![
+			TokenValue::CurlyOpen.get_type(),
+			TokenValue::If.get_type(),
+		]));
 	};
 
 	if peek.value == TokenValue::CurlyOpen {

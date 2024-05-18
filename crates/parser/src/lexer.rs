@@ -7,9 +7,9 @@ use ast::{Location, Span};
 use crate::{Token, TokenValue};
 
 pub mod lexer_error;
-pub use lexer_error::LexerError;
+pub use lexer_error::*;
 
-pub(crate) struct Lexer<'c> {
+pub struct Lexer<'c> {
 	chars: Peekable<Chars<'c>>,
 	line: usize,
 	start_line: usize,
@@ -89,13 +89,19 @@ impl<'c> Lexer<'c> {
 			}
 
 			if invalid {
-				errors.push(LexerError::InvalidCharacter {
-					char: self.get_char().unwrap(),
-					loc: Location {
-						line: self.start_line,
-						column: self.start_column,
+				errors.push(LexerError::invalid_character(
+					self.get_char().unwrap(),
+					Span {
+						start: Location {
+							line: self.start_line,
+							column: self.start_column,
+						},
+						end: Location {
+							line: self.start_line,
+							column: self.start_column + 1,
+						},
 					},
-				});
+				));
 			}
 		}
 
@@ -166,9 +172,9 @@ impl<'c> Lexer<'c> {
 		if let Ok(number) = self.curr_src.parse() {
 			Ok(Some(TokenValue::Number(number)))
 		} else {
-			Err(LexerError::InvalidNumber {
-				src: self.curr_src.clone(),
-				span: Span {
+			Err(LexerError::invalid_number(
+				self.curr_src.clone(),
+				Span {
 					start: Location {
 						line: self.start_line,
 						column: self.start_column,
@@ -178,7 +184,7 @@ impl<'c> Lexer<'c> {
 						column: self.column,
 					},
 				},
-			})
+			))
 		}
 	}
 
@@ -228,13 +234,19 @@ impl<'c> Lexer<'c> {
 					'\\' => '\\',
 					'n' => '\n',
 					ch => {
-						invalid_escape = Some(LexerError::InvalidEscape {
-							char: ch,
-							loc: Location {
-								line: self.line,
-								column: self.column,
+						invalid_escape = Some(LexerError::invalid_escape(
+							ch,
+							Span {
+								start: Location {
+									line: self.line,
+									column: self.column - 2,
+								},
+								end: Location {
+									line: self.line,
+									column: self.column,
+								},
 							},
-						});
+						));
 						next_char
 					}
 				}
@@ -253,7 +265,16 @@ impl<'c> Lexer<'c> {
 		}
 
 		if !terminated {
-			Err(LexerError::UnexpectedEndOfFile)
+			Err(LexerError::unterminated_string(Span {
+				start: Location {
+					line: self.line,
+					column: self.column,
+				},
+				end: Location {
+					line: self.line,
+					column: self.column + 1,
+				},
+			}))
 		} else {
 			Ok(Some(string))
 		}
@@ -324,7 +345,16 @@ impl<'c> Lexer<'c> {
 				}
 
 				if !terminated {
-					return Err(LexerError::UnexpectedEndOfFile);
+					return Err(LexerError::unterminated_comment(Span {
+						start: Location {
+							line: self.line,
+							column: self.column,
+						},
+						end: Location {
+							line: self.line,
+							column: self.column + 1,
+						},
+					}));
 				}
 
 				comment.pop(); // remove * at the end

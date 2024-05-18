@@ -2,18 +2,21 @@ use ast::{Global, Identifier, Node, Span};
 
 use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_global_declaration(parser: &mut Parser) -> Result<Node<Global>, ParserError> {
+pub(crate) fn parse_global(parser: &mut Parser) -> Result<Node<Global>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Global)?.span.start;
 
 	let Some(id_token) = parser.tokens.next().cloned() else {
-		return Err(ParserError::UnexpectedEoF);
+		return Err(ParserError::unexpected_eof(vec![TokenValue::Identifier(
+			String::new(),
+		)
+		.get_type()]));
 	};
 	let TokenValue::Identifier(id) = &id_token.value else {
-		return Err(ParserError::UnexpectedToken {
-			src: id_token.src.clone(),
-			span: id_token.span,
-			expected: vec![TokenValue::Identifier(String::new()).type_str()],
-		});
+		return Err(ParserError::unexpected_token(
+			id_token.src.clone(),
+			vec![TokenValue::Identifier(String::new()).get_type()],
+			id_token.span,
+		));
 	};
 
 	let id_node = Node {
@@ -25,8 +28,6 @@ pub(crate) fn parse_global_declaration(parser: &mut Parser) -> Result<Node<Globa
 
 	// TODO: make it optional
 	let value = parse_expression(parser)?;
-
-	// TODO: parse global description
 
 	let end = parser.tokens.expect(TokenValue::Semicolon)?.span.end;
 

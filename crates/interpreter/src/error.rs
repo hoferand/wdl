@@ -3,7 +3,7 @@ use ast::{Identifier, Span, Variable};
 #[derive(Debug, Clone)]
 pub struct Error {
 	pub kind: ErrorKind,
-	pub src: Option<Span>, // TODO: replace by generic Source type
+	pub src: Option<Span>, // TODO: rename to span
 }
 
 impl Error {

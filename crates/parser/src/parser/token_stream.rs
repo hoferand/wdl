@@ -54,19 +54,19 @@ impl<'t> TokenStream<'t> {
 						}
 					}
 
-					Err(ParserError::ExpectedSemicolon { span })
+					Err(ParserError::expected_semicolon(span))
 				} else {
-					Err(ParserError::UnexpectedToken {
-						src: token.src.clone(),
-						span: token.span,
-						expected: vec![expect.type_str()],
-					})
+					Err(ParserError::unexpected_token(
+						token.src.clone(),
+						vec![expect.get_type()],
+						token.span,
+					))
 				}
 			} else {
 				Ok(token)
 			}
 		} else {
-			Err(ParserError::UnexpectedEoF)
+			Err(ParserError::unexpected_eof(vec![expect.get_type()]))
 		}
 	}
 

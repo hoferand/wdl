@@ -4,14 +4,17 @@ use crate::{Parser, ParserError, TokenValue};
 
 pub(crate) fn parse_identifier(parser: &mut Parser) -> Result<Node<Identifier>, ParserError> {
 	let Some(id_token) = parser.tokens.next() else {
-		return Err(ParserError::UnexpectedEoF); // TODO: improve error message
+		return Err(ParserError::unexpected_eof(vec![TokenValue::Identifier(
+			String::new(),
+		)
+		.get_type()]));
 	};
 	let TokenValue::Identifier(id_str) = &id_token.value else {
-		return Err(ParserError::UnexpectedToken {
-			src: id_token.src.clone(),
-			span: id_token.span,
-			expected: vec![TokenValue::Identifier(String::new()).type_str()],
-		});
+		return Err(ParserError::unexpected_token(
+			id_token.src.clone(),
+			vec![TokenValue::Identifier(String::new()).get_type()],
+			id_token.span,
+		));
 	};
 
 	Ok(Node {

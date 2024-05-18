@@ -13,7 +13,8 @@ mod expression;
 use expression::*;
 mod statement;
 use statement::*;
-mod function;
+mod declaration;
+use declaration::*;
 mod identifier;
 
 pub(crate) struct Parser<'t> {
@@ -39,10 +40,7 @@ impl<'t> Parser<'t> {
 				Declaration::GlobalDeclaration(global) => globals.push(global),
 				Declaration::Actions(actions) => {
 					if let Some(actions1) = wf_actions {
-						return Err(ParserError::SecondActions {
-							actions1: actions1.span,
-							actions2: actions.span,
-						});
+						return Err(ParserError::second_actions(actions1.span, actions.span));
 					} else {
 						wf_actions = Some(actions);
 					}
@@ -52,7 +50,7 @@ impl<'t> Parser<'t> {
 		}
 
 		let Some(actions) = wf_actions else {
-			return Err(ParserError::Fatal("No actions block found".to_owned()));
+			return Err(ParserError::no_actions());
 		};
 
 		Ok(Workflow {

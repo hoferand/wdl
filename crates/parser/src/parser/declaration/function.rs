@@ -1,11 +1,16 @@
-use ast::{function::FormalParameter, FunctionBody, Node, Span};
+use ast::{FormalParameter, Function, FunctionBody, Node, Span};
 
-use crate::{Parser, ParserError, TokenValue};
+use crate::{
+	parser::{identifier::parse_identifier, parse_block},
+	Parser, ParserError, TokenValue,
+};
 
-use super::{identifier::parse_identifier, statement::parse_block};
+pub(crate) fn parse_function(parser: &mut Parser) -> Result<Node<Function>, ParserError> {
+	let start = parser.tokens.expect(TokenValue::Function)?.span.start;
 
-pub(crate) fn parse_function(parser: &mut Parser) -> Result<Node<FunctionBody>, ParserError> {
-	let start = parser.tokens.expect(TokenValue::ParenOpen)?.span.start;
+	let id = parse_identifier(parser)?;
+
+	parser.tokens.expect(TokenValue::ParenOpen)?;
 
 	// parse parameter
 	let mut parameter = Vec::new();
@@ -28,11 +33,19 @@ pub(crate) fn parse_function(parser: &mut Parser) -> Result<Node<FunctionBody>, 
 	let body = parse_block(parser)?;
 	parser.state.in_function -= 1;
 
-	Ok(Node {
+	let function = Node {
 		span: Span {
 			start,
 			end: body.span.end,
 		},
 		val: FunctionBody { parameter, body },
+	};
+
+	Ok(Node {
+		span: Span {
+			start,
+			end: function.span.end,
+		},
+		val: Function { id, function },
 	})
 }

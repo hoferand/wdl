@@ -1,8 +1,6 @@
 use ast::{Actions, Node, Span};
 
-use crate::{Parser, ParserError, TokenValue};
-
-use super::parse_block;
+use crate::{parser::parse_block, Parser, ParserError, TokenValue};
 
 pub(crate) fn parse_actions(parser: &mut Parser) -> Result<Node<Actions>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Actions)?.span.start;

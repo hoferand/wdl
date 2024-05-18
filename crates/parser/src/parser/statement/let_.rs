@@ -1,20 +1,14 @@
-use ast::{Identifier, Let, Node, Span};
+use ast::{Let, Node, Span};
 
-use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
+use crate::{
+	parser::{identifier::parse_identifier, parse_expression},
+	Parser, ParserError, TokenValue,
+};
 
 pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Let>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Let)?.span.start;
 
-	let Some(id_token) = parser.tokens.next().cloned() else {
-		return Err(ParserError::UnexpectedEoF);
-	};
-	let TokenValue::Identifier(id) = &id_token.value else {
-		return Err(ParserError::UnexpectedToken {
-			src: id_token.src.clone(),
-			span: id_token.span,
-			expected: vec![TokenValue::Identifier(String::new()).type_str()],
-		});
-	};
+	let id_node = parse_identifier(parser)?;
 
 	parser.tokens.expect(TokenValue::Equal)?;
 
@@ -22,11 +16,6 @@ pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Let>, ParserError> {
 	let value = parse_expression(parser)?;
 
 	let end = parser.tokens.expect(TokenValue::Semicolon)?.span.end;
-
-	let id_node = Node {
-		span: Span { start, end },
-		val: Identifier { id: id.to_owned() },
-	};
 
 	Ok(Node {
 		span: Span { start, end },

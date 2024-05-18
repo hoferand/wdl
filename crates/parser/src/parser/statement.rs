@@ -1,13 +1,9 @@
-use ast::{Assignment, Declaration, Expression, Node, Send, Span, Statement};
+use ast::{Assignment, Expression, Node, Send, Span, Statement};
 
 use crate::{Parser, ParserError, TokenValue};
 
 use super::expression::parse_expression;
 
-pub(crate) mod global_declaration;
-pub(crate) use global_declaration::parse_global_declaration;
-pub(crate) mod actions;
-pub(crate) use actions::parse_actions;
 pub(crate) mod block;
 pub(crate) use block::parse_block;
 pub(crate) mod return_;
@@ -24,37 +20,6 @@ pub(crate) mod if_;
 pub(crate) use if_::parse_if;
 pub(crate) mod let_;
 pub(crate) use let_::parse_let;
-pub(crate) mod function_declaration;
-pub(crate) use function_declaration::parse_function_declaration;
-
-pub(crate) fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaration>, ParserError> {
-	let Some(token) = parser.tokens.peek() else {
-		return Ok(None);
-	};
-
-	Ok(Some(match token.value {
-		TokenValue::EoF => return Ok(None),
-
-		// statements
-		TokenValue::Global => Declaration::GlobalDeclaration(parse_global_declaration(parser)?),
-		TokenValue::Actions => Declaration::Actions(parse_actions(parser)?),
-		TokenValue::Function => {
-			Declaration::FunctionDeclaration(parse_function_declaration(parser)?)
-		}
-
-		_ => {
-			return Err(ParserError::UnexpectedToken {
-				src: token.src.clone(),
-				span: token.span,
-				expected: vec![
-					TokenValue::Global.type_str(),
-					TokenValue::Actions.type_str(),
-					TokenValue::Function.type_str(),
-				],
-			});
-		}
-	}))
-}
 
 pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {
@@ -77,17 +42,16 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 			let expr = parse_expression(parser)?;
 
 			let Some(peek) = parser.tokens.peek() else {
-				return Err(ParserError::UnexpectedEoF);
+				return Err(ParserError::unexpected_eof(vec![
+					TokenValue::Semicolon.get_type()
+				]));
 			};
 			let val;
 			if peek.value == TokenValue::Equal {
 				parser.tokens.expect(TokenValue::Equal)?;
 				if let Expression::Variable(id) = expr {
 					if !id.val.scope.is_empty() {
-						// TODO: improve error message
-						return Err(ParserError::Fatal(
-							"It is not allowed to assign values to scoped identifiers".to_owned(),
-						));
+						return Err(ParserError::invalid_assign(id.val.to_string(), id.span));
 					}
 
 					let value = parse_expression(parser)?;
