@@ -20,7 +20,7 @@ impl<T: FromValue, const N: u32> FromCallContext for Arg<T, N> {
 			};
 			Err(Error {
 				kind: ErrorKind::MissingArgument { id },
-				src: Some(ctx.fn_span),
+				span: Some(ctx.fn_span),
 			})
 		}
 	}
@@ -43,7 +43,7 @@ impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 			let is_null = arg.val == Value::Null;
 			let arg_clone = arg.clone();
 			let value = T::from_value(arg.val).map_err(|mut err| {
-				err.src = Some(arg.span);
+				err.span = Some(arg.span);
 				err
 			})?;
 			if let Some(val) = value {
@@ -61,7 +61,7 @@ impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 							arg_clone.idx
 						),
 					},
-					src: Some(arg_clone.span),
+					span: Some(arg_clone.span),
 				})
 			}
 		} else {

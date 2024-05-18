@@ -39,7 +39,7 @@ impl Scope {
 		if lock.contains_key(&id.val) {
 			return Err(Error {
 				kind: ErrorKind::VariableAlreadyInUse { id: id.val },
-				src: Some(id.span),
+				span: Some(id.span),
 			});
 		}
 		lock.insert(id.val, val);
@@ -56,7 +56,7 @@ impl Scope {
 						scope: Vec::new(),
 					},
 				},
-				src: Some(id.span),
+				span: Some(id.span),
 			});
 		};
 		env.write().await.insert(id.val, val);

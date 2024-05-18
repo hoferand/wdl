@@ -62,23 +62,23 @@ async fn call_function(
 	match error {
 		Error {
 			kind: ErrorKind::ArityMismatch { expected, given },
-			src,
+			span: src,
 		} => Err(Error {
 			kind: ErrorKind::Fatal(format!(
 				"Callback for `{}` should require `{}` argument(s) but requires `{}` argument(s)",
 				callback_name, given, expected
 			)),
-			src,
+			span: src,
 		}),
 		Error {
 			kind: ErrorKind::MissingArgument { id },
-			src,
+			span: src,
 		} => Err(Error {
 			kind: ErrorKind::Fatal(format!(
 				"Callback for `{}` should not require argument `{}`",
 				callback_name, id
 			)),
-			src,
+			span: src,
 		}),
 		err => Err(err),
 	}

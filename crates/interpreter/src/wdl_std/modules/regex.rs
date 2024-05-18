@@ -25,7 +25,7 @@ async fn match_(
 	let Ok(regex) = Regex::new(&regex.val) else {
 		return Err(Error {
 			kind: ErrorKind::Fatal(format!("Invalid regex pattern `{}`", regex.val)),
-			src: Some(regex.span),
+			span: Some(regex.span),
 		});
 	};
 
@@ -39,7 +39,7 @@ async fn find(
 	let Ok(regex) = Regex::new(&regex.val) else {
 		return Err(Error {
 			kind: ErrorKind::Fatal(format!("Invalid regex pattern `{}`", regex.val)),
-			src: Some(regex.span),
+			span: Some(regex.span),
 		});
 	};
 
@@ -57,7 +57,7 @@ async fn replace(
 	let Ok(regex) = Regex::new(&regex.val) else {
 		return Err(Error {
 			kind: ErrorKind::Fatal(format!("Invalid regex pattern `{}`", regex.val)),
-			src: Some(regex.span),
+			span: Some(regex.span),
 		});
 	};
 

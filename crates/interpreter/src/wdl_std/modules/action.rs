@@ -48,7 +48,7 @@ async fn pickup(
 		None => {
 			return Err(Error {
 				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
-				src: Some(src),
+				span: Some(src),
 			});
 		}
 	};
@@ -118,7 +118,7 @@ async fn drop(
 		None => {
 			return Err(Error {
 				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
-				src: Some(src),
+				span: Some(src),
 			});
 		}
 	};
@@ -188,7 +188,7 @@ async fn drive(
 		None => {
 			return Err(Error {
 				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
-				src: Some(src),
+				span: Some(src),
 			});
 		}
 	};

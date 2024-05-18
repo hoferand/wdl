@@ -3,14 +3,14 @@ use ast::{Identifier, Span, Variable};
 #[derive(Debug, Clone)]
 pub struct Error {
 	pub kind: ErrorKind,
-	pub src: Option<Span>, // TODO: rename to span
+	pub span: Option<Span>,
 }
 
 impl Error {
 	pub fn fatal(msg: String) -> Self {
 		Error {
 			kind: ErrorKind::Fatal(msg),
-			src: None,
+			span: None,
 		}
 	}
 }

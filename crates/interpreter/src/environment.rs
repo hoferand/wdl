@@ -89,7 +89,7 @@ impl Environment {
 		if lock.contains_key(&id.val) {
 			return Err(Error {
 				kind: ErrorKind::VariableAlreadyInUse { id: id.val },
-				src: Some(id.span),
+				span: Some(id.span),
 			});
 		}
 		lock.insert(id.val, val);

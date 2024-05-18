@@ -18,13 +18,13 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 async fn done(Source(src): Source) -> Result<(), Error> {
 	Err(Error {
 		kind: ErrorKind::OrderDone,
-		src: Some(src),
+		span: Some(src),
 	})
 }
 
 async fn cancel(Source(src): Source) -> Result<(), Error> {
 	Err(Error {
 		kind: ErrorKind::OrderCancel,
-		src: Some(src),
+		span: Some(src),
 	})
 }

@@ -56,7 +56,7 @@ fn add(left: Value, right: Value, span: &Span) -> Result<Value, Error> {
 			kind: ErrorKind::InvalidType {
 				msg: format!("`{}` + `{}`", left_type, right_type),
 			},
-			src: Some(*span),
+			span: Some(*span),
 		}),
 	}
 }
@@ -68,7 +68,7 @@ fn sub(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 			kind: ErrorKind::InvalidType {
 				msg: format!("`{}` - `{}`", left.get_type(), right.get_type()),
 			},
-			src: Some(*span),
+			span: Some(*span),
 		}),
 	}
 }
@@ -80,7 +80,7 @@ fn mul(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 			kind: ErrorKind::InvalidType {
 				msg: format!("`{}` * `{}`", left.get_type(), right.get_type()),
 			},
-			src: Some(*span),
+			span: Some(*span),
 		}),
 	}
 }
@@ -91,7 +91,7 @@ fn div(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 			if *n2 == 0.0 {
 				return Err(Error {
 					kind: ErrorKind::DivisionByZero,
-					src: Some(*span),
+					span: Some(*span),
 				});
 			}
 			Ok(Value::Number(*n1 / *n2))
@@ -100,7 +100,7 @@ fn div(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 			kind: ErrorKind::InvalidType {
 				msg: format!("`{}` / `{}`", left.get_type(), right.get_type()),
 			},
-			src: Some(*span),
+			span: Some(*span),
 		}),
 	}
 }
@@ -111,7 +111,7 @@ fn mod_(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 			if *n2 == 0.0 {
 				return Err(Error {
 					kind: ErrorKind::DivisionByZero,
-					src: Some(*span),
+					span: Some(*span),
 				});
 			}
 			Ok(Value::Number(*n1 % *n2))
@@ -120,7 +120,7 @@ fn mod_(left: &Value, right: &Value, span: &Span) -> Result<Value, Error> {
 			kind: ErrorKind::InvalidType {
 				msg: format!("`{}` % `{}`", left.get_type(), right.get_type()),
 			},
-			src: Some(*span),
+			span: Some(*span),
 		}),
 	}
 }

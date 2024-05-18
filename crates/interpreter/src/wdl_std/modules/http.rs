@@ -94,7 +94,7 @@ fn parse_url(url: &str, src: Span) -> Result<Url, Error> {
 		Err(err) => {
 			return Err(Error {
 				kind: ErrorKind::Fatal(err.to_string()),
-				src: Some(src),
+				span: Some(src),
 			});
 		}
 	};
@@ -113,7 +113,7 @@ fn parse_url(url: &str, src: Span) -> Result<Url, Error> {
 					"Only requests to `dummyjson.com` are allowed on this playground! For example `https://dummyjson.com/products/1`"
 						.to_owned(),
 				),
-				src: Some(src),
+				span: Some(src),
 			});
 		}
 	}

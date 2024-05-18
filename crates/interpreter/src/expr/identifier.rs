@@ -23,7 +23,7 @@ pub async fn interpret_identifier(
 			kind: ErrorKind::VariableNotFound {
 				id: expr.val.clone(),
 			},
-			src: Some(expr.span),
+			span: Some(expr.span),
 		})
 	}
 }

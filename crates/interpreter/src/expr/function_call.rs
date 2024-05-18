@@ -25,7 +25,7 @@ pub async fn interpret_function_call(
 				kind: ErrorKind::InvalidType {
 					msg: format!("`{}`()", v.get_type()),
 				},
-				src: Some(*expr.val.function.get_span()),
+				span: Some(*expr.val.function.get_span()),
 			});
 		}
 	};
@@ -97,7 +97,7 @@ pub async fn run_function(
 						kind: ErrorKind::MissingArgument {
 							id: id.val.id.val.clone(),
 						},
-						src: Some(fn_span),
+						span: Some(fn_span),
 					});
 				}
 			}
@@ -108,7 +108,7 @@ pub async fn run_function(
 			if let Some((id, arg)) = named_args.into_iter().next() {
 				return Err(Error {
 					kind: ErrorKind::UnknownArgument { id },
-					src: Some(arg.span),
+					span: Some(arg.span),
 				});
 			}
 
@@ -119,7 +119,7 @@ pub async fn run_function(
 						expected,
 						given: expected + rem + rem_named,
 					},
-					src: Some(fn_span),
+					span: Some(fn_span),
 				});
 			}
 

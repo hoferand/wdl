@@ -22,7 +22,7 @@ pub async fn new(Env(env): Env, buffer: Arg<f64, { id(b"buffer") }>) -> Result<C
 				"The buffer size for a channel must be >1, but `{}` given",
 				buffer.val
 			)),
-			src: Some(buffer.span),
+			span: Some(buffer.span),
 		});
 	}
 

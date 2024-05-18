@@ -213,7 +213,7 @@ pub fn convert_interpreter_error(
 	};
 
 	let pos;
-	if let Some(ref span) = error.src {
+	if let Some(ref span) = error.span {
 		pos = Some(common::Position {
 			span: *span,
 			span_str: common::create_error_location(&span.start, &span.end, src_code, target),

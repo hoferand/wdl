@@ -105,10 +105,7 @@ where
 		let json_val = match serde_json::to_value(val) {
 			Ok(val) => val,
 			Err(err) => {
-				return Err(Error {
-					kind: ErrorKind::Fatal(err.to_string()),
-					src: None,
-				});
+				return Err(Error::fatal(err.to_string()));
 			}
 		};
 
@@ -119,7 +116,7 @@ where
 					kind: ErrorKind::InvalidType {
 						msg: err.to_string(),
 					},
-					src: None,
+					span: None,
 				});
 			}
 		};

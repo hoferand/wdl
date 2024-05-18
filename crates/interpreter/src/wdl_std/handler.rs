@@ -42,7 +42,7 @@ macro_rules! impl_handler {
 							kind: ErrorKind::UnknownArgument {
 								id
 							},
-							src: Some(arg.span)
+							span: Some(arg.span)
 						});
 					}
 
@@ -52,7 +52,7 @@ macro_rules! impl_handler {
 								expected: cnt,
 								given: cnt + rem + rem_named
 							},
-							src: Some(ctx.fn_span)
+							span: Some(ctx.fn_span)
 						});
 					}
 

@@ -31,7 +31,7 @@ pub async fn interpret_offset(
 				kind: ErrorKind::InvalidType {
 					msg: format!("`{}`[`{}`]", value.get_type(), offset.get_type()),
 				},
-				src: Some(expr.span),
+				span: Some(expr.span),
 			});
 		}
 	};

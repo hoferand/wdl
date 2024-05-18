@@ -183,7 +183,7 @@ fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
 		}
 	}
 
-	if let Some(ref span) = error.src {
+	if let Some(ref span) = error.span {
 		eprintln!(
 			"{}",
 			create_error_location(&span.start, &span.end, src_code, ColorMode::ANSI)

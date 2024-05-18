@@ -30,7 +30,7 @@ fn negate(val: &Value, span: &Span) -> Result<Value, Error> {
 			kind: ErrorKind::InvalidType {
 				msg: format!("-`{}`", val.get_type()),
 			},
-			src: Some(*span),
+			span: Some(*span),
 		}),
 	}
 }
