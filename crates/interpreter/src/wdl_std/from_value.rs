@@ -2,7 +2,7 @@ use crate::{ChannelId, Error, ErrorKind, FunctionId, Value, ValueType};
 
 use super::ArgType;
 
-pub(crate) trait FromValue: Sized {
+pub trait FromValue: Sized {
 	fn from_value(val: Value) -> Result<Option<Self>, Error>;
 	fn get_type() -> ValueType;
 }

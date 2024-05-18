@@ -4,7 +4,7 @@ use crate::{Error, Value};
 
 use super::{CallContext, StdFunction};
 
-pub(crate) struct HandlerFunction<H: Clone> {
+pub struct HandlerFunction<H: Clone> {
 	pub handler: H,
 	pub call: fn(H, CallContext, bool) -> BoxFuture<'static, Result<Value, Error>>,
 }

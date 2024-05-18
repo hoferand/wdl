@@ -4,7 +4,7 @@ use crate::{ChannelId, Error, FunctionId, Value};
 
 use super::ResultType;
 
-pub(crate) trait IntoResult {
+pub trait IntoResult {
 	fn into_result(self) -> Result<Value, Error>;
 }
 

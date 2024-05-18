@@ -6,7 +6,7 @@ use crate::{Error, ErrorKind, Value};
 
 use super::{name, Arg, CallContext, Env, FromValue, Source};
 
-pub(crate) trait FromCallContext: Sized {
+pub trait FromCallContext: Sized {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error>;
 }
 

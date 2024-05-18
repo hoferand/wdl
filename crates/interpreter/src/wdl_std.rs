@@ -6,12 +6,12 @@ use crate::{
 	expression::run_function, Environment, Error, ErrorKind, FunctionId, FunctionValue, Value,
 };
 
-pub(crate) mod call_context;
-pub(crate) use call_context::*;
-pub(crate) mod modules;
-pub(crate) use modules::resolve_id;
-pub(crate) mod std_function;
-pub(crate) use std_function::StdFunction;
+pub mod call_context;
+pub use call_context::*;
+pub mod modules;
+pub use modules::resolve_id;
+pub mod std_function;
+pub use std_function::StdFunction;
 
 mod from_call_context;
 use from_call_context::FromCallContext;
