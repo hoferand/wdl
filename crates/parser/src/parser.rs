@@ -3,7 +3,7 @@ use ast::{Actions, Declaration, Node, Workflow};
 use crate::Token;
 
 pub mod parser_error;
-pub use parser_error::ParserError;
+pub use parser_error::*;
 
 mod token_stream;
 use token_stream::TokenStream;
