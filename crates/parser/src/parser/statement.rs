@@ -22,8 +22,6 @@ pub(crate) mod else_;
 pub(crate) use else_::parse_else;
 pub(crate) mod if_;
 pub(crate) use if_::parse_if;
-pub(crate) mod par;
-pub(crate) use par::parse_par;
 pub(crate) mod let_;
 pub(crate) use let_::parse_let;
 pub(crate) mod function_declaration;
@@ -70,7 +68,6 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Sp
 
 		// statements
 		TokenValue::Let => Statement::Let(parse_let(parser)?),
-		TokenValue::Par => Statement::Par(parse_par(parser)?),
 		TokenValue::If => Statement::If(parse_if(parser)?),
 		TokenValue::While => Statement::While(parse_while(parser)?),
 		TokenValue::Continue => Statement::Continue(parse_continue(parser)?),

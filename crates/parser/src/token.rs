@@ -54,7 +54,6 @@ pub enum TokenValue {
 	Actions,
 	Function,
 	Let,
-	Par,
 	LAnd, // and
 	LOr,  // or
 	If,
@@ -113,7 +112,6 @@ impl TokenValue {
 			TokenValue::Actions => "actions",
 			TokenValue::Function => "function",
 			TokenValue::Let => "let",
-			TokenValue::Par => "par",
 			TokenValue::LAnd => "and",
 			TokenValue::LOr => "or",
 			TokenValue::If => "if",

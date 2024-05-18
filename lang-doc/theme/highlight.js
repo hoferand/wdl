@@ -16,7 +16,7 @@ hljs.registerLanguage(
         keywords: {
           $pattern: e.IDENT_RE + "!?",
           keyword:
-            "if else while continue break return actions spawn par let global",
+            "if else while continue break return actions spawn let global",
           literal: "true false null",
           built_in: "any void bool number string channel Target Events NoStationLeftEvent HttpResponse"
         },

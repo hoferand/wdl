@@ -17,8 +17,6 @@ pub use actions::interpret_actions;
 pub mod block;
 pub use block::interpret_block;
 
-mod par;
-use par::interpret_par;
 mod if_;
 use if_::interpret_if;
 mod while_;
@@ -53,10 +51,6 @@ pub async fn interpret_stmt(
 		Statement::Continue(_) => interpret_continue(),
 		Statement::If(if_) => interpret_if(if_, scope, env).await,
 		Statement::Let(let_) => interpret_let(let_, scope, env).await,
-		Statement::Par(par) => {
-			interpret_par(par, scope, env).await?;
-			Ok(Interrupt::None)
-		}
 		Statement::Return(return_) => interpret_return(return_, scope, env).await,
 		Statement::Send(stmt) => interpret_send(stmt, scope, env).await,
 		Statement::While(while_) => interpret_while(while_, scope, env).await,

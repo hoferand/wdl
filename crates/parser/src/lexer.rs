@@ -382,7 +382,6 @@ impl<'c> Lexer<'c> {
 			"actions" => TokenValue::Actions,
 			"function" => TokenValue::Function,
 			"let" => TokenValue::Let,
-			"par" => TokenValue::Par,
 			"and" => TokenValue::LAnd,
 			"or" => TokenValue::LOr,
 			"if" => TokenValue::If,

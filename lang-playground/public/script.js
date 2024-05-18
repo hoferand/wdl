@@ -317,7 +317,6 @@ function define_wdl() {
 			"break",
 			"return",
 			"spawn",
-			"par",
 		],
 		keywordsOther: ["global", "function", "let", "true", "false", "null"],
 		operators: [

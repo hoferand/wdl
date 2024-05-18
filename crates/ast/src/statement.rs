@@ -10,8 +10,6 @@ pub mod global_declaration;
 pub use global_declaration::GlobalDeclaration;
 pub mod actions;
 pub use actions::Actions;
-pub mod par;
-pub use par::Par;
 pub mod if_;
 pub use if_::*;
 pub mod while_;
@@ -41,7 +39,6 @@ pub enum Statement<S: Source> {
 	Continue(Node<S, Continue>),
 	If(Node<S, If<S>>),
 	Let(Node<S, Let<S>>),
-	Par(Node<S, Par<S>>),
 	Return(Node<S, Return<S>>),
 	Send(Node<S, Send<S>>),
 	While(Node<S, While<S>>),
@@ -57,7 +54,6 @@ impl<S: Source> Statement<S> {
 			Statement::Continue(stmt) => &stmt.src,
 			Statement::If(stmt) => &stmt.src,
 			Statement::Let(stmt) => &stmt.src,
-			Statement::Par(stmt) => &stmt.src,
 			Statement::Return(stmt) => &stmt.src,
 			Statement::Send(stmt) => &stmt.src,
 			Statement::While(stmt) => &stmt.src,
@@ -73,7 +69,6 @@ impl<S: Source> Statement<S> {
 			Statement::Continue(_) => "continue",
 			Statement::If(_) => "if",
 			Statement::Let(_) => "let",
-			Statement::Par(_) => "par",
 			Statement::Return(_) => "return",
 			Statement::Send(_) => "send",
 			Statement::While(_) => "while",

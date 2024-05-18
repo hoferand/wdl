@@ -54,7 +54,7 @@
 			"patterns": [
 				{
 					"name": "keyword.control.wdl",
-					"match": "\\b(if|else|while|continue|break|return|actions|spawn|par)\\b"
+					"match": "\\b(if|else|while|continue|break|return|actions|spawn)\\b"
 				},
 				{
 					"name": "keyword.other.wdl",
