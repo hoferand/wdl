@@ -6,7 +6,7 @@ use ast::{Actions, Node};
 
 use crate::{Environment, Error, Scope};
 
-use super::interpret_block;
+use crate::statement::interpret_block;
 
 #[async_recursion]
 pub async fn interpret_actions(

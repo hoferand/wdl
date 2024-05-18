@@ -33,7 +33,7 @@ mod spawn;
 use spawn::interpret_spawn;
 
 #[async_recursion]
-pub async fn interpret_expr(
+pub async fn interpret_expression(
 	expr: &Expression,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,

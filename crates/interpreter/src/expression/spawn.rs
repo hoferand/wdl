@@ -6,7 +6,7 @@ use ast::{Node, Spawn};
 
 use crate::{Environment, Error, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_spawn(
@@ -22,7 +22,7 @@ pub async fn interpret_spawn(
 	let env_async = env.clone();
 
 	let handle = tokio::spawn(async move {
-		match interpret_expr(&expr_async, &scope_async, &env_async).await {
+		match interpret_expression(&expr_async, &scope_async, &env_async).await {
 			Ok(value) => ch_async.send(value).await,
 			Err(err) => {
 				env_async.send_error(err.clone()).await;

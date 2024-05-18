@@ -6,7 +6,7 @@ use ast::{Member, Node};
 
 use crate::{Environment, Error, ErrorKind, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_member(
@@ -14,7 +14,7 @@ pub async fn interpret_member(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let value = interpret_expr(&expr.val.object, scope, env).await?;
+	let value = interpret_expression(&expr.val.object, scope, env).await?;
 
 	let id = &expr.val.member;
 

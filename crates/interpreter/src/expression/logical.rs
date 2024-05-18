@@ -6,7 +6,7 @@ use ast::{Logic, LogicOperator, Node};
 
 use crate::{Environment, Error, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_logical(
@@ -14,12 +14,12 @@ pub async fn interpret_logical(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let left = interpret_expr(&expr.val.left, scope, env).await?;
+	let left = interpret_expression(&expr.val.left, scope, env).await?;
 
 	// short circuit evaluation
 	match (left.boolify(), &expr.val.op.val) {
 		(false, LogicOperator::And) => Ok(Value::Bool(false)),
 		(true, LogicOperator::Or) => Ok(Value::Bool(true)),
-		_ => interpret_expr(&expr.val.right, scope, env).await,
+		_ => interpret_expression(&expr.val.right, scope, env).await,
 	}
 }

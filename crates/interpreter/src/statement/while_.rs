@@ -6,7 +6,7 @@ use ast::{Node, While};
 
 use crate::{Environment, Error, Interrupt, Scope};
 
-use super::{interpret_block, interpret_expr};
+use super::{interpret_block, interpret_expression};
 
 #[async_recursion]
 pub async fn interpret_while(
@@ -14,7 +14,7 @@ pub async fn interpret_while(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
-	while interpret_expr(&while_.val.condition, scope, env)
+	while interpret_expression(&while_.val.condition, scope, env)
 		.await?
 		.boolify()
 	{

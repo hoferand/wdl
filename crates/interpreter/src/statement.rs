@@ -6,14 +6,8 @@ use ast::Statement;
 
 use crate::{Environment, Error, Interrupt, Scope};
 
-use super::expr::interpret_expr;
+use super::expression::interpret_expression;
 
-pub mod global_declaration;
-pub use global_declaration::interpret_global_declaration;
-pub mod function_declaration;
-pub use function_declaration::interpret_function_declaration;
-pub mod actions;
-pub use actions::interpret_actions;
 pub mod block;
 pub use block::interpret_block;
 
@@ -35,7 +29,7 @@ mod send;
 use send::interpret_send;
 
 #[async_recursion]
-pub async fn interpret_stmt(
+pub async fn interpret_statement(
 	stmt: &Statement,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
@@ -43,7 +37,7 @@ pub async fn interpret_stmt(
 	match stmt {
 		Statement::Assignment(stmt) => interpret_assignment(stmt, scope, env).await,
 		Statement::Expression(expr) => {
-			interpret_expr(expr, scope, env).await?;
+			interpret_expression(expr, scope, env).await?;
 			Ok(Interrupt::None)
 		}
 		Statement::Block(block) => interpret_block(block, scope, env).await,

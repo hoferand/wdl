@@ -6,7 +6,7 @@ use ast::{Array, Node};
 
 use crate::{Environment, Error, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_array(
@@ -17,7 +17,7 @@ pub async fn interpret_array(
 	let mut values = Vec::new();
 
 	for val_expr in &expr.val.values {
-		values.push(interpret_expr(val_expr, scope, env).await?);
+		values.push(interpret_expression(val_expr, scope, env).await?);
 	}
 
 	Ok(Value::Array(values))

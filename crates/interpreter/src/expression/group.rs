@@ -6,7 +6,7 @@ use ast::{Group, Node};
 
 use crate::{Environment, Error, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_group(
@@ -14,5 +14,5 @@ pub async fn interpret_group(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	interpret_expr(&expr.val.expression, scope, env).await
+	interpret_expression(&expr.val.expression, scope, env).await
 }

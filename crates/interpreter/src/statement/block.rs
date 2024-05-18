@@ -6,7 +6,7 @@ use ast::{Block, Node};
 
 use crate::{Environment, Error, Interrupt, Scope};
 
-use super::interpret_stmt;
+use super::interpret_statement;
 
 #[async_recursion]
 pub async fn interpret_block(
@@ -17,7 +17,7 @@ pub async fn interpret_block(
 	let inner_scope = Arc::new(Scope::with_parent(Arc::clone(scope)));
 
 	for stmt in &stmt.val.stmts {
-		let ret = interpret_stmt(stmt, &inner_scope, env).await?;
+		let ret = interpret_statement(stmt, &inner_scope, env).await?;
 		if !ret.is_none() {
 			return Ok(ret);
 		}

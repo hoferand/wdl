@@ -6,7 +6,7 @@ use ast::{Node, Return};
 
 use crate::{Environment, Error, Interrupt, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_return(
@@ -15,7 +15,7 @@ pub async fn interpret_return(
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
 	let val = if let Some(ret_expr) = &stmt.val.value {
-		interpret_expr(ret_expr, scope, env).await?
+		interpret_expression(ret_expr, scope, env).await?
 	} else {
 		Value::Null
 	};

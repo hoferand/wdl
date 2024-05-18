@@ -6,7 +6,7 @@ use ast::{Node, Send};
 
 use crate::{Environment, Error, Interrupt, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_send(
@@ -14,13 +14,13 @@ pub async fn interpret_send(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
-	match interpret_expr(&expr.val.ch, scope, env).await? {
+	match interpret_expression(&expr.val.ch, scope, env).await? {
 		// TODO: improve error messages
 		Value::Channel(ch_id) => {
 			let Some(ch) = env.get_ch(&ch_id).await else {
 				return Err(Error::fatal(format!("Channel `{}` not found", ch_id.id)));
 			};
-			let value = interpret_expr(&expr.val.value, scope, env).await?;
+			let value = interpret_expression(&expr.val.value, scope, env).await?;
 			if ch.send(value).await.is_none() {
 				Err(Error::fatal("Cannot send on closed channel".to_owned()))
 			} else {

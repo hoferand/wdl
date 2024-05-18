@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Global, Node};
 
-use crate::{expr::interpret_expr, Environment, Error, Interrupt, Value};
+use crate::{expression::interpret_expression, Environment, Error, Interrupt, Value};
 
 #[async_recursion]
 pub async fn interpret_global_declaration(
@@ -18,7 +18,7 @@ pub async fn interpret_global_declaration(
 	if let Some(val) = input_value {
 		value = val;
 	} else if let Some(expr) = &stmt.val.value {
-		value = interpret_expr(expr, &env.global_scope, env).await?;
+		value = interpret_expression(expr, &env.global_scope, env).await?;
 	} else {
 		return Err(Error::fatal(format!(
 			"Missing value for global variable `{}`",

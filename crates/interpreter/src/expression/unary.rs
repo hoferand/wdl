@@ -6,7 +6,7 @@ use ast::{Node, Span, Unary, UnaryOperator};
 
 use crate::{Environment, Error, ErrorKind, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_unary(
@@ -14,7 +14,7 @@ pub async fn interpret_unary(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let right = interpret_expr(&expr.val.right, scope, env).await?;
+	let right = interpret_expression(&expr.val.right, scope, env).await?;
 
 	match expr.val.op.val {
 		UnaryOperator::Negate => negate(&right, &expr.span),

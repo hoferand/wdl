@@ -6,7 +6,7 @@ use ast::{Node, Offset};
 
 use crate::{Environment, Error, ErrorKind, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_offset(
@@ -14,9 +14,9 @@ pub async fn interpret_offset(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let value = interpret_expr(&expr.val.value, scope, env).await?;
+	let value = interpret_expression(&expr.val.value, scope, env).await?;
 
-	let offset = interpret_expr(&expr.val.offset, scope, env).await?;
+	let offset = interpret_expression(&expr.val.offset, scope, env).await?;
 
 	let val = match (&value, &offset) {
 		(Value::Array(a), Value::Number(n)) => a.get(*n as usize).unwrap_or(&Value::Null).clone(), // TODO: fix cast

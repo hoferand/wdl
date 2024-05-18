@@ -5,12 +5,12 @@ use async_recursion::async_recursion;
 use ast::{Call, Identifier, Node, Span};
 
 use crate::{
-	stmt,
+	statement,
 	wdl_std::{ArgumentValue, CallContext},
 	Environment, Error, ErrorKind, FunctionId, FunctionValue, Interrupt, Scope, Value,
 };
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_function_call(
@@ -18,7 +18,7 @@ pub async fn interpret_function_call(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
-	let function_id = match interpret_expr(&expr.val.function, scope, env).await? {
+	let function_id = match interpret_expression(&expr.val.function, scope, env).await? {
 		Value::Function(f) => f,
 		v => {
 			return Err(Error {
@@ -33,7 +33,7 @@ pub async fn interpret_function_call(
 	let mut args = Vec::new();
 	let mut named_args = HashMap::new();
 	for (idx, arg) in expr.val.args.iter().enumerate() {
-		let val = interpret_expr(&arg.val.val, scope, env).await?;
+		let val = interpret_expression(&arg.val.val, scope, env).await?;
 
 		if let Some(id) = &arg.val.id {
 			named_args.insert(
@@ -123,7 +123,7 @@ pub async fn run_function(
 				});
 			}
 
-			match stmt::interpret_block(&function.body, &inner_scope, env).await? {
+			match statement::interpret_block(&function.body, &inner_scope, env).await? {
 				Interrupt::None => val = Value::Null,
 				Interrupt::Return(ret_val) => val = ret_val,
 				int @ (Interrupt::Continue | Interrupt::Break) => {

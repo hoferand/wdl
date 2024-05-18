@@ -6,7 +6,7 @@ use ast::{Node, Object};
 
 use crate::{Environment, Error, Scope, Value};
 
-use super::interpret_expr;
+use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_object(
@@ -17,7 +17,7 @@ pub async fn interpret_object(
 	let mut values = HashMap::new();
 
 	for (key, val_expr) in &expr.val.values {
-		values.insert(key.to_owned(), interpret_expr(val_expr, scope, env).await?);
+		values.insert(key.to_owned(), interpret_expression(val_expr, scope, env).await?);
 	}
 
 	Ok(Value::Object(values))

@@ -6,7 +6,7 @@ use ast::{Else, If, Node};
 
 use crate::{Environment, Error, Interrupt, Scope};
 
-use super::{interpret_block, interpret_expr};
+use super::{interpret_block, interpret_expression};
 
 #[async_recursion]
 pub async fn interpret_if(
@@ -14,7 +14,7 @@ pub async fn interpret_if(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
-	if interpret_expr(&stmt.val.condition, scope, env)
+	if interpret_expression(&stmt.val.condition, scope, env)
 		.await?
 		.boolify()
 	{

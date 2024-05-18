@@ -2,7 +2,9 @@ use std::{collections::HashMap, sync::Arc};
 
 use ast::{Identifier, Span};
 
-use crate::{expr::run_function, Environment, Error, ErrorKind, FunctionId, FunctionValue, Value};
+use crate::{
+	expression::run_function, Environment, Error, ErrorKind, FunctionId, FunctionValue, Value,
+};
 
 pub(crate) mod call_context;
 pub(crate) use call_context::*;
