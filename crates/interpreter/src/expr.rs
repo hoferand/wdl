@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Expression, Span};
+use ast::Expression;
 
 use crate::{scope::Scope, Environment, Error, Value};
 
@@ -34,18 +34,18 @@ use spawn::interpret_spawn;
 
 #[async_recursion]
 pub async fn interpret_expr(
-	expr: &Expression<Span>,
+	expr: &Expression,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	match expr {
 		Expression::Array(expr) => interpret_array(expr, scope, env).await,
 		Expression::Binary(expr) => interpret_binary(expr, scope, env).await,
-		Expression::FunctionCall(expr) => interpret_function_call(expr, scope, env).await,
+		Expression::Call(expr) => interpret_function_call(expr, scope, env).await,
 		Expression::Group(expr) => interpret_group(expr, scope, env).await,
-		Expression::Identifier(expr) => interpret_identifier(expr, scope).await,
+		Expression::Variable(expr) => interpret_identifier(expr, scope).await,
 		Expression::Literal(expr) => interpret_literal(expr),
-		Expression::Logical(expr) => interpret_logical(expr, scope, env).await,
+		Expression::Logic(expr) => interpret_logical(expr, scope, env).await,
 		Expression::Member(expr) => interpret_member(expr, scope, env).await,
 		Expression::Object(expr) => interpret_object(expr, scope, env).await,
 		Expression::Offset(expr) => interpret_offset(expr, scope, env).await,

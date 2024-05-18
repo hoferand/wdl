@@ -2,7 +2,7 @@ use ast::{Identifier, Let, Node, Span};
 
 use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Span, Let<Span>>, ParserError> {
+pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Let>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Let)?.span.start;
 
 	let Some(id_token) = parser.tokens.next().cloned() else {
@@ -24,12 +24,12 @@ pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Span, Let<Span>>, Pa
 	let end = parser.tokens.expect(TokenValue::Semicolon)?.span.end;
 
 	let id_node = Node {
-		src: Span { start, end },
+		span: Span { start, end },
 		val: Identifier { id: id.to_owned() },
 	};
 
 	Ok(Node {
-		src: Span { start, end },
+		span: Span { start, end },
 		val: Let { id: id_node, value },
 	})
 }

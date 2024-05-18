@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Array, Node, Span};
+use ast::{Array, Node};
 
 use crate::{Environment, Error, Scope, Value};
 
@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_array(
-	expr: &Node<Span, Array<Span>>,
+	expr: &Node<Array>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {

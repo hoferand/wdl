@@ -4,7 +4,7 @@ use crate::{Expression, Identifier, Node};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct Let {
+pub struct Global {
 	pub id: Node<Identifier>,
-	pub value: Expression,
+	pub value: Option<Expression>,
 }

@@ -1,25 +1,25 @@
-use ast::{Expression, Logical, LogicalOperator, Node, Span};
+use ast::{Expression, Logic, LogicOperator, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
 use super::parse_and;
 
-pub(crate) fn parse_or(parser: &mut Parser) -> Result<Expression<Span>, ParserError> {
+pub(crate) fn parse_or(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_and(parser)?;
 
 	while let Some(op) = parser.tokens.want(TokenValue::LOr).cloned() {
 		let right = parse_and(parser)?;
 
-		left = Expression::Logical(Node {
-			src: Span {
-				start: left.get_src().start,
-				end: right.get_src().end,
+		left = Expression::Logic(Node {
+			span: Span {
+				start: left.get_span().start,
+				end: right.get_span().end,
 			},
-			val: Logical {
+			val: Logic {
 				left: Box::new(left),
 				op: Node {
-					src: op.span,
-					val: LogicalOperator::Or,
+					span: op.span,
+					val: LogicOperator::Or,
 				},
 				right: Box::new(right),
 			},

@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{FunctionDeclaration, Node, Span};
+use ast::{Function, Node};
 
 use crate::{Environment, Error, FunctionValue, Interrupt};
 
 #[async_recursion]
 pub async fn interpret_function_declaration(
-	stmt: &Node<Span, FunctionDeclaration<Span>>,
+	stmt: &Node<Function>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
 	env.declare_fn(

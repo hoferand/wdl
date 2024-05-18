@@ -4,14 +4,14 @@ use crate::{Parser, ParserError};
 
 use super::parse_null_coalescing;
 
-pub(crate) fn parse_unary(parser: &mut Parser) -> Result<Expression<Span>, ParserError> {
+pub(crate) fn parse_unary(parser: &mut Parser) -> Result<Expression, ParserError> {
 	if let Some(op) = parser.tokens.next_unary_op() {
 		let value = parse_unary(parser)?;
 
 		Ok(Expression::Unary(Node {
-			src: Span {
-				start: op.src.start,
-				end: value.get_src().end,
+			span: Span {
+				start: op.span.start,
+				end: value.get_span().end,
 			},
 			val: Unary {
 				op,

@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Let, Node, Span};
+use ast::{Let, Node};
 
 use crate::{expr::interpret_expr, Environment, Error, Interrupt, Scope};
 
 #[async_recursion]
 pub async fn interpret_let(
-	stmt: &Node<Span, Let<Span>>,
+	stmt: &Node<Let>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {

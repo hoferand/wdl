@@ -1,4 +1,4 @@
-use ast::{Span, Workflow};
+use ast::Workflow;
 
 pub mod lexer;
 pub use lexer::*;
@@ -10,7 +10,7 @@ pub use error::Error;
 mod token;
 use token::*;
 
-pub fn get_ast(src_code: &str) -> Result<Workflow<Span>, Error> {
+pub fn get_ast(src_code: &str) -> Result<Workflow, Error> {
 	let lexer = Lexer::new(src_code);
 	let tokens = lexer.get_tokens()?;
 

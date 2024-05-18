@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_binary(
-	expr: &Node<Span, Binary<Span>>,
+	expr: &Node<Binary>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
@@ -22,11 +22,11 @@ pub async fn interpret_binary(
 	let right = interpret_expr(&expr.val.right, scope, env).await?;
 
 	match expr.val.op.val {
-		BinaryOperator::Add => add(left, right, &expr.src),
-		BinaryOperator::Subtract => sub(&left, &right, &expr.src),
-		BinaryOperator::Multiply => mul(&left, &right, &expr.src),
-		BinaryOperator::Divide => div(&left, &right, &expr.src),
-		BinaryOperator::Modulo => mod_(&left, &right, &expr.src),
+		BinaryOperator::Add => add(left, right, &expr.span),
+		BinaryOperator::Subtract => sub(&left, &right, &expr.span),
+		BinaryOperator::Multiply => mul(&left, &right, &expr.span),
+		BinaryOperator::Divide => div(&left, &right, &expr.span),
+		BinaryOperator::Modulo => mod_(&left, &right, &expr.span),
 		BinaryOperator::Equal => Ok(Value::Bool(left == right)),
 		BinaryOperator::NotEqual => Ok(Value::Bool(left != right)),
 		BinaryOperator::Less => Ok(Value::Bool(left < right)),

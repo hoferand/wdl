@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Node, Offset, Span};
+use ast::{Node, Offset};
 
 use crate::{Environment, Error, ErrorKind, Scope, Value};
 
@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_offset(
-	expr: &Node<Span, Offset<Span>>,
+	expr: &Node<Offset>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
@@ -31,7 +31,7 @@ pub async fn interpret_offset(
 				kind: ErrorKind::InvalidType {
 					msg: format!("`{}`[`{}`]", value.get_type(), offset.get_type()),
 				},
-				src: Some(expr.src),
+				src: Some(expr.span),
 			});
 		}
 	};

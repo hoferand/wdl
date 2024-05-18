@@ -4,7 +4,7 @@ use crate::{Parser, ParserError, Token, TokenValue};
 
 use super::parse_statement;
 
-pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Span, Block<Span>>, ParserError> {
+pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Block>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::CurlyOpen)?.span.start;
 
 	let mut stmts = Vec::new();
@@ -29,7 +29,7 @@ pub(crate) fn parse_block(parser: &mut Parser) -> Result<Node<Span, Block<Span>>
 	let end = parser.tokens.expect(TokenValue::CurlyClose)?.span.end;
 
 	Ok(Node {
-		src: Span { start, end },
+		span: Span { start, end },
 		val: Block { stmts },
 	})
 }

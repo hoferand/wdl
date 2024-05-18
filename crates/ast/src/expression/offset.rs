@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Source};
+use crate::Expression;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct Offset<S: Source> {
-	pub value: Box<Expression<S>>,
-	pub offset: Box<Expression<S>>,
+pub struct Offset {
+	pub value: Box<Expression>,
+	pub offset: Box<Expression>,
 }

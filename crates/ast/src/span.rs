@@ -1,13 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Location, Source};
+use crate::Location;
 
-/// column of end is not inclusive
+/// `column` of `end` is exclusive
 #[derive(Debug, Clone, Default, Serialize, Deserialize, Copy)]
 #[serde(tag = "type")]
 pub struct Span {
 	pub start: Location,
 	pub end: Location,
 }
-
-impl Source for Span {}

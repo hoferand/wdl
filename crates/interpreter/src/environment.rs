@@ -12,7 +12,7 @@ use tokio::{
 	task::JoinHandle,
 };
 
-use ast::{Identifier, Node, Span};
+use ast::{Identifier, Node};
 use router::{RouterClient, RouterClientGrpc, RouterClientWs};
 
 use crate::{
@@ -80,11 +80,7 @@ impl Environment {
 		}
 	}
 
-	pub async fn declare_fn(
-		&self,
-		id: Node<Span, Identifier>,
-		val: FunctionValue,
-	) -> Result<(), Error> {
+	pub async fn declare_fn(&self, id: Node<Identifier>, val: FunctionValue) -> Result<(), Error> {
 		self.global_scope
 			.declare(id.clone(), Value::Function(id.val.clone().into()))
 			.await?;
@@ -93,7 +89,7 @@ impl Environment {
 		if lock.contains_key(&id.val) {
 			return Err(Error {
 				kind: ErrorKind::VariableAlreadyInUse { id: id.val },
-				src: Some(id.src),
+				src: Some(id.span),
 			});
 		}
 		lock.insert(id.val, val);

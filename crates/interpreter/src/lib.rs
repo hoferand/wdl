@@ -6,7 +6,7 @@ use tokio::{
 	sync::mpsc::{self, Sender},
 };
 
-use ast::{Identifier, Span, Workflow};
+use ast::{Identifier, Workflow};
 
 pub mod order;
 pub use order::Order;
@@ -33,7 +33,7 @@ mod stmt;
 mod wdl_std;
 
 pub async fn start_workflow(
-	ast: Workflow<Span>,
+	ast: Workflow,
 	vars: HashMap<Identifier, Value>,
 	router: Router,
 	user_log_ch: Sender<UserLog>,

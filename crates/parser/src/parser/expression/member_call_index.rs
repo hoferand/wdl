@@ -1,12 +1,10 @@
-use ast::{Argument, Expression, FunctionCall, Member, Node, Offset, Span};
+use ast::{Argument, Call, Expression, Member, Node, Offset, Span};
 
 use crate::{parser::identifier::parse_identifier, Parser, ParserError, TokenValue};
 
 use super::{parse_atomic, parse_expression};
 
-pub(crate) fn parse_member_call_index(
-	parser: &mut Parser,
-) -> Result<Expression<Span>, ParserError> {
+pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut expr = parse_atomic(parser)?;
 
 	let mut named = false;
@@ -24,14 +22,14 @@ pub(crate) fn parse_member_call_index(
 				if let Some(token) = parser.tokens.want(TokenValue::Colon).cloned() {
 					named = true;
 					let val = parse_expression(parser)?;
-					if let Expression::Identifier(id) = id {
+					if let Expression::Variable(id) = id {
 						if !id.val.scope.is_empty() {
 							return Err(ParserError::Positional {
 								msg: format!(
 									"Cannot use scoped identifier `{}` as named argument",
 									id.val
 								),
-								span: id.src,
+								span: id.span,
 							});
 						}
 
@@ -42,21 +40,21 @@ pub(crate) fn parse_member_call_index(
 									id.val.id.val
 								),
 								span: Span {
-									start: id.src.start,
-									end: val.get_src().end,
+									start: id.span.start,
+									end: val.get_span().end,
 								},
 							});
 						}
 						names.push(id.val.id.val.clone());
 
 						args.push(Node {
-							src: Span {
-								start: id.src.start,
-								end: val.get_src().end,
+							span: Span {
+								start: id.span.start,
+								end: val.get_span().end,
 							},
 							val: Argument {
 								id: Some(Node {
-									src: id.val.id.src,
+									span: id.val.id.span,
 									val: id.val.id.val,
 								}),
 								val,
@@ -71,14 +69,14 @@ pub(crate) fn parse_member_call_index(
 					}
 				} else if !named {
 					args.push(Node {
-						src: *id.get_src(),
+						span: *id.get_span(),
 						val: Argument { id: None, val: id },
 					});
 				} else {
 					return Err(ParserError::Positional {
 						msg: "Positional arguments are not allowed after named arguments"
 							.to_owned(),
-						span: *id.get_src(),
+						span: *id.get_span(),
 					});
 				}
 
@@ -89,12 +87,12 @@ pub(crate) fn parse_member_call_index(
 
 			let end = parser.tokens.expect(TokenValue::ParenClose)?.span.end;
 
-			expr = Expression::FunctionCall(Node {
-				src: Span {
-					start: expr.get_src().start,
+			expr = Expression::Call(Node {
+				span: Span {
+					start: expr.get_span().start,
 					end,
 				},
-				val: FunctionCall {
+				val: Call {
 					function: Box::new(expr),
 					args,
 				},
@@ -108,7 +106,7 @@ pub(crate) fn parse_member_call_index(
 			let end = parser.tokens.expect(TokenValue::BracketClose)?.span.end;
 
 			expr = Expression::Offset(Node {
-				src: Span { start, end },
+				span: Span { start, end },
 				val: Offset {
 					value: Box::new(expr),
 					offset: Box::new(offset),
@@ -121,9 +119,9 @@ pub(crate) fn parse_member_call_index(
 			let id = parse_identifier(parser)?;
 
 			expr = Expression::Member(Node {
-				src: Span {
+				span: Span {
 					start,
-					end: id.src.end,
+					end: id.span.end,
 				},
 				val: Member {
 					object: Box::new(expr),

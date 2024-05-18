@@ -1,15 +1,15 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Identifier, Node, Source};
+use crate::{Identifier, Node};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct ScopedIdentifier<S: Source> {
-	pub id: Node<S, Identifier>,
-	pub scope: Vec<Node<S, Identifier>>,
+pub struct Variable {
+	pub id: Node<Identifier>,
+	pub scope: Vec<Node<Identifier>>,
 }
 
-impl<S: Source> std::fmt::Display for ScopedIdentifier<S> {
+impl std::fmt::Display for Variable {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		write!(
 			f,

@@ -1,12 +1,10 @@
-use ast::{function::FormalParameter, Function, Node, Span};
+use ast::{function::FormalParameter, FunctionBody, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
 use super::{identifier::parse_identifier, statement::parse_block};
 
-pub(crate) fn parse_function(
-	parser: &mut Parser,
-) -> Result<Node<Span, Function<Span>>, ParserError> {
+pub(crate) fn parse_function(parser: &mut Parser) -> Result<Node<FunctionBody>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::ParenOpen)?.span.start;
 
 	// parse parameter
@@ -17,7 +15,7 @@ pub(crate) fn parse_function(
 		}
 		let id = parse_identifier(parser)?;
 		parameter.push(Node {
-			src: id.src,
+			span: id.span,
 			val: FormalParameter { id },
 		});
 		parser.tokens.want(TokenValue::Comma);
@@ -31,10 +29,10 @@ pub(crate) fn parse_function(
 	parser.state.in_function -= 1;
 
 	Ok(Node {
-		src: Span {
+		span: Span {
 			start,
-			end: body.src.end,
+			end: body.span.end,
 		},
-		val: Function { parameter, body },
+		val: FunctionBody { parameter, body },
 	})
 }

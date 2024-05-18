@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use async_recursion::async_recursion;
 
-use ast::{FunctionCall, Identifier, Node, Span};
+use ast::{Call, Identifier, Node, Span};
 
 use crate::{
 	stmt,
@@ -14,7 +14,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_function_call(
-	expr: &Node<Span, FunctionCall<Span>>,
+	expr: &Node<Call>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
@@ -25,7 +25,7 @@ pub async fn interpret_function_call(
 				kind: ErrorKind::InvalidType {
 					msg: format!("`{}`()", v.get_type()),
 				},
-				src: Some(*expr.val.function.get_src()),
+				src: Some(*expr.val.function.get_span()),
 			});
 		}
 	};
@@ -40,14 +40,14 @@ pub async fn interpret_function_call(
 				id.val.clone(),
 				ArgumentValue {
 					idx: idx + 1,
-					span: arg.src,
+					span: arg.span,
 					val,
 				},
 			);
 		} else {
 			args.push(ArgumentValue {
 				idx: idx + 1,
-				span: *arg.val.val.get_src(),
+				span: *arg.val.val.get_span(),
 				val,
 			});
 		}
@@ -55,7 +55,7 @@ pub async fn interpret_function_call(
 
 	run_function(
 		&function_id,
-		*expr.val.function.get_src(),
+		*expr.val.function.get_span(),
 		args,
 		named_args,
 		true,

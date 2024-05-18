@@ -2,12 +2,12 @@ use std::fmt::Debug;
 
 use serde::{Deserialize, Serialize};
 
-use crate::Source;
+use crate::Span;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct Node<S: Source, V: Debug + Clone> {
-	// TODO: add Serialize + Deserialize bound to S and V
-	pub src: S,
+pub struct Node<V: Debug + Clone> {
+	// TODO: add Serialize + Deserialize bound to V
+	pub span: Span,
 	pub val: V,
 }

@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Identifier, Node, Source};
+use crate::{Expression, Identifier, Node};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct Assignment<S: Source> {
-	pub id: Node<S, Identifier>,
-	pub value: Box<Expression<S>>,
+pub struct Assignment {
+	pub id: Node<Identifier>,
+	pub value: Expression,
 }

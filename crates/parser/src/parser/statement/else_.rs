@@ -4,7 +4,7 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::{parse_block, parse_if};
 
-pub(crate) fn parse_else(parser: &mut Parser) -> Result<Node<Span, Else<Span>>, ParserError> {
+pub(crate) fn parse_else(parser: &mut Parser) -> Result<Node<Else>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Else)?.span.start;
 
 	let Some(peek) = parser.tokens.peek() else {
@@ -14,9 +14,9 @@ pub(crate) fn parse_else(parser: &mut Parser) -> Result<Node<Span, Else<Span>>, 
 	if peek.value == TokenValue::CurlyOpen {
 		let block = parse_block(parser)?;
 		Ok(Node {
-			src: Span {
+			span: Span {
 				start,
-				end: block.src.end,
+				end: block.span.end,
 			},
 			val: Else::Else(block),
 		})
@@ -24,9 +24,9 @@ pub(crate) fn parse_else(parser: &mut Parser) -> Result<Node<Span, Else<Span>>, 
 		let if_ = parse_if(parser)?;
 
 		Ok(Node {
-			src: Span {
+			span: Span {
 				start,
-				end: if_.src.end,
+				end: if_.span.end,
 			},
 			val: Else::ElseIf(if_),
 		})

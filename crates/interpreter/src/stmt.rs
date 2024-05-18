@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Span, Statement};
+use ast::Statement;
 
 use crate::{Environment, Error, Interrupt, Scope};
 
@@ -36,7 +36,7 @@ use send::interpret_send;
 
 #[async_recursion]
 pub async fn interpret_stmt(
-	stmt: &Statement<Span>,
+	stmt: &Statement,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {

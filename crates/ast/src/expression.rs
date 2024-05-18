@@ -1,64 +1,82 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Node, Source};
+use crate::{Node, Span};
 
-pub mod literal;
-pub use literal::Literal;
+pub mod array;
+pub use array::*;
 pub mod binary;
 pub use binary::*;
-pub mod logical;
-pub use logical::*;
+pub mod call;
+pub use call::*;
+pub mod group;
+pub use group::*;
+pub mod literal;
+pub use literal::*;
+pub mod logic;
+pub use logic::*;
+pub mod member;
+pub use member::*;
+pub mod object;
+pub use object::*;
+pub mod offset;
+pub use offset::*;
+pub mod spawn;
+pub use spawn::*;
 pub mod unary;
 pub use unary::*;
-pub mod function_call;
-pub use function_call::FunctionCall;
-pub mod member;
-pub use member::Member;
-pub mod object;
-pub use object::Object;
-pub mod group;
-pub use group::Group;
-pub mod array;
-pub use array::Array;
-pub mod offset;
-pub use offset::Offset;
-pub mod scoped_identifier;
-pub use scoped_identifier::ScopedIdentifier;
-pub mod spawn;
-pub use spawn::Spawn;
+pub mod variable;
+pub use variable::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum Expression<S: Source> {
-	Array(Node<S, Array<S>>),
-	Binary(Node<S, Binary<S>>),
-	FunctionCall(Node<S, FunctionCall<S>>),
-	Group(Node<S, Group<S>>),
-	Identifier(Node<S, ScopedIdentifier<S>>),
-	Literal(Node<S, Literal>),
-	Logical(Node<S, Logical<S>>),
-	Member(Node<S, Member<S>>),
-	Object(Node<S, Object<S>>),
-	Offset(Node<S, Offset<S>>),
-	Spawn(Node<S, Spawn<S>>),
-	Unary(Node<S, Unary<S>>),
+pub enum Expression {
+	Array(Node<Array>),
+	Binary(Node<Binary>),
+	Call(Node<Call>),
+	Group(Node<Group>),
+	Literal(Node<Literal>),
+	Logic(Node<Logic>),
+	Member(Node<Member>),
+	Object(Node<Object>),
+	Offset(Node<Offset>),
+	Spawn(Node<Spawn>),
+	Unary(Node<Unary>),
+	Variable(Node<Variable>),
 }
 
-impl<S: Source> Expression<S> {
-	pub fn get_src(&self) -> &S {
+impl Expression {
+	pub fn get_span(&self) -> &Span {
 		match self {
-			Self::Array(expr) => &expr.src,
-			Self::Binary(expr) => &expr.src,
-			Self::FunctionCall(expr) => &expr.src,
-			Self::Group(expr) => &expr.src,
-			Self::Identifier(expr) => &expr.src,
-			Self::Literal(expr) => &expr.src,
-			Self::Logical(expr) => &expr.src,
-			Self::Member(expr) => &expr.src,
-			Self::Object(expr) => &expr.src,
-			Self::Offset(expr) => &expr.src,
-			Self::Spawn(expr) => &expr.src,
-			Self::Unary(expr) => &expr.src,
+			Self::Array(expr) => &expr.span,
+			Self::Binary(expr) => &expr.span,
+			Self::Call(expr) => &expr.span,
+			Self::Group(expr) => &expr.span,
+			Self::Literal(expr) => &expr.span,
+			Self::Logic(expr) => &expr.span,
+			Self::Member(expr) => &expr.span,
+			Self::Object(expr) => &expr.span,
+			Self::Offset(expr) => &expr.span,
+			Self::Spawn(expr) => &expr.span,
+			Self::Unary(expr) => &expr.span,
+			Self::Variable(expr) => &expr.span,
 		}
+	}
+
+	pub fn get_type(&self) -> String {
+		match self {
+			Self::Array(_) => "array",
+			Self::Binary(_) => "binary",
+			Self::Call(_) => "call",
+			Self::Group(_) => "group",
+			Self::Literal(_) => "literal",
+			Self::Logic(_) => "logic",
+			Self::Member(_) => "member",
+			Self::Object(_) => "object",
+			Self::Offset(_) => "offset",
+			Self::Spawn(_) => "spawn",
+			Self::Unary(_) => "unary",
+			Self::Variable(_) => "variable",
+		}
+		.to_owned()
 	}
 }

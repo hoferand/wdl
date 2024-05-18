@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Node, Send, Span};
+use ast::{Node, Send};
 
 use crate::{Environment, Error, Interrupt, Scope, Value};
 
@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_send(
-	expr: &Node<Span, Send<Span>>,
+	expr: &Node<Send>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {

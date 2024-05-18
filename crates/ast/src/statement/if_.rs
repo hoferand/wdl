@@ -1,18 +1,18 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Block, Expression, Node, Source};
+use crate::{Block, Expression, Node};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct If<S: Source> {
-	pub condition: Expression<S>,
-	pub then: Node<S, Block<S>>,
-	pub else_: Option<Box<Node<S, Else<S>>>>,
+pub struct If {
+	pub condition: Expression,
+	pub then: Node<Block>,
+	pub else_: Option<Box<Node<Else>>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum Else<S: Source> {
-	Else(Node<S, Block<S>>),
-	ElseIf(Node<S, If<S>>),
+pub enum Else {
+	Else(Node<Block>),
+	ElseIf(Node<If>),
 }

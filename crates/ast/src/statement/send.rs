@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Source};
+use crate::Expression;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct Send<S: Source> {
-	pub ch: Box<Expression<S>>,
-	pub value: Box<Expression<S>>,
+pub struct Send {
+	pub ch: Expression,
+	pub value: Expression,
 }

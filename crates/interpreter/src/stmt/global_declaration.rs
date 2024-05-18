@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{GlobalDeclaration, Node, Span};
+use ast::{Global, Node};
 
 use crate::{expr::interpret_expr, Environment, Error, Interrupt, Value};
 
 #[async_recursion]
 pub async fn interpret_global_declaration(
-	stmt: &Node<Span, GlobalDeclaration<Span>>,
+	stmt: &Node<Global>,
 	env: &Arc<Environment>,
 	input_value: Option<Value>,
 ) -> Result<Interrupt, Error> {

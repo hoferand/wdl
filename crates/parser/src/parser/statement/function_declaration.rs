@@ -1,4 +1,4 @@
-use ast::{FunctionDeclaration, Node, Span};
+use ast::{Function, Node, Span};
 
 use crate::{
 	parser::{function::parse_function, identifier::parse_identifier},
@@ -7,7 +7,7 @@ use crate::{
 
 pub(crate) fn parse_function_declaration(
 	parser: &mut Parser,
-) -> Result<Node<Span, FunctionDeclaration<Span>>, ParserError> {
+) -> Result<Node<Function>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Function)?.span.start;
 
 	let id = parse_identifier(parser)?;
@@ -15,10 +15,10 @@ pub(crate) fn parse_function_declaration(
 	let function = parse_function(parser)?;
 
 	Ok(Node {
-		src: Span {
+		span: Span {
 			start,
-			end: function.src.end,
+			end: function.span.end,
 		},
-		val: FunctionDeclaration { id, function },
+		val: Function { id, function },
 	})
 }

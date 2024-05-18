@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use ast::{Identifier, ScopedIdentifier, Source};
+use ast::{Identifier, Variable};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "wdl_type")]
@@ -18,8 +18,8 @@ impl From<Identifier> for FunctionId {
 	}
 }
 
-impl<S: Source> From<ScopedIdentifier<S>> for FunctionId {
-	fn from(value: ScopedIdentifier<S>) -> Self {
+impl From<Variable> for FunctionId {
+	fn from(value: Variable) -> Self {
 		Self {
 			id: value.id.val,
 			scope: value.scope.into_iter().map(|n| n.val).collect(),

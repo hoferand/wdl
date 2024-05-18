@@ -1,4 +1,4 @@
-use ast::{Identifier, ScopedIdentifier, Span};
+use ast::{Identifier, Span, Variable};
 
 #[derive(Debug, Clone)]
 pub struct Error {
@@ -19,7 +19,7 @@ impl Error {
 pub enum ErrorKind {
 	Fatal(String),
 	VariableAlreadyInUse { id: Identifier },
-	VariableNotFound { id: ScopedIdentifier<Span> },
+	VariableNotFound { id: Variable },
 	InvalidType { msg: String },
 	DivisionByZero,
 	ArityMismatch { expected: usize, given: usize },

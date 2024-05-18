@@ -2,10 +2,10 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Source};
+use crate::Expression;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct Object<S: Source> {
-	pub values: HashMap<String, Expression<S>>,
+pub struct Object {
+	pub values: HashMap<String, Expression>,
 }

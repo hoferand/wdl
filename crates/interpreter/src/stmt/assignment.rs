@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Assignment, Node, Span};
+use ast::{Assignment, Node};
 
 use crate::{Environment, Error, Interrupt, Scope};
 
@@ -10,7 +10,7 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_assignment(
-	expr: &Node<Span, Assignment<Span>>,
+	expr: &Node<Assignment>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {

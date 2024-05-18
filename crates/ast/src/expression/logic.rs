@@ -4,24 +4,14 @@ use crate::{Expression, Node};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-pub struct Binary {
+pub struct Logic {
 	pub left: Box<Expression>,
-	pub op: Node<BinaryOperator>,
+	pub op: Node<LogicOperator>,
 	pub right: Box<Expression>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum BinaryOperator {
-	Add,
-	Subtract,
-	Multiply,
-	Divide,
-	Modulo,
-	NullCoalescing,
-	Equal,
-	NotEqual,
-	Less,
-	LessEqual,
-	Greater,
-	GreaterEqual,
+pub enum LogicOperator {
+	And,
+	Or,
 }

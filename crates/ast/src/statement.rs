@@ -1,77 +1,69 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Expression, Node, Source};
+use crate::{Expression, Node, Span};
 
+pub mod assignment;
+pub use assignment::*;
 pub mod block;
-pub use block::Block;
-pub mod function_declaration;
-pub use function_declaration::FunctionDeclaration;
-pub mod global_declaration;
-pub use global_declaration::GlobalDeclaration;
-pub mod actions;
-pub use actions::Actions;
+pub use block::*;
+pub mod break_;
+pub use break_::*;
+pub mod continue_;
+pub use continue_::*;
 pub mod if_;
 pub use if_::*;
-pub mod while_;
-pub use while_::While;
-pub mod break_;
-pub use break_::Break;
-pub mod continue_;
-pub use continue_::Continue;
-pub mod return_;
-pub use return_::Return;
 pub mod let_;
-pub use let_::Let;
-pub mod assignment;
-pub use assignment::Assignment;
+pub use let_::*;
+pub mod return_;
+pub use return_::*;
 pub mod send;
-pub use send::Send;
-pub mod declaration;
-pub use declaration::Declaration;
+pub use send::*;
+pub mod while_;
+pub use while_::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum Statement<S: Source> {
-	Assignment(Node<S, Assignment<S>>),
-	Expression(Expression<S>),
-	Block(Node<S, Block<S>>),
-	Break(Node<S, Break>),
-	Continue(Node<S, Continue>),
-	If(Node<S, If<S>>),
-	Let(Node<S, Let<S>>),
-	Return(Node<S, Return<S>>),
-	Send(Node<S, Send<S>>),
-	While(Node<S, While<S>>),
+pub enum Statement {
+	Assignment(Node<Assignment>),
+	Block(Node<Block>),
+	Break(Node<Break>),
+	Continue(Node<Continue>),
+	Expression(Expression),
+	If(Node<If>),
+	Let(Node<Let>),
+	Return(Node<Return>),
+	Send(Node<Send>),
+	While(Node<While>),
 }
 
-impl<S: Source> Statement<S> {
-	pub fn get_src(&self) -> &S {
+impl Statement {
+	pub fn get_span(&self) -> &Span {
 		match self {
-			Statement::Assignment(stmt) => &stmt.src,
-			Statement::Expression(expr) => expr.get_src(),
-			Statement::Block(stmt) => &stmt.src,
-			Statement::Break(stmt) => &stmt.src,
-			Statement::Continue(stmt) => &stmt.src,
-			Statement::If(stmt) => &stmt.src,
-			Statement::Let(stmt) => &stmt.src,
-			Statement::Return(stmt) => &stmt.src,
-			Statement::Send(stmt) => &stmt.src,
-			Statement::While(stmt) => &stmt.src,
+			Self::Assignment(stmt) => &stmt.span,
+			Self::Block(stmt) => &stmt.span,
+			Self::Break(stmt) => &stmt.span,
+			Self::Continue(stmt) => &stmt.span,
+			Self::Expression(expr) => expr.get_span(),
+			Self::If(stmt) => &stmt.span,
+			Self::Let(stmt) => &stmt.span,
+			Self::Return(stmt) => &stmt.span,
+			Self::Send(stmt) => &stmt.span,
+			Self::While(stmt) => &stmt.span,
 		}
 	}
 
 	pub fn get_type(&self) -> String {
 		match self {
-			Statement::Assignment(_) => "assignment",
-			Statement::Expression(_) => "expression",
-			Statement::Block(_) => "block",
-			Statement::Break(_) => "break",
-			Statement::Continue(_) => "continue",
-			Statement::If(_) => "if",
-			Statement::Let(_) => "let",
-			Statement::Return(_) => "return",
-			Statement::Send(_) => "send",
-			Statement::While(_) => "while",
+			Self::Assignment(_) => "assignment",
+			Self::Block(_) => "block",
+			Self::Break(_) => "break",
+			Self::Continue(_) => "continue",
+			Self::Expression(_) => "expression",
+			Self::If(_) => "if",
+			Self::Let(_) => "let",
+			Self::Return(_) => "return",
+			Self::Send(_) => "send",
+			Self::While(_) => "while",
 		}
 		.to_owned()
 	}

@@ -27,9 +27,7 @@ pub(crate) use let_::parse_let;
 pub(crate) mod function_declaration;
 pub(crate) use function_declaration::parse_function_declaration;
 
-pub(crate) fn parse_declaration(
-	parser: &mut Parser,
-) -> Result<Option<Declaration<Span>>, ParserError> {
+pub(crate) fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaration>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {
 		return Ok(None);
 	};
@@ -58,7 +56,7 @@ pub(crate) fn parse_declaration(
 	}))
 }
 
-pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Span>>, ParserError> {
+pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {
 		return Ok(None);
 	};
@@ -84,7 +82,7 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Sp
 			let val;
 			if peek.value == TokenValue::Equal {
 				parser.tokens.expect(TokenValue::Equal)?;
-				if let Expression::Identifier(id) = expr {
+				if let Expression::Variable(id) = expr {
 					if !id.val.scope.is_empty() {
 						// TODO: improve error message
 						return Err(ParserError::Fatal(
@@ -95,13 +93,13 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Sp
 					let value = parse_expression(parser)?;
 
 					val = Statement::Assignment(Node {
-						src: Span {
-							start: id.src.start,
-							end: value.get_src().end,
+						span: Span {
+							start: id.span.start,
+							end: value.get_span().end,
 						},
 						val: Assignment {
 							id: id.val.id,
-							value: Box::new(value),
+							value,
 						},
 					})
 				} else {
@@ -112,14 +110,11 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement<Sp
 				let value = parse_expression(parser)?;
 
 				val = Statement::Send(Node {
-					src: Span {
-						start: expr.get_src().start,
-						end: value.get_src().end,
+					span: Span {
+						start: expr.get_span().start,
+						end: value.get_span().end,
 					},
-					val: Send {
-						ch: Box::new(expr),
-						value: Box::new(value),
-					},
+					val: Send { ch: expr, value },
 				})
 			} else {
 				val = Statement::Expression(expr);

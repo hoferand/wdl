@@ -80,7 +80,7 @@ impl<'t> TokenStream<'t> {
 		None
 	}
 
-	pub fn next_comp_op(&mut self) -> Option<Node<Span, BinaryOperator>> {
+	pub fn next_comp_op(&mut self) -> Option<Node<BinaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -97,12 +97,12 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span,
+			span: token.span,
 			val: op,
 		})
 	}
 
-	pub fn next_add_op(&mut self) -> Option<Node<Span, BinaryOperator>> {
+	pub fn next_add_op(&mut self) -> Option<Node<BinaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -115,12 +115,12 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span,
+			span: token.span,
 			val: op,
 		})
 	}
 
-	pub fn next_mul_op(&mut self) -> Option<Node<Span, BinaryOperator>> {
+	pub fn next_mul_op(&mut self) -> Option<Node<BinaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -134,12 +134,12 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span,
+			span: token.span,
 			val: op,
 		})
 	}
 
-	pub fn next_unary_op(&mut self) -> Option<Node<Span, UnaryOperator>> {
+	pub fn next_unary_op(&mut self) -> Option<Node<UnaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -153,12 +153,12 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span,
+			span: token.span,
 			val: op,
 		})
 	}
 
-	pub fn next_null_op(&mut self) -> Option<Node<Span, BinaryOperator>> {
+	pub fn next_null_op(&mut self) -> Option<Node<BinaryOperator>> {
 		let token = self.tokens.get(self.pointer)?;
 
 		let op = match token.value {
@@ -170,7 +170,7 @@ impl<'t> TokenStream<'t> {
 		self.pointer += 1;
 
 		Some(Node {
-			src: token.span,
+			span: token.span,
 			val: op,
 		})
 	}

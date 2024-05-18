@@ -10,16 +10,16 @@ use super::interpret_expr;
 
 #[async_recursion]
 pub async fn interpret_unary(
-	expr: &Node<Span, Unary<Span>>,
+	expr: &Node<Unary>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Value, Error> {
 	let right = interpret_expr(&expr.val.right, scope, env).await?;
 
 	match expr.val.op.val {
-		UnaryOperator::Negate => negate(&right, &expr.src),
+		UnaryOperator::Negate => negate(&right, &expr.span),
 		UnaryOperator::Flip => Ok(Value::Bool(!right.boolify())),
-		UnaryOperator::Receive => receive(right, &expr.src, env).await,
+		UnaryOperator::Receive => receive(right, &expr.span, env).await,
 	}
 }
 

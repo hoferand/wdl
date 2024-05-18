@@ -4,16 +4,16 @@ use crate::{Parser, ParserError};
 
 use super::parse_unary;
 
-pub(crate) fn parse_multiplicative(parser: &mut Parser) -> Result<Expression<Span>, ParserError> {
+pub(crate) fn parse_multiplicative(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_unary(parser)?;
 
 	while let Some(op) = parser.tokens.next_mul_op() {
 		let right = parse_unary(parser)?;
 
 		left = Expression::Binary(Node {
-			src: Span {
-				start: left.get_src().start,
-				end: right.get_src().end,
+			span: Span {
+				start: left.get_span().start,
+				end: right.get_span().end,
 			},
 			val: Binary {
 				left: Box::new(left),

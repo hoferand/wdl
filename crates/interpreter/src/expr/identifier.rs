@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use async_recursion::async_recursion;
 
-use ast::{Node, ScopedIdentifier, Span};
+use ast::{Node, Variable};
 
 use crate::{wdl_std::resolve_id, Error, ErrorKind, Scope, Value};
 
 #[async_recursion]
 pub async fn interpret_identifier(
-	expr: &Node<Span, ScopedIdentifier<Span>>,
+	expr: &Node<Variable>,
 	scope: &Arc<Scope>,
 ) -> Result<Value, Error> {
 	if expr.val.scope.is_empty() {
@@ -23,7 +23,7 @@ pub async fn interpret_identifier(
 			kind: ErrorKind::VariableNotFound {
 				id: expr.val.clone(),
 			},
-			src: Some(expr.src),
+			src: Some(expr.span),
 		})
 	}
 }

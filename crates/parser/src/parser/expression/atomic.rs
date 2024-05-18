@@ -1,37 +1,37 @@
 use std::collections::HashMap;
 
-use ast::{Array, Expression, Group, Identifier, Literal, Node, Object, ScopedIdentifier, Span};
+use ast::{Array, Expression, Group, Identifier, Literal, Node, Object, Span, Variable};
 
 use crate::{Parser, ParserError, TokenValue};
 
 use super::parse_expression;
 
-pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, ParserError> {
+pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let Some(token) = parser.tokens.next() else {
 		return Err(ParserError::UnexpectedEoF);
 	};
 
 	let expr = match &token.value {
 		TokenValue::Null => Expression::Literal(Node {
-			src: token.span,
+			span: token.span,
 			val: Literal::Null,
 		}),
 		TokenValue::Bool(b) => Expression::Literal(Node {
-			src: token.span,
+			span: token.span,
 			val: Literal::Bool(*b),
 		}),
 		TokenValue::Number(n) => Expression::Literal(Node {
-			src: token.span,
+			span: token.span,
 			val: Literal::Number(*n),
 		}),
 		TokenValue::String(s) => Expression::Literal(Node {
-			src: token.span,
+			span: token.span,
 			val: Literal::String(s.to_owned()),
 		}),
 		TokenValue::Identifier(id) => {
 			let mut scope = Vec::new();
 			scope.push(Node {
-				src: token.span,
+				span: token.span,
 				val: Identifier { id: id.to_owned() },
 			});
 
@@ -47,7 +47,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 
 				if let TokenValue::Identifier(id_str) = &id.value {
 					scope.push(Node {
-						src: id.span,
+						span: id.span,
 						val: Identifier {
 							id: id_str.to_owned(),
 						},
@@ -59,15 +59,15 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 
 			let start;
 			if let Some(sc) = scope.first() {
-				start = sc.src.start;
+				start = sc.span.start;
 			} else {
-				start = id.src.start;
+				start = id.span.start;
 			}
-			let end = id.src.end;
+			let end = id.span.end;
 
-			Expression::Identifier(Node {
-				src: Span { start, end },
-				val: ScopedIdentifier { id, scope },
+			Expression::Variable(Node {
+				span: Span { start, end },
+				val: Variable { id, scope },
 			})
 		}
 		TokenValue::ParenOpen => {
@@ -76,7 +76,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 			let end = parser.tokens.expect(TokenValue::ParenClose)?.span.end;
 
 			Expression::Group(Node {
-				src: Span { start, end },
+				span: Span { start, end },
 				val: Group {
 					expression: Box::new(expr),
 				},
@@ -102,7 +102,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 			let end = parser.tokens.expect(TokenValue::BracketClose)?.span.end;
 
 			Expression::Array(Node {
-				src: Span { start, end },
+				span: Span { start, end },
 				val: Array { values },
 			})
 		}
@@ -147,7 +147,7 @@ pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression<Span>, Pars
 			let end = parser.tokens.expect(TokenValue::CurlyClose)?.span.end;
 
 			Expression::Object(Node {
-				src: Span { start, end },
+				span: Span { start, end },
 				val: Object { values },
 			})
 		}

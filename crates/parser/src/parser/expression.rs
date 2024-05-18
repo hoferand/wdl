@@ -21,16 +21,16 @@ pub(crate) use and::parse_and;
 pub(crate) mod or;
 pub(crate) use or::parse_or;
 
-pub(crate) fn parse_expression(parser: &mut Parser) -> Result<Expression<Span>, ParserError> {
+pub(crate) fn parse_expression(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let spawn_option = parser.tokens.want(TokenValue::Spawn).cloned();
 
 	let expr = parse_or(parser)?;
 
 	if let Some(spawn) = spawn_option {
 		Ok(Expression::Spawn(Node {
-			src: Span {
+			span: Span {
 				start: spawn.span.start,
-				end: expr.get_src().end,
+				end: expr.get_span().end,
 			},
 			val: Spawn {
 				expr: Box::new(expr),
