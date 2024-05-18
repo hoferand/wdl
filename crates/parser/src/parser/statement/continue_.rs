@@ -2,7 +2,7 @@ use ast::{Continue, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_continue(parser: &mut Parser) -> Result<Node<Continue>, ParserError> {
+pub fn parse_continue(parser: &mut Parser) -> Result<Node<Continue>, ParserError> {
 	let token = parser.tokens.expect(TokenValue::Continue)?;
 
 	if parser.state.in_loop < 1 {

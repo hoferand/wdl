@@ -2,7 +2,7 @@ use ast::{BinaryOperator, Location, Node, Span, UnaryOperator};
 
 use crate::{ParserError, Token, TokenValue};
 
-pub(crate) struct TokenStream<'t> {
+pub struct TokenStream<'t> {
 	tokens: &'t [Token],
 	pointer: usize,
 }

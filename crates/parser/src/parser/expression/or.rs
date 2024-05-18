@@ -4,7 +4,7 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::parse_and;
 
-pub(crate) fn parse_or(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub fn parse_or(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_and(parser)?;
 
 	while let Some(op) = parser.tokens.want(TokenValue::LOr).cloned() {

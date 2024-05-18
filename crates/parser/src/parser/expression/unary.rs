@@ -4,7 +4,7 @@ use crate::{Parser, ParserError};
 
 use super::parse_null_coalescing;
 
-pub(crate) fn parse_unary(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub fn parse_unary(parser: &mut Parser) -> Result<Expression, ParserError> {
 	if let Some(op) = parser.tokens.next_unary_op() {
 		let value = parse_unary(parser)?;
 

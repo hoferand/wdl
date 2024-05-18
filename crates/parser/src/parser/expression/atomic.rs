@@ -6,7 +6,7 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::parse_expression;
 
-pub(crate) fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let Some(token) = parser.tokens.next() else {
 		return Err(ParserError::unexpected_eof(vec![
 			TokenValue::Null.get_type(),

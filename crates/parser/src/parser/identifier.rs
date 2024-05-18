@@ -2,7 +2,7 @@ use ast::{Identifier, Node, Span};
 
 use crate::{Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_identifier(parser: &mut Parser) -> Result<Node<Identifier>, ParserError> {
+pub fn parse_identifier(parser: &mut Parser) -> Result<Node<Identifier>, ParserError> {
 	let Some(id_token) = parser.tokens.next() else {
 		return Err(ParserError::unexpected_eof(vec![TokenValue::Identifier(
 			String::new(),

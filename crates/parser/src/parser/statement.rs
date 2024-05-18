@@ -4,24 +4,24 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::expression::parse_expression;
 
-pub(crate) mod block;
-pub(crate) use block::parse_block;
-pub(crate) mod return_;
-pub(crate) use return_::parse_return;
-pub(crate) mod break_;
-pub(crate) use break_::parse_break;
-pub(crate) mod continue_;
-pub(crate) use continue_::parse_continue;
-pub(crate) mod while_;
-pub(crate) use while_::parse_while;
-pub(crate) mod else_;
-pub(crate) use else_::parse_else;
-pub(crate) mod if_;
-pub(crate) use if_::parse_if;
-pub(crate) mod let_;
-pub(crate) use let_::parse_let;
+pub mod block;
+pub use block::parse_block;
+pub mod return_;
+pub use return_::parse_return;
+pub mod break_;
+pub use break_::parse_break;
+pub mod continue_;
+pub use continue_::parse_continue;
+pub mod while_;
+pub use while_::parse_while;
+pub mod else_;
+pub use else_::parse_else;
+pub mod if_;
+pub use if_::parse_if;
+pub mod let_;
+pub use let_::parse_let;
 
-pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, ParserError> {
+pub fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {
 		return Ok(None);
 	};

@@ -2,7 +2,7 @@ use ast::{Global, Identifier, Node, Span};
 
 use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValue};
 
-pub(crate) fn parse_global(parser: &mut Parser) -> Result<Node<Global>, ParserError> {
+pub fn parse_global(parser: &mut Parser) -> Result<Node<Global>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Global)?.span.start;
 
 	let Some(id_token) = parser.tokens.next().cloned() else {

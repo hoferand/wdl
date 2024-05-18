@@ -4,7 +4,7 @@ use crate::{parser::identifier::parse_identifier, Parser, ParserError, TokenValu
 
 use super::{parse_atomic, parse_expression};
 
-pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub fn parse_member_call_index(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut expr = parse_atomic(parser)?;
 
 	let mut named = false;

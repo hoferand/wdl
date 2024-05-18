@@ -4,7 +4,7 @@ use crate::{Parser, ParserError};
 
 use super::parse_unary;
 
-pub(crate) fn parse_multiplicative(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub fn parse_multiplicative(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_unary(parser)?;
 
 	while let Some(op) = parser.tokens.next_mul_op() {

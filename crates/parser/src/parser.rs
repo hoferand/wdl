@@ -17,7 +17,7 @@ mod declaration;
 use declaration::*;
 mod identifier;
 
-pub(crate) struct Parser<'t> {
+pub struct Parser<'t> {
 	tokens: TokenStream<'t>,
 	state: ParserState,
 }

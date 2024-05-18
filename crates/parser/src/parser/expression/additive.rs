@@ -4,7 +4,7 @@ use crate::{Parser, ParserError};
 
 use super::parse_multiplicative;
 
-pub(crate) fn parse_additive(parser: &mut Parser) -> Result<Expression, ParserError> {
+pub fn parse_additive(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_multiplicative(parser)?;
 
 	while let Some(op) = parser.tokens.next_add_op() {

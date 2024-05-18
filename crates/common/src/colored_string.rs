@@ -29,7 +29,7 @@ impl ColoredString {
 	}
 }
 
-// this is necessary for padding in format strings to work correctly.
+// Deref is necessary for padding in format strings to work correctly.
 impl Deref for ColoredString {
 	type Target = str;
 

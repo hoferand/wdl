@@ -5,7 +5,7 @@ use crate::{
 	Parser, ParserError, TokenValue,
 };
 
-pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Let>, ParserError> {
+pub fn parse_let(parser: &mut Parser) -> Result<Node<Let>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Let)?.span.start;
 
 	let id_node = parse_identifier(parser)?;

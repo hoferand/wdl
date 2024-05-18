@@ -2,14 +2,14 @@ use ast::Declaration;
 
 use crate::{Parser, ParserError, TokenValue};
 
-pub(crate) mod actions;
-pub(crate) use actions::parse_actions;
-pub(crate) mod function;
-pub(crate) use function::parse_function;
-pub(crate) mod global;
-pub(crate) use global::parse_global;
+pub mod actions;
+pub use actions::parse_actions;
+pub mod function;
+pub use function::parse_function;
+pub mod global;
+pub use global::parse_global;
 
-pub(crate) fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaration>, ParserError> {
+pub fn parse_declaration(parser: &mut Parser) -> Result<Option<Declaration>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {
 		return Ok(None);
 	};

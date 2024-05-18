@@ -4,7 +4,7 @@ use crate::{Parser, ParserError, TokenValue};
 
 use super::{parse_block, parse_if};
 
-pub(crate) fn parse_else(parser: &mut Parser) -> Result<Node<Else>, ParserError> {
+pub fn parse_else(parser: &mut Parser) -> Result<Node<Else>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Else)?.span.start;
 
 	let Some(peek) = parser.tokens.peek() else {
