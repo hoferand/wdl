@@ -83,7 +83,7 @@ pub async fn run_function(
 			let inner_scope = Arc::new(Scope::with_parent(Arc::clone(&env.global_scope)));
 
 			let mut vals = args.into_iter();
-			for id in function.parameter.iter() {
+			for id in function.parameters.iter() {
 				if let Some(val) = vals.next() {
 					// positional argument
 					inner_scope.declare(id.val.id.clone(), val.val).await?;
@@ -113,7 +113,7 @@ pub async fn run_function(
 			}
 
 			if strict && rem != 0 {
-				let expected = function.parameter.len();
+				let expected = function.parameters.len();
 				return Err(Error {
 					kind: ErrorKind::ArityMismatch {
 						expected,

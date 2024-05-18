@@ -12,7 +12,7 @@ pub struct Function {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub struct FunctionBody {
-	pub parameter: Vec<Node<FormalParameter>>,
+	pub parameters: Vec<Node<FormalParameter>>,
 	pub body: Node<Block>,
 }
 

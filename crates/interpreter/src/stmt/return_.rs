@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Return};
 
-use crate::{Environment, Error, Interrupt, Scope};
+use crate::{Environment, Error, Interrupt, Scope, Value};
 
 use super::interpret_expr;
 
@@ -14,7 +14,11 @@ pub async fn interpret_return(
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
-	let val = interpret_expr(&stmt.val.value, scope, env).await?;
+	let val = if let Some(ret_expr) = &stmt.val.value {
+		interpret_expr(ret_expr, scope, env).await?
+	} else {
+		Value::Null
+	};
 
 	Ok(Interrupt::Return(val))
 }

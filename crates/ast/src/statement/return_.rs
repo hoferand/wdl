@@ -5,5 +5,5 @@ use crate::Expression;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub struct Return {
-	pub value: Expression,
+	pub value: Option<Expression>,
 }

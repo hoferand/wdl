@@ -79,7 +79,6 @@ pub fn convert_parser_error(
 		parser::Error::Parser(err) => {
 			let mut span = err.span;
 			let title = match &err.kind {
-				parser::ParserErrorKind::Fatal(msg) => format!("{}!", msg),
 				parser::ParserErrorKind::UnexpectedToken { src, expected } => {
 					let mut msg = format!("Unexpected token `{}`", src);
 					if expected.len() == 1 {
@@ -118,8 +117,32 @@ pub fn convert_parser_error(
 					"Unexpected end of file!".to_owned()
 				}
 				parser::ParserErrorKind::NoActions => "No actions block found!".to_owned(),
-				parser::ParserErrorKind::InvalidAssign { id } => {
-					format!("It is not allowed to assign a value to `{}`!", id)
+				parser::ParserErrorKind::ScopedIdentifierAssign { id } => {
+					format!("Assignment to scoped identifier `{}` is not allowed!", id)
+				}
+				parser::ParserErrorKind::UnexpectedContinue => {
+					"`continue` is only allowed inside loops!".to_owned()
+				}
+				parser::ParserErrorKind::UnexpectedBreak => {
+					"`break` is only allowed inside loops!".to_owned()
+				}
+				parser::ParserErrorKind::UnexpectedReturn => {
+					"`return` is only allowed inside function bodies!".to_owned()
+				}
+				parser::ParserErrorKind::DuplicateParameter { id } => {
+					format!("Duplicate parameter `{}` found!", id)
+				}
+				parser::ParserErrorKind::DuplicateArgument { id } => {
+					format!("Duplicate argument `{}` found!", id)
+				}
+				parser::ParserErrorKind::ScopedArgument { id } => {
+					format!(
+						"Scoped identifier `{}` is not allowed as argument name!",
+						id
+					)
+				}
+				parser::ParserErrorKind::PositionalAfterNamed => {
+					"Positional arguments are not allowed after named arguments!".to_owned()
 				}
 			};
 			ret.push(Error {

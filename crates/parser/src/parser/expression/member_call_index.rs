@@ -24,22 +24,16 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 					let val = parse_expression(parser)?;
 					if let Expression::Variable(id) = id {
 						if !id.val.scope.is_empty() {
-							return Err(ParserError::fatal(
-								format!(
-									"Cannot use scoped identifier `{}` as named argument",
-									id.val
-								),
-								Some(id.span),
-							));
+							return Err(ParserError::scoped_argument(id.val.to_string(), id.span));
 						}
 
 						if names.contains(&id.val.id.val) {
-							return Err(ParserError::fatal(
-								format!("Same named argument `{}` multiple times", id.val.id.val),
-								Some(Span {
+							return Err(ParserError::duplicate_argument(
+								id.val.id.val.id,
+								Span {
 									start: id.span.start,
 									end: val.get_span().end,
-								}),
+								},
 							));
 						}
 						names.push(id.val.id.val.clone());
@@ -60,7 +54,7 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 					} else {
 						return Err(ParserError::unexpected_token(
 							token.src,
-							Vec::new(), // TODO
+							vec![TokenValue::Comma.get_type()],
 							token.span,
 						));
 					}
@@ -70,10 +64,7 @@ pub(crate) fn parse_member_call_index(parser: &mut Parser) -> Result<Expression,
 						val: Argument { id: None, val: id },
 					});
 				} else {
-					return Err(ParserError::fatal(
-						"Positional arguments are not allowed after named arguments".to_owned(),
-						Some(*id.get_span()),
-					));
+					return Err(ParserError::positional_after_named(*id.get_span()));
 				}
 
 				if parser.tokens.want(TokenValue::Comma).is_none() {

@@ -12,7 +12,6 @@ pub(crate) fn parse_let(parser: &mut Parser) -> Result<Node<Let>, ParserError> {
 
 	parser.tokens.expect(TokenValue::Equal)?;
 
-	// TODO: make it optional
 	let value = parse_expression(parser)?;
 
 	let end = parser.tokens.expect(TokenValue::Semicolon)?.span.end;

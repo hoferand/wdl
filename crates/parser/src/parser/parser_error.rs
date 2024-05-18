@@ -7,13 +7,6 @@ pub struct ParserError {
 }
 
 impl ParserError {
-	pub fn fatal(msg: String, span: Option<Span>) -> Self {
-		Self {
-			kind: ParserErrorKind::Fatal(msg),
-			span,
-		}
-	}
-
 	pub fn unexpected_token(src: String, expected: Vec<String>, span: Span) -> Self {
 		Self {
 			kind: ParserErrorKind::UnexpectedToken { src, expected },
@@ -28,9 +21,58 @@ impl ParserError {
 		}
 	}
 
-	pub fn invalid_assign(id: String, span: Span) -> Self {
+	pub fn scoped_identifier_assign(id: String, span: Span) -> Self {
 		Self {
-			kind: ParserErrorKind::InvalidAssign { id },
+			kind: ParserErrorKind::ScopedIdentifierAssign { id },
+			span: Some(span),
+		}
+	}
+
+	pub fn unexpected_continue(span: Span) -> Self {
+		Self {
+			kind: ParserErrorKind::UnexpectedContinue,
+			span: Some(span),
+		}
+	}
+
+	pub fn unexpected_break(span: Span) -> Self {
+		Self {
+			kind: ParserErrorKind::UnexpectedBreak,
+			span: Some(span),
+		}
+	}
+
+	pub fn unexpected_return(span: Span) -> Self {
+		Self {
+			kind: ParserErrorKind::UnexpectedReturn,
+			span: Some(span),
+		}
+	}
+
+	pub fn duplicate_parameter(id: String, span: Span) -> Self {
+		Self {
+			kind: ParserErrorKind::DuplicateParameter { id },
+			span: Some(span),
+		}
+	}
+
+	pub fn duplicate_argument(id: String, span: Span) -> Self {
+		Self {
+			kind: ParserErrorKind::DuplicateArgument { id },
+			span: Some(span),
+		}
+	}
+
+	pub fn scoped_argument(id: String, span: Span) -> Self {
+		Self {
+			kind: ParserErrorKind::ScopedArgument { id },
+			span: Some(span),
+		}
+	}
+
+	pub fn positional_after_named(span: Span) -> Self {
+		Self {
+			kind: ParserErrorKind::PositionalAfterNamed,
 			span: Some(span),
 		}
 	}
@@ -59,10 +101,16 @@ impl ParserError {
 
 #[derive(Debug, Clone)]
 pub enum ParserErrorKind {
-	Fatal(String),
 	UnexpectedToken { src: String, expected: Vec<String> },
 	SecondActions { actions1: Span, actions2: Span },
-	InvalidAssign { id: String },
+	ScopedIdentifierAssign { id: String },
+	UnexpectedContinue,
+	UnexpectedBreak,
+	UnexpectedReturn,
+	DuplicateParameter { id: String },
+	DuplicateArgument { id: String },
+	ScopedArgument { id: String },
+	PositionalAfterNamed,
 	ExpectedSemicolon,
 	NoActions,
 	UnexpectedEoF { expected: Vec<String> },

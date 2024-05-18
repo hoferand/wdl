@@ -51,7 +51,10 @@ pub(crate) fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, 
 				parser.tokens.expect(TokenValue::Equal)?;
 				if let Expression::Variable(id) = expr {
 					if !id.val.scope.is_empty() {
-						return Err(ParserError::invalid_assign(id.val.to_string(), id.span));
+						return Err(ParserError::scoped_identifier_assign(
+							id.val.to_string(),
+							id.span,
+						));
 					}
 
 					let value = parse_expression(parser)?;
