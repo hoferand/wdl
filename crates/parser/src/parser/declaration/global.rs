@@ -32,9 +32,6 @@ pub fn parse_global(parser: &mut Parser) -> Result<Node<Global>, ParserError> {
 
 	Ok(Node {
 		span: Span { start, end },
-		val: Global {
-			id: id_node,
-			value: Some(value),
-		},
+		val: Global { id: id_node, value },
 	})
 }

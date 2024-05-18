@@ -6,8 +6,8 @@ use ast::Expression;
 
 use crate::{scope::Scope, Environment, Error, Value};
 
-pub mod function_call;
-pub use function_call::{interpret_function_call, run_function};
+pub mod call;
+pub use call::{interpret_call, run_function};
 
 mod literal;
 use literal::interpret_literal;
@@ -41,7 +41,7 @@ pub async fn interpret_expression(
 	match expr {
 		Expression::Array(expr) => interpret_array(expr, scope, env).await,
 		Expression::Binary(expr) => interpret_binary(expr, scope, env).await,
-		Expression::Call(expr) => interpret_function_call(expr, scope, env).await,
+		Expression::Call(expr) => interpret_call(expr, scope, env).await,
 		Expression::Group(expr) => interpret_group(expr, scope, env).await,
 		Expression::Variable(expr) => interpret_identifier(expr, scope).await,
 		Expression::Literal(expr) => interpret_literal(expr),

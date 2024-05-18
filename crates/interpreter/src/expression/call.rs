@@ -13,7 +13,7 @@ use crate::{
 use super::interpret_expression;
 
 #[async_recursion]
-pub async fn interpret_function_call(
+pub async fn interpret_call(
 	expr: &Node<Call>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,

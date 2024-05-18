@@ -49,12 +49,12 @@ pub async fn start_workflow(
 			default = Some(val.clone());
 		}
 
-		declaration::interpret_global_declaration(global_decl, &env, default).await?;
+		declaration::interpret_global(global_decl, &env, default).await?;
 	}
 
 	// function declarations
 	for fn_decl in &ast.functions {
-		declaration::interpret_function_declaration(fn_decl, &env).await?;
+		declaration::interpret_function(fn_decl, &env).await?;
 	}
 
 	Ok(Order { workflow: ast, env })

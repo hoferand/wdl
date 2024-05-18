@@ -6,5 +6,5 @@ use crate::{Expression, Identifier, Node};
 #[serde(tag = "type")]
 pub struct Global {
 	pub id: Node<Identifier>,
-	pub value: Option<Expression>,
+	pub value: Expression,
 }

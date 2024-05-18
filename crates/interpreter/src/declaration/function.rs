@@ -7,7 +7,7 @@ use ast::{Function, Node};
 use crate::{Environment, Error, FunctionValue, Interrupt};
 
 #[async_recursion]
-pub async fn interpret_function_declaration(
+pub async fn interpret_function(
 	stmt: &Node<Function>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
