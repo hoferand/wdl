@@ -23,7 +23,7 @@ pub struct Environment {
 	pub global_scope: Arc<Scope>,
 	pub router: Router,
 	user_log_ch: Mutex<Sender<UserLog>>,
-	error_ch: Mutex<Option<Sender<Error>>>, // TODO: find a way to remove Option
+	error_ch: Mutex<Sender<Error>>,
 	handles: Mutex<Vec<JoinHandle<Result<(), Error>>>>,
 	functions: RwLock<HashMap<Identifier, FunctionValue>>,
 	channels: RwLock<HashMap<ChannelId, Channel>>,
@@ -31,12 +31,17 @@ pub struct Environment {
 }
 
 impl Environment {
-	pub fn new(global_scope: Arc<Scope>, router: Router, user_log_ch: Sender<UserLog>) -> Self {
+	pub fn new(
+		global_scope: Arc<Scope>,
+		router: Router,
+		user_log_ch: Sender<UserLog>,
+		error_ch: Sender<Error>,
+	) -> Self {
 		Environment {
 			global_scope,
 			router,
 			user_log_ch: Mutex::new(user_log_ch),
-			error_ch: Mutex::new(None),
+			error_ch: Mutex::new(error_ch),
 			handles: Mutex::new(Vec::new()),
 			functions: RwLock::new(HashMap::new()),
 			channels: RwLock::new(HashMap::new()),
@@ -52,21 +57,12 @@ impl Environment {
 		self.handles.lock().await.pop()
 	}
 
-	pub async fn set_error_ch(&self, ch: Sender<Error>) {
-		*self.error_ch.lock().await = Some(ch);
-	}
-
 	pub async fn send_error(&self, err: Error) {
-		if let Some(ch) = self.error_ch.lock().await.as_ref() {
-			if let Err(send_err) = ch.send(err.clone()).await {
-				warn!(
-					"Failed to send error over channel, send error `{}`, error `{:?}`",
-					send_err, err
-				);
-			}
-		} else {
-			error!("Error channel missing, cannot send error `{:?}`", err);
-			// TODO: panic?
+		if let Err(send_err) = self.error_ch.lock().await.send(err.clone()).await {
+			error!(
+				"Failed to send error over channel, send error `{}`, error `{:?}`",
+				send_err, err
+			);
 		}
 	}
 

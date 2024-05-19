@@ -92,22 +92,13 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 		}
 	});
 
-	let order = match interpreter::start_workflow(
+	let ret = interpreter::run_workflow(
 		workflow,
 		variables,
 		interpreter::Router::Grpc(RouterClientGrpc),
 		user_log_sender,
 	)
-	.await
-	{
-		Ok(o) => o,
-		Err(error) => {
-			print_interpreter_error(&error, &src_code);
-			return Ok(ExitCode::FAILURE);
-		}
-	};
-
-	let ret = interpreter::run_order(order).await;
+	.await;
 
 	if let Err(err) = log_handle.await {
 		error!("Failed to wait for log receiver: `{}`", err);

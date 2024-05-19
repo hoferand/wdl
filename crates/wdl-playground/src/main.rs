@@ -70,30 +70,6 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 
 	let (sender, mut receiver, router) = RouterClientWs::new();
 
-	let (log_sender, mut log_receiver) = mpsc::channel(10);
-
-	let order = match interpreter::start_workflow(
-		ast,
-		HashMap::new(),
-		interpreter::Router::Ws(router),
-		log_sender,
-	)
-	.await
-	{
-		Ok(o) => o,
-		Err(error) => {
-			let errors = vec![convert_interpreter_error(
-				&error,
-				&src_code,
-				ColorMode::HTML,
-			)];
-			socket
-				.emit("error", serde_json::to_string(&errors).unwrap())
-				.ok();
-			return;
-		}
-	};
-
 	let (exit_sender, mut exit_receiver) = mpsc::channel::<()>(3);
 
 	let async_socket = socket.clone();
@@ -136,6 +112,8 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		}
 	});
 
+	let (log_sender, mut log_receiver) = mpsc::channel::<UserLog>(10);
+
 	let async_socket = socket.clone();
 	let log_handle = tokio::spawn(async move {
 		while let Some(log) = log_receiver.recv().await {
@@ -149,7 +127,13 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		}
 	});
 
-	let ret = interpreter::run_order(order).await;
+	let ret = interpreter::run_workflow(
+		ast,
+		HashMap::new(),
+		interpreter::Router::Ws(router),
+		log_sender,
+	)
+	.await;
 	exit_sender.send(()).await.ok();
 	log_handle.await.unwrap();
 

@@ -10,8 +10,6 @@ use ast::{Identifier, Workflow};
 
 mod error;
 pub use error::*;
-mod order;
-pub use order::Order;
 mod user_log;
 pub use user_log::*;
 mod value;
@@ -34,19 +32,20 @@ use scope::Scope;
 mod statement;
 mod wdl_std;
 
-pub async fn start_workflow(
-	ast: Workflow,
-	vars: HashMap<Identifier, Value>,
+pub async fn run_workflow(
+	workflow: Workflow,
+	variables: HashMap<Identifier, Value>,
 	router: Router,
 	user_log_ch: Sender<UserLog>,
-) -> Result<Order, Error> {
+) -> Result<(), Error> {
+	let (err_tx, mut err_rx) = mpsc::channel(1);
 	let global_scope = Arc::new(Scope::new());
-	let env = Arc::new(Environment::new(global_scope, router, user_log_ch));
+	let env = Arc::new(Environment::new(global_scope, router, user_log_ch, err_tx));
 
 	// global declarations
-	for global_decl in &ast.globals {
+	for global_decl in &workflow.globals {
 		let mut default = None;
-		if let Some(val) = vars.get(&global_decl.val.id.val) {
+		if let Some(val) = variables.get(&global_decl.val.id.val) {
 			default = Some(val.clone());
 		}
 
@@ -54,29 +53,18 @@ pub async fn start_workflow(
 	}
 
 	// function declarations
-	for fn_decl in &ast.functions {
+	for fn_decl in &workflow.functions {
 		declaration::interpret_function(fn_decl, &env).await?;
 	}
 
-	Ok(Order { workflow: ast, env })
-}
-
-pub async fn run_order(order: Order) -> Result<(), Error> {
-	let (err_tx, mut err_rx) = mpsc::channel(1);
-	order.env.set_error_ch(err_tx).await;
-
-	let fut = declaration::interpret_actions(
-		&order.workflow.actions,
-		&order.env.global_scope,
-		&order.env,
-	);
+	let fut = declaration::interpret_actions(&workflow.actions, &env.global_scope, &env);
 
 	select! {
 		ret = fut => {
 			if ret.is_ok() {
 				err_rx.close();
 				info!("Main flow finished, error channel closed, waiting for background tasks to finish!");
-				while let Some(handle) = order.env.pop_handle().await {
+				while let Some(handle) = env.pop_handle().await {
 					if let Ok(val) = handle.await {
 						if let Err(err) = val {
 							info!("Background task returned error: {:?}", err);
