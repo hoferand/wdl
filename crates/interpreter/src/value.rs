@@ -5,11 +5,11 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-pub mod channel_id;
+mod channel_id;
 pub use channel_id::ChannelId;
-pub mod function_id;
+mod function_id;
 pub use function_id::FunctionId;
-pub mod type_;
+mod type_;
 pub use type_::ValueType;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -114,6 +114,8 @@ impl PartialEq for Value {
 			(Value::String(s1), Value::String(s2)) => s1 == s2,
 			(Value::Array(a1), Value::Array(a2)) => a1 == a2,
 			(Value::Object(o1), Value::Object(o2)) => o1 == o2,
+			(Value::Function(f1), Value::Function(f2)) => f1 == f2,
+			(Value::Channel(c1), Value::Channel(c2)) => c1 == c2,
 			_ => false,
 		}
 	}
@@ -121,7 +123,7 @@ impl PartialEq for Value {
 
 impl PartialOrd for Value {
 	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-		// TODO: rethink
+		// TODO: rethink or throw error on other types
 		match (self, other) {
 			(Self::Number(n1), Self::Number(n2)) => n1.partial_cmp(n2),
 			_ => None,

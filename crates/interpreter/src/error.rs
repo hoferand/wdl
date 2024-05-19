@@ -13,6 +13,13 @@ impl Error {
 			span: None,
 		}
 	}
+
+	pub fn positional(msg: String, span: Span) -> Self {
+		Error {
+			kind: ErrorKind::Fatal(msg),
+			span: Some(span),
+		}
+	}
 }
 
 #[derive(Debug, Clone)]
@@ -25,6 +32,6 @@ pub enum ErrorKind {
 	ArityMismatch { expected: usize, given: usize },
 	MissingArgument { id: Identifier },
 	UnknownArgument { id: Identifier },
-	OrderDone,
-	OrderCancel,
+	OrderDone,   // TODO: should be no error
+	OrderCancel, // TODO: should be no error
 }

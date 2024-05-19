@@ -20,9 +20,9 @@ pub async fn interpret_offset(
 		(Value::Array(a), Value::Number(n)) => a.get(*n as usize).unwrap_or(&Value::Null).clone(), // TODO: fix cast
 		(Value::String(s), Value::Number(n)) => s
 			.chars()
-			.nth(*n as usize)
+			.nth(*n as usize) // TODO: fix cast
 			.map(|ch| Value::String(ch.to_string()))
-			.unwrap_or(Value::Null), // TODO: fix cast
+			.unwrap_or(Value::Null),
 		(Value::Object(o), Value::String(s)) => o.get(s).unwrap_or(&Value::Null).clone(),
 		_ => {
 			return Err(Error {

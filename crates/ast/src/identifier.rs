@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -9,5 +11,12 @@ pub struct Identifier {
 impl std::fmt::Display for Identifier {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		write!(f, "{}", self.id)
+	}
+}
+
+// necessary for `join()`
+impl Borrow<str> for Identifier {
+	fn borrow(&self) -> &str {
+		&self.id
 	}
 }

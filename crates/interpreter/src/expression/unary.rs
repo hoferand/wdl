@@ -33,22 +33,31 @@ fn negate(val: &Value, span: &Span) -> Result<Value, Error> {
 	}
 }
 
-pub async fn receive(ch: Value, _span: &Span, env: &Arc<Environment>) -> Result<Value, Error> {
-	// TODO: improve error messages
+pub async fn receive(ch: Value, span: &Span, env: &Arc<Environment>) -> Result<Value, Error> {
 	match ch {
 		Value::Channel(ch_id) => {
 			let Some(ch) = env.get_ch(&ch_id).await else {
-				return Err(Error::fatal(format!("Channel `{}` not found", ch_id.id)));
+				// TODO: improve error message
+				return Err(Error::positional(
+					format!("Channel `{}` not found", ch_id.id),
+					*span,
+				));
 			};
 			if let Some(v) = ch.receive().await {
 				Ok(v)
 			} else {
-				Err(Error::fatal("Cannot receive on closed channel".to_owned()))
+				// TODO: improve error message
+				Err(Error::positional(
+					"Cannot receive on closed channel".to_owned(),
+					*span,
+				))
 			}
 		}
-		val => Err(Error::fatal(format!(
-			"Cannot receive on type `{}`",
-			val.get_type()
-		))),
+		val => Err(Error {
+			kind: ErrorKind::InvalidType {
+				msg: format!("<-`{}`", val.get_type()),
+			},
+			span: Some(*span),
+		}),
 	}
 }

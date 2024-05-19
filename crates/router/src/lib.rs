@@ -32,11 +32,11 @@ impl From<proto::RouterStatus> for RouterStatus {
 
 pub trait RouterClient {
 	#[allow(async_fn_in_trait)]
-	async fn pickup(&self, target: Target) -> Option<RouterStatus>;
+	async fn pickup(&self, target: Target) -> Option<RouterStatus>; // TODO: return Result instead of Option
 
 	#[allow(async_fn_in_trait)]
-	async fn drop(&self, target: Target) -> Option<RouterStatus>;
+	async fn drop(&self, target: Target) -> Option<RouterStatus>; // TODO: return Result instead of Option
 
 	#[allow(async_fn_in_trait)]
-	async fn drive(&self, target: Target) -> Option<RouterStatus>;
+	async fn drive(&self, target: Target) -> Option<RouterStatus>; // TODO: return Result instead of Option
 }

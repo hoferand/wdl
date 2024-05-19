@@ -24,7 +24,5 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 		};
 	}
 
-	// TODO: add prelude which do not need a scope
-
 	None
 }

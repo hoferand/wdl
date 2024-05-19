@@ -9,7 +9,6 @@ pub struct RouterClientGrpc;
 
 impl crate::RouterClient for RouterClientGrpc {
 	async fn pickup(&self, target: Target) -> Option<RouterStatus> {
-		// TODO: return Result instead of Option
 		let mut client = match RouterClient::connect(String::from("http://") + super::URL).await {
 			Ok(c) => c,
 			Err(err) => {
@@ -41,7 +40,6 @@ impl crate::RouterClient for RouterClientGrpc {
 	}
 
 	async fn drop(&self, target: Target) -> Option<RouterStatus> {
-		// TODO: return Result instead of Option
 		let mut client = match RouterClient::connect(String::from("http://") + super::URL).await {
 			Ok(c) => c,
 			Err(err) => {
@@ -73,7 +71,6 @@ impl crate::RouterClient for RouterClientGrpc {
 	}
 
 	async fn drive(&self, target: Target) -> Option<RouterStatus> {
-		// TODO: return Result instead of Option
 		let mut client = match RouterClient::connect(String::from("http://") + super::URL).await {
 			Ok(c) => c,
 			Err(err) => {

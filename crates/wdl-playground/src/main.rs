@@ -157,10 +157,10 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		let error = convert_interpreter_error(&err, &src_code, ColorMode::HTML);
 		match err.kind {
 			interpreter::ErrorKind::OrderDone => {
-				socket.emit("done", error.pos.unwrap()).ok(); // TODO: remove unwrap
+				socket.emit("done", error.pos).ok();
 			}
 			interpreter::ErrorKind::OrderCancel => {
-				socket.emit("canceled", error.pos.unwrap()).ok(); // TODO: remove unwrap
+				socket.emit("canceled", error.pos).ok();
 			}
 			_ => {
 				socket
@@ -202,14 +202,8 @@ pub fn convert_interpreter_error(
 		interpreter::ErrorKind::UnknownArgument { id } => {
 			format!("Named argument `{}` unknown!", id)
 		}
-		interpreter::ErrorKind::OrderDone => {
-			// TODO: should be no error
-			"Order done!".to_owned()
-		}
-		interpreter::ErrorKind::OrderCancel => {
-			// TODO: should be no error
-			"Order canceled!".to_owned()
-		}
+		interpreter::ErrorKind::OrderDone => "Order done!".to_owned(),
+		interpreter::ErrorKind::OrderCancel => "Order canceled!".to_owned(),
 	};
 
 	let pos;
@@ -225,7 +219,6 @@ pub fn convert_interpreter_error(
 	common::Error { title, pos }
 }
 
-// TODO: do not replicate function
 /// `len` must be >= 3
 fn truncate(s: String, len: usize) -> String {
 	if s.chars().count() <= len {

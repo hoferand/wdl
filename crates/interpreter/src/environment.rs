@@ -23,7 +23,7 @@ pub struct Environment {
 	pub global_scope: Arc<Scope>,
 	pub router: Router,
 	user_log_ch: Mutex<Sender<UserLog>>,
-	error_ch: Mutex<Option<Sender<Error>>>, // TODO: remove Option
+	error_ch: Mutex<Option<Sender<Error>>>, // TODO: find a way to remove Option
 	handles: Mutex<Vec<JoinHandle<Result<(), Error>>>>,
 	functions: RwLock<HashMap<Identifier, FunctionValue>>,
 	channels: RwLock<HashMap<ChannelId, Channel>>,
