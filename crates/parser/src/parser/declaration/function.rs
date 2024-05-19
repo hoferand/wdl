@@ -1,7 +1,7 @@
 use ast::{FormalParameter, Function, FunctionBody, Node, Span};
 
 use crate::{
-	parser::{identifier::parse_identifier, parse_block},
+	parser::{parse_block, parse_identifier},
 	Parser, ParserError, TokenValue,
 };
 
@@ -35,9 +35,9 @@ pub fn parse_function(parser: &mut Parser) -> Result<Node<Function>, ParserError
 	parser.tokens.expect(TokenValue::ParenClose)?;
 
 	// parse body
-	parser.state.in_function += 1;
+	parser.state.enter_function();
 	let body = parse_block(parser)?;
-	parser.state.in_function -= 1;
+	parser.state.leave_function();
 
 	let function = Node {
 		span: Span {

@@ -9,7 +9,7 @@ use crate::{Environment, Error, Scope, Value};
 use super::interpret_expression;
 
 #[async_recursion]
-pub async fn interpret_logical(
+pub async fn interpret_logic(
 	expr: &Node<Logic>,
 	scope: &Arc<Scope>,
 	env: &Arc<Environment>,
@@ -20,6 +20,10 @@ pub async fn interpret_logical(
 	match (left.boolify(), &expr.val.op.val) {
 		(false, LogicOperator::And) => Ok(Value::Bool(false)),
 		(true, LogicOperator::Or) => Ok(Value::Bool(true)),
-		_ => interpret_expression(&expr.val.right, scope, env).await,
+		_ => Ok(Value::Bool(
+			interpret_expression(&expr.val.right, scope, env)
+				.await?
+				.boolify(),
+		)),
 	}
 }

@@ -5,7 +5,7 @@ use crate::{Parser, ParserError, TokenValue};
 pub fn parse_continue(parser: &mut Parser) -> Result<Node<Continue>, ParserError> {
 	let token = parser.tokens.expect(TokenValue::Continue)?;
 
-	if parser.state.in_loop < 1 {
+	if !parser.state.in_loop() {
 		return Err(ParserError::unexpected_continue(token.span));
 	}
 

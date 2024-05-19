@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use ast::{Array, Expression, Group, Identifier, Literal, Node, Object, Span, Variable};
 
-use crate::{Parser, ParserError, TokenValue};
-
-use super::parse_expression;
+use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
 
 pub fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let Some(token) = parser.tokens.next() else {

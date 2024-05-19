@@ -15,8 +15,8 @@ mod binary;
 use binary::interpret_binary;
 mod unary;
 use unary::interpret_unary;
-mod logical;
-use logical::interpret_logical;
+mod logic;
+use logic::interpret_logic;
 mod group;
 use group::interpret_group;
 mod identifier;
@@ -45,7 +45,7 @@ pub async fn interpret_expression(
 		Expression::Group(expr) => interpret_group(expr, scope, env).await,
 		Expression::Variable(expr) => interpret_identifier(expr, scope).await,
 		Expression::Literal(expr) => interpret_literal(expr),
-		Expression::Logic(expr) => interpret_logical(expr, scope, env).await,
+		Expression::Logic(expr) => interpret_logic(expr, scope, env).await,
 		Expression::Member(expr) => interpret_member(expr, scope, env).await,
 		Expression::Object(expr) => interpret_object(expr, scope, env).await,
 		Expression::Offset(expr) => interpret_offset(expr, scope, env).await,

@@ -1,17 +1,18 @@
 use ast::{Node, Span, While};
 
-use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValue};
-
-use super::parse_block;
+use crate::{
+	parser::{parse_block, parse_expression},
+	Parser, ParserError, TokenValue,
+};
 
 pub fn parse_while(parser: &mut Parser) -> Result<Node<While>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::While)?.span.start;
 
 	let condition = parse_expression(parser)?;
 
-	parser.state.in_loop += 1;
+	parser.state.enter_loop();
 	let block = parse_block(parser)?;
-	parser.state.in_loop -= 1;
+	parser.state.leave_loop();
 
 	Ok(Node {
 		span: Span {

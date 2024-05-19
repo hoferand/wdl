@@ -1,8 +1,6 @@
 use ast::{Binary, Expression, Node, Span};
 
-use crate::{Parser, ParserError};
-
-use super::parse_member_call_index;
+use crate::{parser::parse_member_call_index, Parser, ParserError};
 
 pub fn parse_null_coalescing(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_member_call_index(parser)?;

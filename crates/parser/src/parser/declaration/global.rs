@@ -1,6 +1,6 @@
 use ast::{Global, Identifier, Node, Span};
 
-use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValue};
+use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
 
 pub fn parse_global(parser: &mut Parser) -> Result<Node<Global>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Global)?.span.start;

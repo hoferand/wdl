@@ -1,8 +1,6 @@
 use ast::{Expression, Node, Span, Unary};
 
-use crate::{Parser, ParserError};
-
-use super::parse_null_coalescing;
+use crate::{parser::parse_null_coalescing, Parser, ParserError};
 
 pub fn parse_unary(parser: &mut Parser) -> Result<Expression, ParserError> {
 	if let Some(op) = parser.tokens.next_unary_op() {

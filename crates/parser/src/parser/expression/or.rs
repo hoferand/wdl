@@ -1,8 +1,6 @@
 use ast::{Expression, Logic, LogicOperator, Node, Span};
 
-use crate::{Parser, ParserError, TokenValue};
-
-use super::parse_and;
+use crate::{parser::parse_and, Parser, ParserError, TokenValue};
 
 pub fn parse_or(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_and(parser)?;

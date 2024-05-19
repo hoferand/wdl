@@ -1,7 +1,7 @@
 use ast::{Let, Node, Span};
 
 use crate::{
-	parser::{identifier::parse_identifier, parse_expression},
+	parser::{parse_expression, parse_identifier},
 	Parser, ParserError, TokenValue,
 };
 

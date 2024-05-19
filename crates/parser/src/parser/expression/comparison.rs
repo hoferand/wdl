@@ -1,8 +1,6 @@
 use ast::{Binary, Expression, Node, Span};
 
-use crate::{Parser, ParserError};
-
-use super::parse_additive;
+use crate::{parser::parse_additive, Parser, ParserError};
 
 pub fn parse_comparison(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_additive(parser)?;

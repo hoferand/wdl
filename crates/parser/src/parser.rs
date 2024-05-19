@@ -5,17 +5,18 @@ use crate::Token;
 pub mod parser_error;
 pub use parser_error::*;
 
-mod token_stream;
-use token_stream::TokenStream;
-mod parser_state;
-use parser_state::ParserState;
-mod expression;
-use expression::*;
-mod statement;
-use statement::*;
 mod declaration;
 use declaration::*;
+mod expression;
+use expression::*;
 mod identifier;
+use identifier::*;
+mod parser_state;
+use parser_state::ParserState;
+mod statement;
+use statement::*;
+mod token_stream;
+use token_stream::TokenStream;
 
 pub struct Parser<'t> {
 	tokens: TokenStream<'t>,

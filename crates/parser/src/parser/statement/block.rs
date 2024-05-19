@@ -1,8 +1,6 @@
 use ast::{Block, Node, Span};
 
-use crate::{Parser, ParserError, Token, TokenValue};
-
-use super::parse_statement;
+use crate::{parser::parse_statement, Parser, ParserError, Token, TokenValue};
 
 pub fn parse_block(parser: &mut Parser) -> Result<Node<Block>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::CurlyOpen)?.span.start;

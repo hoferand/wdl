@@ -1,11 +1,11 @@
 use ast::{Node, Return, Span};
 
-use crate::{parser::expression::parse_expression, Parser, ParserError, TokenValue};
+use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
 
 pub fn parse_return(parser: &mut Parser) -> Result<Node<Return>, ParserError> {
 	let token = parser.tokens.expect(TokenValue::Return)?;
 
-	if parser.state.in_function < 1 {
+	if !parser.state.in_function() {
 		return Err(ParserError::unexpected_return(token.span));
 	}
 
