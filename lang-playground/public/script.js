@@ -155,17 +155,19 @@ function format_log(log) {
 	return html_escape(ret);
 }
 
-document.getElementById("done-btn").addEventListener("click", (_event) => {
-	hide_router();
-	if (response_callback) {
-		response_callback("Done");
-	} else {
-		throw "Response callback not set!";
-	}
-});
+document
+	.getElementById("router-done-btn")
+	.addEventListener("click", (_event) => {
+		hide_router();
+		if (response_callback) {
+			response_callback("Done");
+		} else {
+			throw "Response callback not set!";
+		}
+	});
 
 document
-	.getElementById("no-station-left-btn")
+	.getElementById("router-no-station-left-btn")
 	.addEventListener("click", (_event) => {
 		hide_router();
 		if (response_callback) {

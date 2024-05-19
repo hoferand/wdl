@@ -9,38 +9,36 @@
 		<title>WDL Playground</title>
 	</head>
 	<body>
-		<div id="app">
-			<div id="playground">
-				<h1 id="title">WDL Playground</h1>
-				<div class="row">
-					<div id="editor" class="container">
-						<div class="row" id="editor-row">
-							<h2 id="editor-headline">Editor</h2>
-							<a href="doc/" target="_blank" id="doc-btn">
-								<img src="question.svg" alt="Documentation" id="doc-img" />
-							</a>
-							<button id="run-btn">Start</button>
-						</div>
-						<div id="editor-container"></div>
+		<div id="playground">
+			<h1 id="title">WDL Playground</h1>
+			<div class="row">
+				<div id="editor" class="container">
+					<div class="row" id="editor-row">
+						<h2>Editor</h2>
+						<a href="doc/" target="_blank" id="doc-btn">
+							<img src="question.svg" alt="Documentation" id="doc-img" />
+						</a>
+						<button id="run-btn">Start</button>
 					</div>
-					<div id="router" class="container">
-						<h2>Router</h2>
-						<h3 id="router-wait">Waiting for actions ...</h3>
-						<div id="router-request" style="display: none">
-							<h3 id="action-text"></h3>
-							<pre><code id="target-area"></code></pre>
-							<h3>Status:</h3>
-							<div class="row">
-								<button id="done-btn">Done</button>
-								<button id="no-station-left-btn">No station left</button>
-							</div>
+					<div id="editor-container"></div>
+				</div>
+				<div id="router" class="container">
+					<h2>Router</h2>
+					<h3 id="router-wait">Waiting for actions ...</h3>
+					<div id="router-request" style="display: none">
+						<h3 id="action-text"></h3>
+						<pre><code id="target-area"></code></pre>
+						<h3>Status:</h3>
+						<div class="row">
+							<button id="router-done-btn">Done</button>
+							<button id="router-no-station-left-btn">No station left</button>
 						</div>
 					</div>
 				</div>
-				<div id="output" class="container">
-					<h2>Output</h2>
-					<pre><code id="output-area"></code></pre>
-				</div>
+			</div>
+			<div id="output" class="container">
+				<h2>Output</h2>
+				<pre><code id="output-area"></code></pre>
 			</div>
 		</div>
 	</body>

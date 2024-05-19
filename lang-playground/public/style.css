@@ -2,11 +2,29 @@ html {
 	font-family: "Courier New", Courier, monospace;
 }
 
-#app {
-	width: 100%;
+body {
 	display: flex;
-	flex-direction: column;
-	align-items: center;
+	justify-content: center;
+}
+
+button {
+	height: 35px;
+	background-color: #eee;
+	border: 1px solid grey;
+	border-radius: 5px;
+	padding: 5px;
+	padding-left: 15px;
+	padding-right: 15px;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #ccc;
+}
+
+pre {
+	overflow: auto;
+	margin-bottom: 0;
 }
 
 #playground {
@@ -14,39 +32,16 @@ html {
 	max-width: 1024px;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
 }
 
 #title {
 	margin-right: auto;
 }
 
-#editor-headline {
-	margin-bottom: 0;
-}
-
 .row {
 	display: flex;
 	flex-direction: row;
-}
-
-#editor {
-	flex-grow: 1;
-	margin-right: 1vmin;
-	display: flex;
-	flex-direction: column;
-}
-
-#editor-container {
-	height: 500px;
-	border: 1px solid grey;
-}
-
-#router {
-	width: 400px;
-}
-
-#output {
-	margin-top: 1vmin;
 }
 
 .container {
@@ -59,58 +54,30 @@ html {
 	margin-top: 0;
 }
 
-#output-area {
-	height: 200px;
+/* EDITOR */
+
+#editor {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	margin-right: 1vmin;
 }
 
-span.blue {
-	color: #007fff;
+#editor-row {
+	margin-bottom: 10px;
 }
 
-span.red {
-	color: red;
-}
-
-span.orange {
-	color: orange;
-}
-
-button {
-	width: 70px;
-	height: 35px;
-	background-color: #eee;
-	border: 1px solid grey;
-	border-radius: 5px;
-	padding: 5px;
-	cursor: pointer;
-}
-
-button:hover {
-	background-color: #ccc;
+#editor h2 {
+	margin-bottom: 0;
 }
 
 #run-btn {
 	margin-left: 10px;
 }
 
-#no-station-left-btn {
-	width: 120px;
-	margin-left: auto;
-}
-
-pre {
-	overflow: auto;
-	margin-bottom: 0;
-}
-
 #doc-btn {
 	height: 35px;
-	margin-left: 10px;
 	margin-left: auto;
-}
-
-#editor-row {
-	margin-bottom: 10px;
 }
 
 #doc-img {
@@ -120,4 +87,52 @@ pre {
 
 #doc-img:hover {
 	transform: scale(1.05);
+}
+
+#editor-container {
+	height: 500px;
+	border: 1px solid grey;
+}
+
+/* ROUTER */
+
+#router {
+	width: 400px;
+}
+
+#router-done-btn {
+	margin-right: 10px;
+}
+
+#router-no-station-left-btn {
+	width: 120px;
+	margin-left: auto;
+}
+
+/* OUTPUT */
+
+#output {
+	margin-top: 1vmin;
+}
+
+#output-area {
+	height: 200px;
+}
+
+/* COLORED TEXT */
+
+span.green {
+	color: green;
+}
+
+span.blue {
+	color: #007fff;
+}
+
+span.orange {
+	color: orange;
+}
+
+span.red {
+	color: red;
 }
