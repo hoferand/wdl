@@ -4,29 +4,27 @@ use async_recursion::async_recursion;
 
 use ast::Statement;
 
-use crate::{Environment, Error, Interrupt, Scope};
-
-use super::expression::interpret_expression;
+use crate::{expression::interpret_expression, Environment, Error, Interrupt, Scope};
 
 pub mod block;
 pub use block::interpret_block;
 
-mod if_;
-use if_::interpret_if;
-mod while_;
-use while_::interpret_while;
+mod assignment;
+use assignment::interpret_assignment;
 mod break_;
 use break_::interpret_break;
 mod continue_;
 use continue_::interpret_continue;
-mod return_;
-use return_::interpret_return;
+mod if_;
+use if_::interpret_if;
 mod let_;
 use let_::interpret_let;
-mod assignment;
-use assignment::interpret_assignment;
+mod return_;
+use return_::interpret_return;
 mod send;
 use send::interpret_send;
+mod while_;
+use while_::interpret_while;
 
 #[async_recursion]
 pub async fn interpret_statement(

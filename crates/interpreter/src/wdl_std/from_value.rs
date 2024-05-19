@@ -1,6 +1,4 @@
-use crate::{ChannelId, Error, ErrorKind, FunctionId, Value, ValueType};
-
-use super::ArgType;
+use crate::{wdl_std::ArgType, ChannelId, Error, ErrorKind, FunctionId, Value, ValueType};
 
 pub trait FromValue: Sized {
 	fn from_value(val: Value) -> Result<Option<Self>, Error>;

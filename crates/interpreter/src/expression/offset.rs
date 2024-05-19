@@ -4,9 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Offset};
 
-use crate::{Environment, Error, ErrorKind, Scope, Value};
-
-use super::interpret_expression;
+use crate::{expression::interpret_expression, Environment, Error, ErrorKind, Scope, Value};
 
 #[async_recursion]
 pub async fn interpret_offset(

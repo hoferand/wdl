@@ -5,12 +5,11 @@ use async_recursion::async_recursion;
 use ast::{Call, Identifier, Node, Span};
 
 use crate::{
-	statement,
+	expression::interpret_expression,
+	statement::interpret_block,
 	wdl_std::{ArgumentValue, CallContext},
 	Environment, Error, ErrorKind, FunctionId, FunctionValue, Interrupt, Scope, Value,
 };
-
-use super::interpret_expression;
 
 #[async_recursion]
 pub async fn interpret_call(
@@ -123,7 +122,7 @@ pub async fn run_function(
 				});
 			}
 
-			match statement::interpret_block(&function.body, &inner_scope, env).await? {
+			match interpret_block(&function.body, &inner_scope, env).await? {
 				Interrupt::None => val = Value::Null,
 				Interrupt::Return(ret_val) => val = ret_val,
 				int @ (Interrupt::Continue | Interrupt::Break) => {

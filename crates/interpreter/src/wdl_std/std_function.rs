@@ -1,8 +1,6 @@
 use futures::future::BoxFuture;
 
-use crate::{Error, Value};
-
-use super::CallContext;
+use crate::{wdl_std::CallContext, Error, Value};
 
 pub trait StdFunction {
 	fn clone_box(&self) -> Box<dyn StdFunction>;

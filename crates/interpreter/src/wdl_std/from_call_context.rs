@@ -2,9 +2,10 @@ use std::sync::Arc;
 
 use ast::Identifier;
 
-use crate::{Error, ErrorKind, Value};
-
-use super::{name, Arg, CallContext, Env, FromValue, Source};
+use crate::{
+	wdl_std::{name, Arg, CallContext, Env, FromValue, Source},
+	Error, ErrorKind, Value,
+};
 
 pub trait FromCallContext: Sized {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error>;

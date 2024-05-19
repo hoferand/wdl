@@ -8,26 +8,27 @@ use tokio::{
 
 use ast::{Identifier, Workflow};
 
-pub mod order;
-pub use order::Order;
-pub mod error;
+mod error;
 pub use error::*;
-pub mod value;
-pub use value::*;
-pub mod user_log;
+mod order;
+pub use order::Order;
+mod user_log;
 pub use user_log::*;
+mod value;
+pub use value::*;
+mod router;
+pub use router::Router;
 
-mod environment;
-use environment::Environment;
-pub use environment::Router;
-mod interrupt;
-use interrupt::Interrupt;
 mod channel;
 use channel::Channel;
 mod declaration;
+mod environment;
+use environment::Environment;
 mod expression;
 mod function_value;
 use function_value::FunctionValue;
+mod interrupt;
+use interrupt::Interrupt;
 mod scope;
 use scope::Scope;
 mod statement;

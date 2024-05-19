@@ -4,9 +4,10 @@ use async_recursion::async_recursion;
 
 use ast::{Node, While};
 
-use crate::{Environment, Error, Interrupt, Scope};
-
-use super::{interpret_block, interpret_expression};
+use crate::{
+	expression::interpret_expression, statement::interpret_block, Environment, Error, Interrupt,
+	Scope,
+};
 
 #[async_recursion]
 pub async fn interpret_while(

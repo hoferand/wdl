@@ -1,8 +1,4 @@
-use std::sync::Arc;
-
 use ast::Span;
-
-use crate::environment::Environment;
 
 pub struct Arg<V, const N: u32> {
 	pub idx: usize, // useful if named arguments are used
@@ -15,10 +11,6 @@ impl<V, const N: u32> Arg<V, N> {
 		Self { idx, span, val }
 	}
 }
-
-pub struct Env(pub Arc<Environment>);
-
-pub struct Source(pub Span);
 
 pub const fn id(name: &[u8]) -> u32 {
 	let id = match name {
@@ -36,13 +28,10 @@ pub const fn id(name: &[u8]) -> u32 {
 		_ => todo!(),
 	};
 
-	// check if match statements are equal
-	self::name(id);
-
 	id
 }
 
-// TODO: add unit test that compares name with id
+// TODO: add unit test that compares `name()` with `id()`
 
 pub const fn name(id: u32) -> &'static [u8] {
 	let name: &'static [u8] = match id {

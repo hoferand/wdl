@@ -2,9 +2,10 @@ use std::future::Future;
 
 use futures::future::BoxFuture;
 
-use crate::{Error, ErrorKind, Value};
-
-use super::{CallContext, FromCallContext, IntoResult};
+use crate::{
+	wdl_std::{CallContext, FromCallContext, IntoResult},
+	Error, ErrorKind, Value,
+};
 
 pub trait Handler<T>: Clone + Send + Sized + 'static {
 	fn call(self, ctx: CallContext, strict: bool) -> BoxFuture<'static, Result<Value, Error>>;

@@ -5,12 +5,12 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-pub mod type_;
-pub use type_::*;
 pub mod channel_id;
 pub use channel_id::ChannelId;
 pub mod function_id;
 pub use function_id::FunctionId;
+pub mod type_;
+pub use type_::ValueType;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]

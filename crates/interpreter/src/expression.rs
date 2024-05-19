@@ -4,33 +4,33 @@ use async_recursion::async_recursion;
 
 use ast::Expression;
 
-use crate::{scope::Scope, Environment, Error, Value};
+use crate::{Environment, Error, Scope, Value};
 
-pub mod call;
-pub use call::{interpret_call, run_function};
-
-mod literal;
-use literal::interpret_literal;
-mod binary;
-use binary::interpret_binary;
-mod unary;
-use unary::interpret_unary;
-mod logic;
-use logic::interpret_logic;
-mod group;
-use group::interpret_group;
-mod identifier;
-use identifier::interpret_identifier;
 mod array;
 use array::interpret_array;
-mod offset;
-use offset::interpret_offset;
+mod binary;
+use binary::interpret_binary;
+pub mod call;
+use call::interpret_call;
+pub use call::run_function;
+mod group;
+use group::interpret_group;
+mod variable;
+use variable::interpret_variable;
+mod literal;
+use literal::interpret_literal;
+mod logic;
+use logic::interpret_logic;
 mod member;
 use member::interpret_member;
 mod object;
 use object::interpret_object;
+mod offset;
+use offset::interpret_offset;
 mod spawn;
 use spawn::interpret_spawn;
+mod unary;
+use unary::interpret_unary;
 
 #[async_recursion]
 pub async fn interpret_expression(
@@ -43,7 +43,7 @@ pub async fn interpret_expression(
 		Expression::Binary(expr) => interpret_binary(expr, scope, env).await,
 		Expression::Call(expr) => interpret_call(expr, scope, env).await,
 		Expression::Group(expr) => interpret_group(expr, scope, env).await,
-		Expression::Variable(expr) => interpret_identifier(expr, scope).await,
+		Expression::Variable(expr) => interpret_variable(expr, scope).await,
 		Expression::Literal(expr) => interpret_literal(expr),
 		Expression::Logic(expr) => interpret_logic(expr, scope, env).await,
 		Expression::Member(expr) => interpret_member(expr, scope, env).await,
