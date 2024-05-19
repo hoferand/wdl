@@ -6,7 +6,7 @@ use std::{
 	},
 };
 
-use log::{error, warn};
+use log::error;
 use tokio::{
 	sync::{mpsc::Sender, Mutex, RwLock},
 	task::JoinHandle,
