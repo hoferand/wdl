@@ -1,5 +1,8 @@
-import init, { check_src } from "./wasm/wasm.js";
 import { io } from "./npm_modules/socket.io-client/dist/socket.io.esm.min.js";
+
+import init, { check_src } from "./wasm/wasm.js";
+
+import * as Output from "./output.js";
 
 let editor = null;
 
@@ -7,7 +10,6 @@ let socket = null;
 
 let response_callback = null;
 
-const output_area = document.getElementById("output-area");
 const target_area = document.getElementById("target-area");
 const router_request = document.getElementById("router-request");
 const router_wait = document.getElementById("router-wait");
@@ -43,7 +45,7 @@ window.addEventListener("load", async (_event) => {
 document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	if (socket) {
 		close_socket();
-		output_area.innerHTML += warn("Order canceled by user.\n");
+		Output.add_warn("Order canceled by user.");
 		return;
 	}
 
@@ -51,7 +53,8 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 	document.getElementById("run-btn").innerHTML = "Stop";
 
-	output_area.innerHTML = info("Start order.\n");
+	Output.clear();
+	Output.add_info("Start order.");
 
 	console.log("open socket");
 	let proto = "ws://";
@@ -62,17 +65,7 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 		reconnectionDelayMax: 10000,
 	});
 
-	socket.on("log", (log) => {
-		if (log.level == "Info") {
-			output_area.innerHTML += info(format_log(log)) + "\n";
-		} else if (log.level == "Warn") {
-			output_area.innerHTML += warn(format_log(log)) + "\n";
-		} else if (log.level == "Error") {
-			output_area.innerHTML += error(format_log(log)) + "\n";
-		} else {
-			throw "Invalid log level received!";
-		}
-	});
+	socket.on("log", Output.add_log);
 
 	socket.on("router_request", (request, callback) => {
 		console.log("Received router request:", request);
@@ -97,16 +90,15 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 	socket.on("error", (errors) => {
 		errors = JSON.parse(errors);
-		print_errors(errors, output_area);
+		print_errors(errors, true);
 		close_socket();
-		output_area.innerHTML += warn("Order canceled due to previous error(s).\n");
+		Output.add_warn("Order canceled due to previous error(s).");
 	});
 
 	socket.on("done", (pos) => {
 		close_socket();
-		output_area.innerHTML += info("Order done.\n");
+		Output.add_info("Order done.", pos ? { span_str: pos.span_str } : {});
 		if (pos) {
-			output_area.innerHTML += pos.span_str + "\n";
 			const editor_info = {
 				startLineNumber: pos.span.start.line + 1,
 				startColumn: pos.span.start.column + 1,
@@ -121,9 +113,8 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 	socket.on("canceled", (pos) => {
 		close_socket();
-		output_area.innerHTML += warn("Order canceled.\n");
+		Output.add_warn("Order canceled.", pos ? { span_str: pos.span_str } : {});
 		if (pos) {
-			output_area.innerHTML += pos.span_str + "\n";
 			const editor_warning = {
 				startLineNumber: pos.span.start.line + 1,
 				startColumn: pos.span.start.column + 1,
@@ -140,20 +131,6 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 
 	socket.emit("start", editor.getValue());
 });
-
-function format_log(log) {
-	let ret = "";
-
-	if (log.span) {
-		ret += `[${log.span.start.line + 1}:${log.span.start.column}]`;
-	}
-	if (log.user) {
-		ret += "[user]";
-	}
-	ret += ": " + log.msg;
-
-	return html_escape(ret);
-}
 
 document
 	.getElementById("router-done-btn")
@@ -190,41 +167,22 @@ function hide_router() {
 	router_wait.style.display = "block";
 }
 
-function info(msg) {
-	if (msg[0] == "[") {
-		return '<span class="blue">[INFO]</span>' + msg;
-	}
-	return '<span class="blue">[INFO]</span>: ' + msg;
-}
-
-function warn(msg) {
-	if (msg[0] == "[") {
-		return '<span class="orange">[WARN]</span>' + msg;
-	}
-	return '<span class="orange">[WARN]</span>: ' + msg;
-}
-
-function error(msg) {
-	if (msg[0] == "[") {
-		return '<span class="red">[ERROR]</span>' + msg;
-	}
-	return '<span class="red">[ERROR]</span>: ' + msg;
-}
-
 const debounced_check = debounce(check, 100);
 async function check(src) {
-	let status = check_src(src);
+	const status = check_src(src);
 
-	let output = {};
-	if (!socket) {
-		output = output_area;
-	}
+	const output = !socket;
 
 	if (status.status === "ok") {
-		output.innerHTML = info("No problems found");
+		if (output) {
+			Output.clear();
+			Output.add_info("No problems found.");
+		}
 		monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
 	} else {
-		output.innerHTML = "";
+		if (output) {
+			Output.clear();
+		}
 		print_errors(status.errors, output);
 	}
 }
@@ -232,10 +190,14 @@ async function check(src) {
 function print_errors(errors, output) {
 	let editor_errors = [];
 	for (let error2 of errors) {
-		output.innerHTML += error(html_escape(error2.title)) + "\n";
+		if (output) {
+			Output.add_error(
+				error2.title,
+				error2.pos ? { span_str: error2.pos.span_str } : {}
+			);
+		}
 		if (error2.pos) {
 			const pos = error2.pos;
-			output.innerHTML += pos.span_str + "\n";
 
 			editor_errors.push({
 				startLineNumber: pos.span.start.line + 1,
@@ -248,13 +210,6 @@ function print_errors(errors, output) {
 		}
 	}
 	monaco.editor.setModelMarkers(editor.getModel(), "owner", editor_errors);
-}
-
-function html_escape(str) {
-	return str.replace(
-		/[\u00A0-\u9999<>\&]/g,
-		(i) => "&#" + i.charCodeAt(0) + ";"
-	);
 }
 
 function debounce(func, timeout = 300) {
