@@ -13,7 +13,7 @@ impl<V, const N: u32> Arg<V, N> {
 }
 
 pub const fn id(name: &[u8]) -> u32 {
-	let id = match name {
+	match name {
 		b"ms" => 1,
 		b"regex" => 2,
 		b"haystack" => 3,
@@ -26,15 +26,13 @@ pub const fn id(name: &[u8]) -> u32 {
 		b"arg" => 10,
 		b"events" => 11,
 		_ => todo!(),
-	};
-
-	id
+	}
 }
 
 // TODO: add unit test that compares `name()` with `id()`
 
 pub const fn name(id: u32) -> &'static [u8] {
-	let name: &'static [u8] = match id {
+	match id {
 		1 => b"ms",
 		2 => b"regex",
 		3 => b"haystack",
@@ -47,7 +45,5 @@ pub const fn name(id: u32) -> &'static [u8] {
 		10 => b"arg",
 		11 => b"events",
 		_ => todo!(),
-	};
-
-	name
+	}
 }

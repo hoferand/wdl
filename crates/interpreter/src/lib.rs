@@ -77,12 +77,12 @@ pub async fn run_order(order: Order) -> Result<(), Error> {
 			if ret.is_ok() {
 				err_rx.close();
 				info!("Main flow finished, error channel closed, waiting for background tasks to finish!");
-				while let Some(handle) = order.env.pop_handle().await{
+				while let Some(handle) = order.env.pop_handle().await {
 					if let Ok(val) = handle.await {
-						if let Err(err) = &val {
+						if let Err(err) = val {
 							info!("Background task returned error: {:?}", err);
+							return Err(err);
 						}
-						val?;
 					} else {
 						error!("Failed to finish background task!");
 						// TODO: panic?
