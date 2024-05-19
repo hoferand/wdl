@@ -61,7 +61,6 @@ pub async fn start_workflow(
 	Ok(Order { workflow: ast, env })
 }
 
-// TODO: maybe return vector of errors (background tasks)
 pub async fn run_order(order: Order) -> Result<(), Error> {
 	let (err_tx, mut err_rx) = mpsc::channel(1);
 	order.env.set_error_ch(err_tx).await;
