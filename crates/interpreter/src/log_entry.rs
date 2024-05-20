@@ -6,8 +6,8 @@ use ast::Span;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct LogEntry {
-	pub msg: String,
 	pub level: LogEntryLevel,
+	pub msg: String,
 	pub user: bool,
 	pub span: Option<Span>,
 }
@@ -15,8 +15,8 @@ pub struct LogEntry {
 impl LogEntry {
 	pub fn trace(msg: impl Into<String>, span: Option<Span>) -> Self {
 		Self {
-			msg: msg.into(),
 			level: LogEntryLevel::Trace,
+			msg: msg.into(),
 			user: false,
 			span,
 		}
@@ -24,8 +24,8 @@ impl LogEntry {
 
 	pub fn debug(msg: impl Into<String>, span: Option<Span>) -> Self {
 		Self {
-			msg: msg.into(),
 			level: LogEntryLevel::Debug,
+			msg: msg.into(),
 			user: false,
 			span,
 		}
@@ -33,8 +33,8 @@ impl LogEntry {
 
 	pub fn info(msg: impl Into<String>, span: Option<Span>) -> Self {
 		Self {
-			msg: msg.into(),
 			level: LogEntryLevel::Info,
+			msg: msg.into(),
 			user: false,
 			span,
 		}
@@ -42,8 +42,8 @@ impl LogEntry {
 
 	pub fn warn(msg: impl Into<String>, span: Option<Span>) -> Self {
 		Self {
-			msg: msg.into(),
 			level: LogEntryLevel::Warn,
+			msg: msg.into(),
 			user: false,
 			span,
 		}
@@ -51,8 +51,8 @@ impl LogEntry {
 
 	pub fn error(msg: impl Into<String>, span: Option<Span>) -> Self {
 		Self {
-			msg: msg.into(),
 			level: LogEntryLevel::Error,
+			msg: msg.into(),
 			user: false,
 			span,
 		}

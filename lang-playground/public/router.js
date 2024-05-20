@@ -1,13 +1,4 @@
-/**
- * ResponseCallback
- *
- * @callback ResponseCallback
- *
- * @param {string} status
- *
- * @returns {void}
- */
-
+import "./typedef.js";
 import * as Output from "./output.js";
 
 const ROUTER_REQUEST = document.getElementById("router-request");
@@ -27,7 +18,6 @@ let response_callback = null;
  *
  * @param {{action: "Pickup"|"Drop"|"Drive", target: any}} request
  * @param {ResponseCallback} callback
- *
  * @returns {void}
  */
 export function set_request(request, callback) {
@@ -105,7 +95,6 @@ function send_no_station_left() {
  * Sends a status to the current interpreter connection.
  *
  * @param {string} status
- *
  * @returns {void}
  */
 function send_status(status) {

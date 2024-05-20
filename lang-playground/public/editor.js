@@ -1,184 +1,12 @@
-import { io } from "./npm_modules/socket.io-client/dist/socket.io.esm.min.js";
+import wasm_init, { check_src } from "./wasm/wasm.js";
+await wasm_init();
 
-import init, { check_src } from "./wasm/wasm.js";
-
+import "./typedef.js";
 import * as Output from "./output.js";
-import * as Router from "./router.js";
 
-const RUN_BTN = document.getElementById("run-btn");
-
-let editor = null;
-
-let socket = null;
-
-window.addEventListener("load", async (_event) => {
-	await init();
-
-	require.config({
-		paths: { vs: "npm_modules/monaco-editor/min/vs" },
-	});
-
-	require(["vs/editor/editor.main"], function () {
-		define_wdl();
-
-		editor = monaco.editor.create(document.getElementById("editor-container"), {
-			value: DEFAULT_SOURCE_CODE,
-			language: "wdl",
-			theme: "wdl-theme",
-			minimap: { enabled: false },
-		});
-
-		editor.getModel().updateOptions({ tabSize: 4 });
-
-		editor.getModel().onDidChangeContent((_event) => {
-			debounced_check(editor.getValue());
-		});
-
-		check(editor.getValue());
-	});
-});
-
-RUN_BTN.addEventListener("click", async (_event) => {
-	if (socket) {
-		close_socket();
-		Output.add_warn("Order canceled by user.");
-		return;
-	}
-
-	Output.clear();
-	Output.add_info("Start order.");
-
-	monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
-
-	console.log("open socket");
-	let proto = "ws://";
-	if (window.location.protocol === "https:") {
-		proto = "wss://";
-	}
-	socket = io(proto + window.location.host + "/run", {
-		reconnectionDelayMax: 10000,
-	});
-
-	RUN_BTN.innerText = "Stop";
-
-	socket.on("log", Output.add_log);
-
-	socket.on("router_request", Router.set_request);
-
-	socket.on("error", (errors) => {
-		errors = JSON.parse(errors);
-		print_errors(errors, true);
-		close_socket();
-		Output.add_warn("Order canceled due to previous error(s).");
-	});
-
-	socket.on("done", (pos) => {
-		close_socket();
-		Output.add_info("Order done.", pos ? { span_str: pos.span_str } : {});
-		if (pos) {
-			const editor_info = {
-				startLineNumber: pos.span.start.line + 1,
-				startColumn: pos.span.start.column + 1,
-				endLineNumber: pos.span.end.line + 1,
-				endColumn: pos.span.end.column + 1,
-				message: "Order done.",
-				severity: monaco.MarkerSeverity.Info,
-			};
-			monaco.editor.setModelMarkers(editor.getModel(), "owner", [editor_info]);
-		}
-	});
-
-	socket.on("canceled", (pos) => {
-		close_socket();
-		Output.add_warn("Order canceled.", pos ? { span_str: pos.span_str } : {});
-		if (pos) {
-			const editor_warning = {
-				startLineNumber: pos.span.start.line + 1,
-				startColumn: pos.span.start.column + 1,
-				endLineNumber: pos.span.end.line + 1,
-				endColumn: pos.span.end.column + 1,
-				message: "Order canceled.",
-				severity: monaco.MarkerSeverity.Warning,
-			};
-			monaco.editor.setModelMarkers(editor.getModel(), "owner", [
-				editor_warning,
-			]);
-		}
-	});
-
-	socket.emit("start", editor.getValue());
-});
-
-function close_socket() {
-	Router.cancel_request();
-	console.log("close socket");
-	socket.close();
-	socket = null;
-	RUN_BTN.innerText = "Start";
-}
-
-const debounced_check = debounce(check, 100);
-async function check(src) {
-	const status = check_src(src);
-
-	const output = !socket;
-
-	if (status.status === "Ok") {
-		if (output) {
-			Output.clear();
-			Output.add_info("No problems found.");
-		}
-		monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
-	} else if (status.status === "Error") {
-		if (output) {
-			Output.clear();
-		}
-		print_errors(status.errors, output);
-	} else {
-		if (output) {
-			Output.clear();
-			Output.add_error("Received invalid status from source code checker!");
-		}
-		monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
-		throw `Received invalid status \`${status.status}\` from source code checker!`;
-	}
-}
-
-function print_errors(errors, output) {
-	let editor_errors = [];
-	for (let error2 of errors) {
-		if (output) {
-			Output.add_error(
-				error2.title,
-				error2.pos ? { span_str: error2.pos.span_str } : {}
-			);
-		}
-		if (error2.pos) {
-			const pos = error2.pos;
-
-			editor_errors.push({
-				startLineNumber: pos.span.start.line + 1,
-				startColumn: pos.span.start.column + 1,
-				endLineNumber: pos.span.end.line + 1,
-				endColumn: pos.span.end.column + 1,
-				message: error2.title,
-				severity: monaco.MarkerSeverity.Error,
-			});
-		}
-	}
-	monaco.editor.setModelMarkers(editor.getModel(), "owner", editor_errors);
-}
-
-function debounce(func, timeout = 300) {
-	let timer;
-	return (...args) => {
-		clearTimeout(timer);
-		timer = setTimeout(() => {
-			func.apply(this, args);
-		}, timeout);
-	};
-}
-
+/**
+ * This source code is set on editor load.
+ */
 const DEFAULT_SOURCE_CODE = `global source = "mySource";
 global destination = "myDestination";
 
@@ -206,6 +34,218 @@ actions {
 }
 `;
 
+/**
+ * The monaco editor instance.
+ */
+let editor = null;
+
+/**
+ * Indicates if errors should be
+ * printed to the output field.
+ */
+let output = true;
+
+/**
+ * Initializes the monaco editor inside `container`.
+ *
+ * @param {HTMLDivElement} container
+ * @returns {void}
+ */
+export function init(container) {
+	require.config({
+		paths: { vs: "npm_modules/monaco-editor/min/vs" },
+	});
+
+	require(["vs/editor/editor.main"], function () {
+		define_wdl();
+
+		editor = monaco.editor.create(container, {
+			value: DEFAULT_SOURCE_CODE,
+			language: "wdl",
+			theme: "wdl-theme",
+			minimap: { enabled: false },
+		});
+
+		editor.getModel().updateOptions({ tabSize: 4 });
+
+		editor.getModel().onDidChangeContent((_event) => {
+			debounced_check(editor.getValue());
+		});
+
+		check(editor.getValue());
+	});
+}
+
+/**
+ * Enables logging to the output field.
+ *
+ * @returns {void}
+ */
+export function enable_output() {
+	output = true;
+}
+
+/**
+ * Disables logging to the output field.
+ *
+ * @returns {void}
+ */
+export function disable_output() {
+	output = false;
+}
+
+/**
+ * Sets markers to the editor.
+ * Previous markers gets deleted.
+ *
+ * @param {Marker[]} markers
+ * @returns {void}
+ */
+export function set_markers(markers) {
+	let converted = [];
+
+	for (const marker of markers) {
+		converted.push({
+			severity: convert_severity(marker.severity),
+			message: marker.message,
+			startLineNumber: marker.span.start.line + 1,
+			startColumn: marker.span.start.column + 1,
+			endLineNumber: marker.span.end.line + 1,
+			endColumn: marker.span.end.column + 1,
+		});
+	}
+
+	monaco.editor.setModelMarkers(editor.getModel(), "owner", converted);
+}
+
+/**
+ * Clears all markers from the editor.
+ *
+ * @returns {void}
+ */
+export function clear_markers() {
+	monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
+}
+
+/**
+ * Returns the current source code.
+ *
+ * @returns {string}
+ */
+export function get_code() {
+	return editor.getValue();
+}
+
+/**
+ * Converts the severity enum to the corresponding number.
+ *
+ * @param {Severity} severity
+ * @returns {number}
+ */
+function convert_severity(severity) {
+	switch (severity) {
+		case "Hint":
+			return monaco.MarkerSeverity.Hint;
+		case "Info":
+			return monaco.MarkerSeverity.Info;
+		case "Warning":
+			return monaco.MarkerSeverity.Warning;
+		case "Error":
+			return monaco.MarkerSeverity.Error;
+		default:
+			if (output) {
+				Output.add_error("Internal error!");
+			}
+			throw `Received invalid severity \`${severity}\`!`;
+	}
+}
+
+/**
+ * Checks if the given source code is syntactically correct.
+ *
+ * @param {string} src
+ * @returns {void}
+ */
+function check(src) {
+	const status = check_src(src);
+
+	if (output) {
+		Output.clear();
+	}
+
+	if (status.status === "Ok") {
+		if (output) {
+			Output.add_info("No problems found.");
+		}
+		clear_markers();
+	} else if (status.status === "Error") {
+		display_errors(status.errors, output);
+	} else {
+		if (output) {
+			Output.add_error("Received invalid status from source code checker!");
+		}
+		clear_markers();
+		throw `Received invalid status \`${status.status}\` from source code checker!`;
+	}
+}
+
+/**
+ * Debounced version of `check()`.
+ *
+ * @param {string} src
+ * @returns {void}
+ */
+const debounced_check = debounce(check, 100);
+
+/**
+ * Displays the given errors inline in the editor (if position is available)
+ * and prints them to the output field if enabled.
+ *
+ * @param {WdlError[]} errors
+ * @returns {void}
+ */
+function display_errors(errors) {
+	let editor_errors = [];
+	for (let error2 of errors) {
+		if (output) {
+			Output.add_error(
+				error2.title,
+				error2.pos ? { span_str: error2.pos.span_str } : {}
+			);
+		}
+		if (error2.pos) {
+			editor_errors.push({
+				severity: "Error",
+				message: error2.title,
+				span: error2.pos.span,
+			});
+		}
+	}
+	set_markers(editor_errors);
+}
+
+/**
+ * Returns a debounced version of `func`.
+ *
+ * @param {function(...any): any} func
+ * @param {number} timeout
+ * @returns {function(...any): any}
+ */
+function debounce(func, timeout = 300) {
+	let timer;
+	return (...args) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			func.apply(this, args);
+		}, timeout);
+	};
+}
+
+/**
+ * Defines WDL as language for the monaco editor.
+ *
+ * @returns {void}
+ */
 function define_wdl() {
 	monaco.languages.register({
 		id: "wdl",
@@ -234,12 +274,13 @@ function define_wdl() {
 		],
 		keywordsOther: ["global", "function", "let", "true", "false", "null"],
 		operators: [
-			"!",
 			"+",
 			"-",
 			"*",
 			"/",
 			"%",
+			"??",
+			"!",
 			"<",
 			">",
 			"==",

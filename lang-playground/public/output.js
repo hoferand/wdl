@@ -1,23 +1,4 @@
-/**
- * Location
- *
- * @typedef {{line: number, column: number}} Location
- */
-
-/**
- * Span
- *
- * @typedef {{start: Location, end: Location}} Span
- */
-
-/**
- * Log
- *
- * `msg` is not html escaped
- * `span_str` is html escaped
- *
- * @typedef {{level: "Trace"|"Debug"|"Info"|"Warn"|"Error", msg: string, user?: boolean, span?: Span, span_str?: string}} Log
- */
+import "./typedef.js";
 
 const output_area = document.getElementById("output-area");
 
@@ -40,7 +21,6 @@ export function clear() {
  * Adds a log to the output field.
  *
  * @param {Log} log
- *
  * @returns {void}
  */
 export function add_log(log) {
@@ -52,7 +32,6 @@ export function add_log(log) {
  *
  * @param {string} msg
  * @param {{span?: Span, span_str?: string}} pos
- *
  * @returns {void}
  */
 export function add_trace(msg, pos = {}) {
@@ -64,7 +43,6 @@ export function add_trace(msg, pos = {}) {
  *
  * @param {string} msg
  * @param {{span?: Span, span_str?: string}} pos
- *
  * @returns {void}
  */
 export function add_debug(msg, pos = {}) {
@@ -76,7 +54,6 @@ export function add_debug(msg, pos = {}) {
  *
  * @param {string} msg
  * @param {{span?: Span, span_str?: string}} pos
- *
  * @returns {void}
  */
 export function add_info(msg, pos = {}) {
@@ -88,7 +65,6 @@ export function add_info(msg, pos = {}) {
  *
  * @param {string} msg
  * @param {{span?: Span, span_str?: string}} pos
- *
  * @returns {void}
  */
 export function add_warn(msg, pos = {}) {
@@ -100,7 +76,6 @@ export function add_warn(msg, pos = {}) {
  *
  * @param {string} msg
  * @param {{span?: Span, span_str?: string}} pos
- *
  * @returns {void}
  */
 export function add_error(msg, pos = {}) {
@@ -111,7 +86,6 @@ export function add_error(msg, pos = {}) {
  * Formats a log to a string representation.
  *
  * @param {Log} log
- *
  * @returns {string}
  */
 function format_log(log) {
@@ -159,7 +133,7 @@ function format_log(log) {
  * Escapes strings to be html secure.
  *
  * @param {string} str
- * @returns string
+ * @returns {string}
  */
 function html_escape(str) {
 	return str.replace(
