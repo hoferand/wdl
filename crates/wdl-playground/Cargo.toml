@@ -9,6 +9,7 @@ router = { path = "../router" }
 parser = { path = "../parser" }
 interpreter = { path = "../interpreter", features = ["playground"] }
 
+log = "0.4.21"
 axum = "0.7.4"
 shuttle-axum = "0.45.0"
 shuttle-runtime = "0.45.0"

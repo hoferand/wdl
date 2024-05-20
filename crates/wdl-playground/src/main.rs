@@ -1,6 +1,7 @@
 use std::{collections::HashMap, time::Duration};
 
 use axum::{http::Method, Router};
+use log::info;
 use serde_json::Value;
 use socketioxide::{
 	extract::{Data, SocketRef},
@@ -43,7 +44,7 @@ async fn main() -> shuttle_axum::ShuttleAxum {
 }
 
 async fn run(socket: SocketRef) {
-	eprintln!("Socket.IO connected: {:?} {:?}", socket.ns(), socket.id);
+	info!("Socket.IO connected: {:?} {:?}", socket.ns(), socket.id);
 
 	socket.on("start", run_workflow);
 
@@ -51,7 +52,7 @@ async fn run(socket: SocketRef) {
 }
 
 async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
-	eprintln!("Received workflow [{}]:\n{}", socket.id, src_code);
+	info!("Received workflow [{}]:\n{}", socket.id, src_code);
 	let ast = match parser::get_ast(&src_code.clone()) {
 		Ok(ast) => ast,
 		Err(err) => {

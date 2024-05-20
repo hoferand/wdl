@@ -2943,6 +2943,7 @@ dependencies = [
  "axum 0.7.5",
  "format",
  "interpreter",
+ "log",
  "parser",
  "router",
  "serde_json",
