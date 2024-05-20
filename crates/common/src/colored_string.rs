@@ -55,7 +55,7 @@ impl Display for ColoredString {
 	}
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ColorMode {
 	None,
 	ANSI,

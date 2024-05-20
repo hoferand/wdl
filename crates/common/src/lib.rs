@@ -190,10 +190,10 @@ pub fn create_error_location(
 				);
 			}
 		} else if let Some(line) = lines.get(line_number) {
-			let line = match target {
-				ColorMode::None => line.to_owned().to_owned(),
-				ColorMode::ANSI => line.to_owned().to_owned(),
-				ColorMode::HTML => html_escape::encode_text(line).to_string(),
+			let line = if target == ColorMode::HTML {
+				html_escape::encode_text(line).to_string()
+			} else {
+				line.to_owned().to_owned()
 			};
 			ret += &format!(
 				"{:<pad$} {:} {}\n",
@@ -203,11 +203,10 @@ pub fn create_error_location(
 				pad = number_padding,
 			);
 		} else {
-			ret = format!(
+			return format!(
 				"Internal error, line number `{}` does not exist!",
 				line_number + 1
 			);
-			return ret;
 		}
 	}
 
