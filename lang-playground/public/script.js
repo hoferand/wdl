@@ -3,17 +3,13 @@ import { io } from "./npm_modules/socket.io-client/dist/socket.io.esm.min.js";
 import init, { check_src } from "./wasm/wasm.js";
 
 import * as Output from "./output.js";
+import * as Router from "./router.js";
+
+const RUN_BTN = document.getElementById("run-btn");
 
 let editor = null;
 
 let socket = null;
-
-let response_callback = null;
-
-const target_area = document.getElementById("target-area");
-const router_request = document.getElementById("router-request");
-const router_wait = document.getElementById("router-wait");
-const action_text = document.getElementById("action-text");
 
 window.addEventListener("load", async (_event) => {
 	await init();
@@ -26,7 +22,7 @@ window.addEventListener("load", async (_event) => {
 		define_wdl();
 
 		editor = monaco.editor.create(document.getElementById("editor-container"), {
-			value: default_source,
+			value: DEFAULT_SOURCE_CODE,
 			language: "wdl",
 			theme: "wdl-theme",
 			minimap: { enabled: false },
@@ -42,19 +38,17 @@ window.addEventListener("load", async (_event) => {
 	});
 });
 
-document.getElementById("run-btn").addEventListener("click", async (_event) => {
+RUN_BTN.addEventListener("click", async (_event) => {
 	if (socket) {
 		close_socket();
 		Output.add_warn("Order canceled by user.");
 		return;
 	}
 
-	monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
-
-	document.getElementById("run-btn").innerHTML = "Stop";
-
 	Output.clear();
 	Output.add_info("Start order.");
+
+	monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
 
 	console.log("open socket");
 	let proto = "ws://";
@@ -65,28 +59,11 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 		reconnectionDelayMax: 10000,
 	});
 
+	RUN_BTN.innerText = "Stop";
+
 	socket.on("log", Output.add_log);
 
-	socket.on("router_request", (request, callback) => {
-		console.log("Received router request:", request);
-		response_callback = callback;
-		const action = request.action;
-		action_text.innerText = action.charAt(0).toUpperCase() + action.slice(1);
-		if (action === "pickup") {
-			action_text.innerText += " from:";
-		} else {
-			action_text.innerText += " to:";
-		}
-		target_area.innerText = JSON.stringify(
-			request.target,
-			(_key, value) => {
-				if (value !== null) return value;
-			},
-			4
-		);
-		router_wait.style.display = "none";
-		router_request.style.display = "block";
-	});
+	socket.on("router_request", Router.set_request);
 
 	socket.on("error", (errors) => {
 		errors = JSON.parse(errors);
@@ -132,39 +109,12 @@ document.getElementById("run-btn").addEventListener("click", async (_event) => {
 	socket.emit("start", editor.getValue());
 });
 
-document
-	.getElementById("router-done-btn")
-	.addEventListener("click", (_event) => {
-		hide_router();
-		if (response_callback) {
-			response_callback("Done");
-		} else {
-			throw "Response callback not set!";
-		}
-	});
-
-document
-	.getElementById("router-no-station-left-btn")
-	.addEventListener("click", (_event) => {
-		hide_router();
-		if (response_callback) {
-			response_callback("NoStationLeft");
-		} else {
-			throw "Response callback not set!";
-		}
-	});
-
 function close_socket() {
-	hide_router();
+	Router.cancel_request();
 	console.log("close socket");
 	socket.close();
 	socket = null;
-	document.getElementById("run-btn").innerHTML = "Start";
-}
-
-function hide_router() {
-	router_request.style.display = "none";
-	router_wait.style.display = "block";
+	RUN_BTN.innerText = "Start";
 }
 
 const debounced_check = debounce(check, 100);
@@ -222,7 +172,7 @@ function debounce(func, timeout = 300) {
 	};
 }
 
-const default_source = `global source = "mySource";
+const DEFAULT_SOURCE_CODE = `global source = "mySource";
 global destination = "myDestination";
 
 actions {
