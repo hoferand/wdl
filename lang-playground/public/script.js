@@ -123,17 +123,24 @@ async function check(src) {
 
 	const output = !socket;
 
-	if (status.status === "ok") {
+	if (status.status === "Ok") {
 		if (output) {
 			Output.clear();
 			Output.add_info("No problems found.");
 		}
 		monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
-	} else {
+	} else if (status.status === "Error") {
 		if (output) {
 			Output.clear();
 		}
 		print_errors(status.errors, output);
+	} else {
+		if (output) {
+			Output.clear();
+			Output.add_error("Received invalid status from source code checker!");
+		}
+		monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
+		throw `Received invalid status \`${status.status}\` from source code checker!`;
 	}
 }
 

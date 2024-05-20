@@ -8,12 +8,12 @@ pub use colored_string::*;
 pub fn check_src(src_code: String, target: ColorMode) -> Status {
 	if let Err(error) = parser::get_ast(&src_code) {
 		Status {
-			status: "error".to_owned(),
+			status: "Error".to_owned(),
 			errors: Some(convert_parser_error(&error, &src_code, target)),
 		}
 	} else {
 		Status {
-			status: "ok".to_owned(),
+			status: "Ok".to_owned(),
 			errors: None,
 		}
 	}

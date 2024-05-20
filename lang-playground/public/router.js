@@ -23,9 +23,9 @@ const TARGET_AREA = document.getElementById("target-area");
 let response_callback = null;
 
 /**
- * Displays a new request from the router.
+ * Displays a new request.
  *
- * @param {{action: "pickup"|"drop"|"drive", target: any}} request
+ * @param {{action: "Pickup"|"Drop"|"Drive", target: any}} request
  * @param {ResponseCallback} callback
  *
  * @returns {void}
@@ -35,10 +35,13 @@ export function set_request(request, callback) {
 
 	const action = request.action;
 	ACTION_TEXT.innerText = action.charAt(0).toUpperCase() + action.slice(1);
-	if (action === "pickup") {
+	if (action === "Pickup") {
 		ACTION_TEXT.innerText += " from:";
-	} else {
+	} else if (["Drop", "Drive"].includes(action)) {
 		ACTION_TEXT.innerText += " to:";
+	} else {
+		Output.add_error(`Received invalid action type \`${action}\`!`);
+		throw `Received invalid action type \`${action}\`!`;
 	}
 
 	TARGET_AREA.innerText = JSON.stringify(
@@ -51,7 +54,7 @@ export function set_request(request, callback) {
 }
 
 /**
- * Cancels the current router request.
+ * Cancels the current request.
  *
  * @returns {void}
  */
@@ -81,7 +84,7 @@ function hide_request() {
 }
 
 /**
- * Sends status "Done" to the router.
+ * Sends router status "Done" to the interpreter.
  *
  * @returns {void}
  */
@@ -90,7 +93,7 @@ function send_done() {
 }
 
 /**
- * Sends status "NoStationLeft" to the router.
+ * Sends router status "NoStationLeft" to the interpreter.
  *
  * @returns {void}
  */
@@ -99,7 +102,7 @@ function send_no_station_left() {
 }
 
 /**
- * Sends a status to the current router connection.
+ * Sends a status to the current interpreter connection.
  *
  * @param {string} status
  *

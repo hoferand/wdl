@@ -37,11 +37,9 @@ impl RouterClientWs {
 
 impl crate::RouterClient for RouterClientWs {
 	async fn pickup(&self, target: Target) -> Option<RouterStatus> {
-		eprintln!("should do pickup: {:?}", target);
-
 		self.sender
 			.send(WsRouterRequest {
-				action: "pickup".to_owned(),
+				action: "Pickup".to_owned(),
 				target,
 			})
 			.await
@@ -53,7 +51,7 @@ impl crate::RouterClient for RouterClientWs {
 	async fn drop(&self, target: Target) -> Option<RouterStatus> {
 		self.sender
 			.send(WsRouterRequest {
-				action: "drop".to_owned(),
+				action: "Drop".to_owned(),
 				target,
 			})
 			.await
@@ -65,7 +63,7 @@ impl crate::RouterClient for RouterClientWs {
 	async fn drive(&self, target: Target) -> Option<RouterStatus> {
 		self.sender
 			.send(WsRouterRequest {
-				action: "drive".to_owned(),
+				action: "Drive".to_owned(),
 				target,
 			})
 			.await
