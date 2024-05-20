@@ -14,7 +14,7 @@ use tower_http::{
 };
 
 use common::{ColorMode, Status};
-use interpreter::UserLog;
+use interpreter::LogEntry;
 use router::{RouterClientWs, RouterStatus};
 
 #[shuttle_runtime::main]
@@ -112,12 +112,12 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		}
 	});
 
-	let (log_sender, mut log_receiver) = mpsc::channel::<UserLog>(10);
+	let (log_sender, mut log_receiver) = mpsc::channel::<LogEntry>(10);
 
 	let async_socket = socket.clone();
 	let log_handle = tokio::spawn(async move {
 		while let Some(log) = log_receiver.recv().await {
-			let send_log = UserLog {
+			let send_log = LogEntry {
 				msg: truncate(log.msg, 100), // to save network traffic
 				level: log.level,
 				user: log.user,

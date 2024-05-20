@@ -16,13 +16,14 @@
  * `msg` is not html escaped
  * `span_str` is html escaped
  *
- * @typedef {{level: "Trace"|"Info"|"Warn"|"Error", msg: string, user?: boolean, span?: Span, span_str?: string}} Log
+ * @typedef {{level: "Trace"|"Debug"|"Info"|"Warn"|"Error", msg: string, user?: boolean, span?: Span, span_str?: string}} Log
  */
 
 const output_area = document.getElementById("output-area");
 
-const TRACE = '<span class="green">[TRACE]</span>';
-const INFO = '<span class="blue">[INFO]</span>';
+const TRACE = '<span class="gray">[TRACE]</span>';
+const DEBUG = '<span class="blue">[DEBUG]</span>';
+const INFO = '<span class="green">[INFO]</span>';
 const WARN = '<span class="orange">[WARN]</span>';
 const ERROR = '<span class="red">[ERROR]</span>';
 
@@ -56,6 +57,18 @@ export function add_log(log) {
  */
 export function add_trace(msg, pos = {}) {
 	add_log({ level: "Trace", msg, ...pos });
+}
+
+/**
+ * Adds a debug message to the output field.
+ *
+ * @param {string} msg
+ * @param {{span?: Span, span_str?: string}} pos
+ *
+ * @returns {void}
+ */
+export function add_debug(msg, pos = {}) {
+	add_log({ level: "Debug", msg, ...pos });
 }
 
 /**
@@ -106,6 +119,8 @@ function format_log(log) {
 
 	if (log.level === "Trace") {
 		ret += TRACE;
+	} else if (log.level === "Debug") {
+		ret += DEBUG;
 	} else if (log.level === "Info") {
 		ret += INFO;
 	} else if (log.level === "Warn") {
@@ -116,7 +131,7 @@ function format_log(log) {
 		throw `Invalid log level \`${log.level}\`!`;
 	}
 
-	if (log.span !== undefined) {
+	if (log.span ?? false) {
 		ret += `[${log.span.start.line + 1}:${log.span.start.column + 1}]`;
 	}
 
@@ -130,7 +145,7 @@ function format_log(log) {
 		ret += "\n";
 	}
 
-	if (log.span_str !== undefined) {
+	if (log.span_str ?? false) {
 		ret += log.span_str;
 		if (log.span_str.slice(-1) !== "\n") {
 			ret += "\n";

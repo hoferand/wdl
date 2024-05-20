@@ -10,8 +10,8 @@ use ast::{Identifier, Workflow};
 
 mod error;
 pub use error::*;
-mod user_log;
-pub use user_log::*;
+mod log_entry;
+pub use log_entry::*;
 mod value;
 pub use value::*;
 mod router;
@@ -36,7 +36,7 @@ pub async fn run_workflow(
 	workflow: Workflow,
 	variables: HashMap<Identifier, Value>,
 	router: Router,
-	user_log_ch: Sender<UserLog>,
+	user_log_ch: Sender<LogEntry>,
 ) -> Result<(), Error> {
 	let (err_tx, mut err_rx) = mpsc::channel(1);
 	let global_scope = Arc::new(Scope::new());

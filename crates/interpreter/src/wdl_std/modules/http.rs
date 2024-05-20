@@ -8,7 +8,7 @@ use ast::Span;
 
 use crate::{
 	wdl_std::{get_handler, id, Arg, Env, ResultType, Source},
-	Error, ErrorKind, FunctionId, FunctionValue, UserLog, Value,
+	Error, ErrorKind, FunctionId, FunctionValue, LogEntry, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -37,7 +37,7 @@ async fn get(
 	Env(env): Env,
 	Source(src): Source,
 ) -> Result<Option<HttpResponse>, Error> {
-	env.send_log(UserLog::info(
+	env.send_log(LogEntry::info(
 		format!("Send GET request to `{}`.", url.val),
 		Some(src),
 	))
@@ -45,7 +45,7 @@ async fn get(
 
 	let ret = process_response(reqwest::get(parse_url(&url.val, url.span)?).await).await?;
 
-	env.send_log(UserLog::info(
+	env.send_log(LogEntry::info(
 		format!(
 			"Response: {}.",
 			serde_json::to_string(&ret).unwrap_or("<internal error>".to_owned())
@@ -62,7 +62,7 @@ async fn post(
 	Env(env): Env,
 	Source(src): Source,
 ) -> Result<Option<HttpResponse>, Error> {
-	env.send_log(UserLog::info(
+	env.send_log(LogEntry::info(
 		format!("Send POST request to `{}`.", url.val),
 		Some(src),
 	))
@@ -76,7 +76,7 @@ async fn post(
 	)
 	.await?;
 
-	env.send_log(UserLog::info(
+	env.send_log(LogEntry::info(
 		format!(
 			"Response: {}.",
 			serde_json::to_string(&ret).unwrap_or("<internal error>".to_owned())

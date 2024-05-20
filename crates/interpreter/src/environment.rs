@@ -16,13 +16,13 @@ use ast::{Identifier, Node};
 
 use crate::{
 	wdl_std::resolve_id, Channel, ChannelId, Error, ErrorKind, FunctionId, FunctionValue, Router,
-	Scope, UserLog, Value,
+	Scope, LogEntry, Value,
 };
 
 pub struct Environment {
 	pub global_scope: Arc<Scope>,
 	pub router: Router,
-	user_log_ch: Mutex<Sender<UserLog>>,
+	user_log_ch: Mutex<Sender<LogEntry>>,
 	error_ch: Mutex<Sender<Error>>,
 	handles: Mutex<Vec<JoinHandle<Result<(), Error>>>>,
 	functions: RwLock<HashMap<Identifier, FunctionValue>>,
@@ -34,7 +34,7 @@ impl Environment {
 	pub fn new(
 		global_scope: Arc<Scope>,
 		router: Router,
-		user_log_ch: Sender<UserLog>,
+		user_log_ch: Sender<LogEntry>,
 		error_ch: Sender<Error>,
 	) -> Self {
 		Environment {
@@ -66,7 +66,7 @@ impl Environment {
 		}
 	}
 
-	pub async fn send_log(&self, log: UserLog) {
+	pub async fn send_log(&self, log: LogEntry) {
 		if let Err(send_err) = self.user_log_ch.lock().await.send(log.clone()).await {
 			error!(
 				"Failed to send user log over channel `{}` `{:?}`",

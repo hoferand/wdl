@@ -121,6 +121,10 @@ pre {
 
 /* COLORED TEXT */
 
+span.gray {
+	color: gray;
+}
+
 span.green {
 	color: green;
 }

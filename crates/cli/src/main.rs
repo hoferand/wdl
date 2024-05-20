@@ -10,7 +10,7 @@ use tokio::sync::mpsc;
 use ::router::RouterClientGrpc;
 use ast::Identifier;
 use common::{convert_parser_error, create_error_location, ColorMode};
-use interpreter::UserLog;
+use interpreter::LogEntry;
 
 mod router;
 use router::router;
@@ -84,7 +84,7 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 		}
 	};
 
-	let (user_log_sender, mut user_log_receiver) = mpsc::channel::<UserLog>(10);
+	let (user_log_sender, mut user_log_receiver) = mpsc::channel::<LogEntry>(10);
 
 	let log_handle = tokio::spawn(async move {
 		while let Some(log) = user_log_receiver.recv().await {

@@ -8,7 +8,7 @@ use router::{self, RouterClient, RouterStatus, Target};
 
 use crate::{
 	wdl_std::{call_function, get_handler, id, Arg, ArgType, Env, Source},
-	Error, ErrorKind, FunctionId, FunctionValue, UserLog, Value,
+	Error, ErrorKind, FunctionId, FunctionValue, LogEntry, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -40,7 +40,7 @@ async fn pickup(
 ) -> Result<(), Error> {
 	info!("pickup from {:?}", target.val);
 
-	env.send_log(UserLog::info("Start pickup action.", Some(src)))
+	env.send_log(LogEntry::info("Start pickup action.", Some(src)))
 		.await;
 
 	let status = match env.router.pickup(target.val).await {
@@ -61,7 +61,7 @@ async fn pickup(
 			hooked = true;
 
 			if let Some(callback) = events.val.no_station_left {
-				env.send_log(UserLog::info(
+				env.send_log(LogEntry::info(
 					format!("Trigger `no_station_left`, execute `{}`.", callback),
 					Some(src),
 				))
@@ -89,14 +89,14 @@ async fn pickup(
 	}
 
 	if !hooked && status == RouterStatus::NoStationLeft {
-		env.send_log(UserLog::info(
+		env.send_log(LogEntry::info(
 			"Trigger `no_station_left`, not hooked.",
 			Some(src),
 		))
 		.await;
 	}
 
-	env.send_log(UserLog::info("Pickup action finished.", Some(src)))
+	env.send_log(LogEntry::info("Pickup action finished.", Some(src)))
 		.await;
 
 	Ok(())
@@ -110,7 +110,7 @@ async fn drop(
 ) -> Result<(), Error> {
 	info!("drop to {:?}", target.val);
 
-	env.send_log(UserLog::info("Start drop action.", Some(src)))
+	env.send_log(LogEntry::info("Start drop action.", Some(src)))
 		.await;
 
 	let status = match env.router.drop(target.val).await {
@@ -131,7 +131,7 @@ async fn drop(
 			hooked = true;
 
 			if let Some(callback) = events.val.no_station_left {
-				env.send_log(UserLog::info(
+				env.send_log(LogEntry::info(
 					format!("Trigger `no_station_left`, execute `{}`.", callback),
 					Some(src),
 				))
@@ -159,14 +159,14 @@ async fn drop(
 	}
 
 	if !hooked && status == RouterStatus::NoStationLeft {
-		env.send_log(UserLog::info(
+		env.send_log(LogEntry::info(
 			"Trigger `no_station_left`, not hooked.",
 			Some(src),
 		))
 		.await;
 	}
 
-	env.send_log(UserLog::info("Drop action finished.", Some(src)))
+	env.send_log(LogEntry::info("Drop action finished.", Some(src)))
 		.await;
 
 	Ok(())
@@ -180,7 +180,7 @@ async fn drive(
 ) -> Result<(), Error> {
 	info!("drive to {:?}", target.val);
 
-	env.send_log(UserLog::info("Start drive action.", Some(src)))
+	env.send_log(LogEntry::info("Start drive action.", Some(src)))
 		.await;
 
 	let status = match env.router.drive(target.val).await {
@@ -201,7 +201,7 @@ async fn drive(
 			hooked = true;
 
 			if let Some(callback) = events.val.no_station_left {
-				env.send_log(UserLog::info(
+				env.send_log(LogEntry::info(
 					format!("Trigger `no_station_left`, execute `{}`.", callback),
 					Some(src),
 				))
@@ -229,14 +229,14 @@ async fn drive(
 	}
 
 	if !hooked && status == RouterStatus::NoStationLeft {
-		env.send_log(UserLog::info(
+		env.send_log(LogEntry::info(
 			"Trigger `no_station_left`, not hooked.",
 			Some(src),
 		))
 		.await;
 	}
 
-	env.send_log(UserLog::info("Drive action finished.", Some(src)))
+	env.send_log(LogEntry::info("Drive action finished.", Some(src)))
 		.await;
 
 	Ok(())
