@@ -9,7 +9,7 @@ use tokio::sync::mpsc;
 
 use ::router::RouterClientGrpc;
 use ast::Identifier;
-use common::{convert_parser_error, create_error_location, ColorMode};
+use format::{format_parser_error, ColorMode};
 use interpreter::LogEntry;
 
 mod router;
@@ -139,51 +139,26 @@ async fn check(file: &str) -> Result<ExitCode, Box<dyn Error>> {
 	Ok(ExitCode::SUCCESS)
 }
 
-fn print_interpreter_error(error: &interpreter::Error, src_code: &str) {
-	match &error.kind {
-		interpreter::ErrorKind::Fatal(msg) => error!("{}!", msg),
-		interpreter::ErrorKind::VariableAlreadyInUse { id } => {
-			error!("Variable `{}` already in use!", id.id);
-		}
-		interpreter::ErrorKind::VariableNotFound { id } => {
-			error!("Variable `{}` not found!", id);
-		}
-		interpreter::ErrorKind::InvalidType { msg } => {
-			error!("Invalid types, {}!", msg);
-		}
-		interpreter::ErrorKind::DivisionByZero => {
-			error!("Division by zero!");
-		}
-		interpreter::ErrorKind::ArityMismatch { expected, given } => {
-			error!(
-				"Invalid count of function call parameter, expected `{}`, given `{}`!",
-				expected, given
-			);
-		}
-		interpreter::ErrorKind::MissingArgument { id } => {
-			error!("Argument `{}` missing!", id);
-		}
-		interpreter::ErrorKind::UnknownArgument { id } => {
-			error!("Named argument `{}` unknown!", id);
-		}
+fn print_interpreter_error(err: &interpreter::Error, src_code: &str) {
+	let error = format::format_interpreter_error(err, src_code, ColorMode::ANSI);
+	match err.kind {
 		interpreter::ErrorKind::OrderDone => {
-			info!("Order done!");
+			info!("{}", error.title);
 		}
 		interpreter::ErrorKind::OrderCancel => {
-			warn!("Order canceled!");
+			warn!("{}", error.title);
+		}
+		_ => {
+			error!("{}", error.title);
 		}
 	}
-
-	if let Some(ref span) = error.span {
-		eprintln!(
-			"{}",
-			create_error_location(&span.start, &span.end, src_code, ColorMode::ANSI)
-		);
+	if let Some(pos) = error.pos {
+		eprintln!("{}", pos.span_str);
 	}
 }
 
 fn print_parser_error(error: &parser::Error, src_code: &str) {
-	for error in convert_parser_error(error, src_code, ColorMode::ANSI) {
+	for error in format_parser_error(error, src_code, ColorMode::ANSI) {
 		error!("{}", error.title);
 		if let Some(pos) = error.pos {
 			eprintln!("{}", pos.span_str);

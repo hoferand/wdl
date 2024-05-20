@@ -448,7 +448,7 @@ version = "0.1.0"
 dependencies = [
  "ast",
  "clap",
- "common",
+ "format",
  "interpreter",
  "log",
  "parser",
@@ -486,17 +486,6 @@ dependencies = [
  "strum 0.24.1",
  "strum_macros 0.24.3",
  "unicode-width",
-]
-
-[[package]]
-name = "common"
-version = "0.1.0"
-dependencies = [
- "ast",
- "colored",
- "html-escape",
- "parser",
- "serde",
 ]
 
 [[package]]
@@ -731,6 +720,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e13624c2627564efccf4934284bdd98cbaa14e79b0b5a141218e507b3a823456"
 dependencies = [
  "percent-encoding",
+]
+
+[[package]]
+name = "format"
+version = "0.1.0"
+dependencies = [
+ "ast",
+ "colored",
+ "html-escape",
+ "interpreter",
+ "parser",
+ "serde",
 ]
 
 [[package]]
@@ -1927,9 +1928,9 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.200"
+version = "1.0.202"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ddc6f9cc94d67c0e21aaf7eda3a010fd3af78ebf6e096aa6e2e13c79749cce4f"
+checksum = "226b61a0d411b2ba5ff6d7f73a476ac4f8bb900373459cd00fab8512828ba395"
 dependencies = [
  "serde_derive",
 ]
@@ -1947,9 +1948,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.200"
+version = "1.0.202"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "856f046b9400cee3c8c94ed572ecdb752444c24528c035cd35882aad6f492bcb"
+checksum = "6048858004bcff69094cd972ed40a32500f153bd3be9f716b2eed2e8217c4838"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2859,7 +2860,9 @@ checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
 name = "wasm"
 version = "0.1.0"
 dependencies = [
- "common",
+ "format",
+ "parser",
+ "serde",
  "serde-wasm-bindgen",
  "wasm-bindgen",
 ]
@@ -2937,7 +2940,7 @@ name = "wdl-playground"
 version = "0.1.0"
 dependencies = [
  "axum 0.7.5",
- "common",
+ "format",
  "interpreter",
  "parser",
  "router",

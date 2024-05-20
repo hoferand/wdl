@@ -1,6 +1,6 @@
 use std::{collections::HashMap, time::Duration};
 
-use axum::{http::Method, routing::post, Json, Router};
+use axum::{http::Method, Router};
 use serde_json::Value;
 use socketioxide::{
 	extract::{Data, SocketRef},
@@ -13,7 +13,7 @@ use tower_http::{
 	services::ServeDir,
 };
 
-use common::{ColorMode, Status};
+use format::ColorMode;
 use interpreter::LogEntry;
 use router::{RouterClientWs, RouterStatus};
 
@@ -28,7 +28,6 @@ async fn main() -> shuttle_axum::ShuttleAxum {
 		.allow_origin(Any);
 
 	let router = Router::new()
-		.route("/check", post(check))
 		.nest_service(
 			"/npm_modules",
 			ServeDir::new("lang-playground/node_modules"),
@@ -41,10 +40,6 @@ async fn main() -> shuttle_axum::ShuttleAxum {
 		.layer(CompressionLayer::new());
 
 	Ok(router.into())
-}
-
-async fn check(src_code: String) -> Json<Status> {
-	Json(common::check_src(src_code, ColorMode::HTML))
 }
 
 async fn run(socket: SocketRef) {
@@ -60,7 +55,7 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	let ast = match parser::get_ast(&src_code.clone()) {
 		Ok(ast) => ast,
 		Err(err) => {
-			let errors = common::convert_parser_error(&err, &src_code, ColorMode::HTML);
+			let errors = format::format_parser_error(&err, &src_code, ColorMode::HTML);
 			socket
 				.emit("error", serde_json::to_string(&errors).unwrap())
 				.ok();
@@ -138,7 +133,7 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	log_handle.await.unwrap();
 
 	if let Err(err) = ret {
-		let error = convert_interpreter_error(&err, &src_code, ColorMode::HTML);
+		let error = format::format_interpreter_error(&err, &src_code, ColorMode::HTML);
 		match err.kind {
 			interpreter::ErrorKind::OrderDone => {
 				socket.emit("done", error.pos).ok();
@@ -155,52 +150,6 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 	} else {
 		socket.emit("done", Value::Null).ok();
 	}
-}
-
-pub fn convert_interpreter_error(
-	error: &interpreter::Error,
-	src_code: &str,
-	target: ColorMode,
-) -> common::Error {
-	let title = match &error.kind {
-		interpreter::ErrorKind::Fatal(msg) => format!("{}!", msg),
-		interpreter::ErrorKind::VariableAlreadyInUse { id } => {
-			format!("Variable `{}` already in use!", id.id)
-		}
-		interpreter::ErrorKind::VariableNotFound { id } => {
-			format!("Variable `{}` not found!", id)
-		}
-		interpreter::ErrorKind::InvalidType { msg } => {
-			format!("Invalid types, {}!", msg)
-		}
-		interpreter::ErrorKind::DivisionByZero => "Division by zero!".to_owned(),
-		interpreter::ErrorKind::ArityMismatch { expected, given } => {
-			format!(
-				"Invalid count of function call parameter, expected `{}`, given `{}`!",
-				expected, given
-			)
-		}
-		interpreter::ErrorKind::MissingArgument { id } => {
-			format!("Argument `{}` missing!", id)
-		}
-		interpreter::ErrorKind::UnknownArgument { id } => {
-			format!("Named argument `{}` unknown!", id)
-		}
-		interpreter::ErrorKind::OrderDone => "Order done!".to_owned(),
-		interpreter::ErrorKind::OrderCancel => "Order canceled!".to_owned(),
-	};
-
-	let pos;
-	if let Some(ref span) = error.span {
-		pos = Some(common::Position {
-			span: *span,
-			span_str: common::create_error_location(&span.start, &span.end, src_code, target),
-		});
-	} else {
-		pos = None;
-	}
-
-	common::Error { title, pos }
 }
 
 /// `len` must be >= 3

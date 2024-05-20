@@ -24,14 +24,14 @@ impl Error {
 
 #[derive(Debug, Clone)]
 pub enum ErrorKind {
+	ArityMismatch { expected: usize, given: usize },
+	DivisionByZero,
 	Fatal(String),
+	InvalidType { msg: String },
+	MissingArgument { id: Identifier },
+	OrderCancel, // TODO: should be no error
+	OrderDone,   // TODO: should be no error
+	UnknownArgument { id: Identifier },
 	VariableAlreadyInUse { id: Identifier },
 	VariableNotFound { id: Variable },
-	InvalidType { msg: String },
-	DivisionByZero,
-	ArityMismatch { expected: usize, given: usize },
-	MissingArgument { id: Identifier },
-	UnknownArgument { id: Identifier },
-	OrderDone,   // TODO: should be no error
-	OrderCancel, // TODO: should be no error
 }

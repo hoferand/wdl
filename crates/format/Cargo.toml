@@ -1,11 +1,15 @@
 [package]
-name = "common"
+name = "format"
 version = "0.1.0"
 edition = "2021"
+
+[features]
+interpreter = ["dep:interpreter"]
 
 [dependencies]
 ast = { path = "../ast" }
 parser = { path = "../parser" }
+interpreter = { path = "../interpreter", optional = true }
 
 serde = { version = "1.0.200", features = ["derive"] }
 colored = "2.1.0"
