@@ -1,6 +1,8 @@
+use std::sync::Arc;
+
 use crate::{
-	wdl_std::{get_handler, id, Arg, Env},
-	ChannelId, Error, ErrorKind, FunctionId, FunctionValue,
+	wdl_std::{get_handler, id, Arg},
+	ChannelId, Environment, Error, ErrorKind, FunctionId, FunctionValue,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -15,7 +17,10 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-pub async fn new(Env(env): Env, buffer: Arg<f64, { id(b"buffer") }>) -> Result<ChannelId, Error> {
+pub async fn new(
+	buffer: Arg<f64, { id(b"buffer") }>,
+	env: Arc<Environment>,
+) -> Result<ChannelId, Error> {
 	if buffer.val < 1.0 {
 		return Err(Error {
 			kind: ErrorKind::Fatal(format!(
@@ -31,7 +36,10 @@ pub async fn new(Env(env): Env, buffer: Arg<f64, { id(b"buffer") }>) -> Result<C
 	Ok(ch_id)
 }
 
-pub async fn close(Env(env): Env, ch_id: Arg<ChannelId, { id(b"channel") }>) -> Result<(), Error> {
+pub async fn close(
+	ch_id: Arg<ChannelId, { id(b"channel") }>,
+	env: Arc<Environment>,
+) -> Result<(), Error> {
 	let Some(ch) = env.get_ch(&ch_id.val).await else {
 		return Err(Error::fatal(format!(
 			"Channel `{}` not found",

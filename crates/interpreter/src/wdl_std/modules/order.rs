@@ -1,7 +1,6 @@
-use crate::{
-	wdl_std::{get_handler, Source},
-	Error, ErrorKind, FunctionId, FunctionValue,
-};
+use ast::Span;
+
+use crate::{wdl_std::get_handler, Error, ErrorKind, FunctionId, FunctionValue};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {
@@ -15,16 +14,16 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-async fn done(Source(src): Source) -> Result<(), Error> {
+async fn done(fn_span: Span) -> Result<(), Error> {
 	Err(Error {
 		kind: ErrorKind::OrderDone,
-		span: Some(src),
+		span: Some(fn_span),
 	})
 }
 
-async fn cancel(Source(src): Source) -> Result<(), Error> {
+async fn cancel(fn_span: Span) -> Result<(), Error> {
 	Err(Error {
 		kind: ErrorKind::OrderCancel,
-		span: Some(src),
+		span: Some(fn_span),
 	})
 }

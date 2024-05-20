@@ -1,14 +1,14 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use log::info;
 use serde::Deserialize;
 
-use ast::Identifier;
+use ast::{Identifier, Span};
 use router::{self, RouterClient, RouterStatus, Target};
 
 use crate::{
-	wdl_std::{call_function, get_handler, id, Arg, ArgType, Env, Source},
-	Error, ErrorKind, FunctionId, FunctionValue, LogEntry, Value,
+	wdl_std::{call_function, get_handler, id, Arg, ArgType},
+	Environment, Error, ErrorKind, FunctionId, FunctionValue, LogEntry, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -33,14 +33,14 @@ struct Events {
 impl<'de> ArgType<'de> for Events {}
 
 async fn pickup(
-	Source(src): Source,
-	Env(env): Env,
 	target: Arg<Target, { id(b"target") }>,
 	events: Option<Arg<Events, { id(b"events") }>>,
+	fn_span: Span,
+	env: Arc<Environment>,
 ) -> Result<(), Error> {
 	info!("pickup from {:?}", target.val);
 
-	env.send_log(LogEntry::info("Start pickup action.", Some(src)))
+	env.send_log(LogEntry::info("Start pickup action.", Some(fn_span)))
 		.await;
 
 	let status = match env.router.pickup(target.val).await {
@@ -48,7 +48,7 @@ async fn pickup(
 		None => {
 			return Err(Error {
 				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
-				span: Some(src),
+				span: Some(fn_span),
 			});
 		}
 	};
@@ -63,7 +63,7 @@ async fn pickup(
 			if let Some(callback) = events.val.no_station_left {
 				env.send_log(LogEntry::info(
 					format!("Trigger `no_station_left`, execute `{}`.", callback),
-					Some(src),
+					Some(fn_span),
 				))
 				.await;
 
@@ -91,26 +91,26 @@ async fn pickup(
 	if !hooked && status == RouterStatus::NoStationLeft {
 		env.send_log(LogEntry::info(
 			"Trigger `no_station_left`, not hooked.",
-			Some(src),
+			Some(fn_span),
 		))
 		.await;
 	}
 
-	env.send_log(LogEntry::info("Pickup action finished.", Some(src)))
+	env.send_log(LogEntry::info("Pickup action finished.", Some(fn_span)))
 		.await;
 
 	Ok(())
 }
 
 async fn drop(
-	Source(src): Source,
-	Env(env): Env,
 	target: Arg<Target, { id(b"target") }>,
 	events: Option<Arg<Events, { id(b"events") }>>,
+	fn_span: Span,
+	env: Arc<Environment>,
 ) -> Result<(), Error> {
 	info!("drop to {:?}", target.val);
 
-	env.send_log(LogEntry::info("Start drop action.", Some(src)))
+	env.send_log(LogEntry::info("Start drop action.", Some(fn_span)))
 		.await;
 
 	let status = match env.router.drop(target.val).await {
@@ -118,7 +118,7 @@ async fn drop(
 		None => {
 			return Err(Error {
 				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
-				span: Some(src),
+				span: Some(fn_span),
 			});
 		}
 	};
@@ -133,7 +133,7 @@ async fn drop(
 			if let Some(callback) = events.val.no_station_left {
 				env.send_log(LogEntry::info(
 					format!("Trigger `no_station_left`, execute `{}`.", callback),
-					Some(src),
+					Some(fn_span),
 				))
 				.await;
 
@@ -161,26 +161,26 @@ async fn drop(
 	if !hooked && status == RouterStatus::NoStationLeft {
 		env.send_log(LogEntry::info(
 			"Trigger `no_station_left`, not hooked.",
-			Some(src),
+			Some(fn_span),
 		))
 		.await;
 	}
 
-	env.send_log(LogEntry::info("Drop action finished.", Some(src)))
+	env.send_log(LogEntry::info("Drop action finished.", Some(fn_span)))
 		.await;
 
 	Ok(())
 }
 
 async fn drive(
-	Source(src): Source,
-	Env(env): Env,
 	target: Arg<Target, { id(b"target") }>,
 	events: Option<Arg<Events, { id(b"events") }>>,
+	fn_span: Span,
+	env: Arc<Environment>,
 ) -> Result<(), Error> {
 	info!("drive to {:?}", target.val);
 
-	env.send_log(LogEntry::info("Start drive action.", Some(src)))
+	env.send_log(LogEntry::info("Start drive action.", Some(fn_span)))
 		.await;
 
 	let status = match env.router.drive(target.val).await {
@@ -188,7 +188,7 @@ async fn drive(
 		None => {
 			return Err(Error {
 				kind: ErrorKind::Fatal("Communication with router failed".to_owned()),
-				span: Some(src),
+				span: Some(fn_span),
 			});
 		}
 	};
@@ -203,7 +203,7 @@ async fn drive(
 			if let Some(callback) = events.val.no_station_left {
 				env.send_log(LogEntry::info(
 					format!("Trigger `no_station_left`, execute `{}`.", callback),
-					Some(src),
+					Some(fn_span),
 				))
 				.await;
 
@@ -231,12 +231,12 @@ async fn drive(
 	if !hooked && status == RouterStatus::NoStationLeft {
 		env.send_log(LogEntry::info(
 			"Trigger `no_station_left`, not hooked.",
-			Some(src),
+			Some(fn_span),
 		))
 		.await;
 	}
 
-	env.send_log(LogEntry::info("Drive action finished.", Some(src)))
+	env.send_log(LogEntry::info("Drive action finished.", Some(fn_span)))
 		.await;
 
 	Ok(())

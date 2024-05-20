@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-use ast::Identifier;
+use ast::{Identifier, Span};
 
 use crate::{
-	wdl_std::{name, Arg, CallContext, Env, FromValue, Source},
-	Error, ErrorKind, Value,
+	wdl_std::{name, Arg, CallContext, FromValue},
+	Environment, Error, ErrorKind, Value,
 };
 
 pub trait FromCallContext: Sized {
@@ -73,14 +73,14 @@ impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 
 // TODO: implement for Arg<Vec<T>, N> and Arg<HashMap<String, T>, N>
 
-impl FromCallContext for Env {
+impl FromCallContext for Arc<Environment> {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
-		Ok(Env(Arc::clone(&ctx.env)))
+		Ok(Arc::clone(&ctx.env))
 	}
 }
 
-impl FromCallContext for Source {
+impl FromCallContext for Span {
 	fn from_ctx(ctx: &mut CallContext) -> Result<Self, Error> {
-		Ok(Source(ctx.fn_span))
+		Ok(ctx.fn_span)
 	}
 }

@@ -17,8 +17,6 @@ mod arg_type;
 use arg_type::ArgType;
 mod arg;
 use arg::*;
-mod env;
-use env::Env;
 mod from_call_context;
 use from_call_context::FromCallContext;
 mod from_value;
@@ -31,8 +29,6 @@ mod into_result;
 use into_result::IntoResult;
 mod result_type;
 use result_type::ResultType;
-mod source;
-use source::Source;
 
 fn get_handler<H, T>(fun: H) -> FunctionValue
 where

@@ -1,6 +1,10 @@
+use std::sync::Arc;
+
+use ast::Span;
+
 use crate::{
-	wdl_std::{get_handler, id, Arg, Env, Source},
-	FunctionId, FunctionValue, LogEntry, LogEntryLevel, Value,
+	wdl_std::{get_handler, id, Arg},
+	Environment, FunctionId, FunctionValue, LogEntry, LogEntryLevel, Value,
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
@@ -16,32 +20,32 @@ pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	}
 }
 
-pub async fn info(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
+pub async fn info(msg: Arg<Value, { id(b"msg") }>, fn_span: Span, env: Arc<Environment>) {
 	env.send_log(LogEntry {
 		msg: truncate(msg.val.to_string(), 100),
 		level: LogEntryLevel::Info,
 		user: true,
-		span: Some(src),
+		span: Some(fn_span),
 	})
 	.await;
 }
 
-pub async fn warn(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
+pub async fn warn(msg: Arg<Value, { id(b"msg") }>, fn_span: Span, env: Arc<Environment>) {
 	env.send_log(LogEntry {
 		msg: truncate(msg.val.to_string(), 100),
 		level: LogEntryLevel::Warn,
 		user: true,
-		span: Some(src),
+		span: Some(fn_span),
 	})
 	.await;
 }
 
-pub async fn error(Source(src): Source, msg: Arg<Value, { id(b"msg") }>, Env(env): Env) {
+pub async fn error(msg: Arg<Value, { id(b"msg") }>, fn_span: Span, env: Arc<Environment>) {
 	env.send_log(LogEntry {
 		msg: truncate(msg.val.to_string(), 100),
 		level: LogEntryLevel::Error,
 		user: true,
-		span: Some(src),
+		span: Some(fn_span),
 	})
 	.await;
 }
