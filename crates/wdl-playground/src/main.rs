@@ -7,8 +7,8 @@ use socketioxide::{
 	SocketIo,
 };
 use tokio::{select, sync::mpsc};
-use tower::ServiceBuilder;
 use tower_http::{
+	compression::CompressionLayer,
 	cors::{Any, CorsLayer},
 	services::ServeDir,
 };
@@ -19,15 +19,13 @@ use router::{RouterClientWs, RouterStatus};
 
 #[shuttle_runtime::main]
 async fn main() -> shuttle_axum::ShuttleAxum {
-	let (layer, io) = SocketIo::new_layer();
+	let (ws_layer, io) = SocketIo::new_layer();
 
 	io.ns("/run", run);
 
 	let cors = CorsLayer::new()
 		.allow_methods([Method::GET, Method::POST])
 		.allow_origin(Any);
-
-	let service = ServiceBuilder::new().layer(cors).layer(layer);
 
 	let router = Router::new()
 		.route("/check", post(check))
@@ -38,7 +36,9 @@ async fn main() -> shuttle_axum::ShuttleAxum {
 		.nest_service("/wasm", ServeDir::new("lang-playground/wasm"))
 		.nest_service("/doc", ServeDir::new("lang-doc/book"))
 		.nest_service("/", ServeDir::new("lang-playground/public"))
-		.layer(service);
+		.layer(ws_layer)
+		.layer(cors)
+		.layer(CompressionLayer::new());
 
 	Ok(router.into())
 }
