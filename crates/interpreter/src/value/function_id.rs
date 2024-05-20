@@ -29,6 +29,13 @@ impl From<Variable> for FunctionId {
 
 impl std::fmt::Display for FunctionId {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "{}{}", self.scope.join("::"), self.id.id)
+		write!(
+			f,
+			"{}{}",
+			self.scope
+				.iter()
+				.fold(String::new(), |str, id| str + &id.id + "::"),
+			self.id.id
+		)
 	}
 }
