@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a continue statement.
+///
+/// Syntax:  
+/// `continue` `;`
+#[derive(Debug, Clone)]
 pub struct Continue {}

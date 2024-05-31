@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::Expression;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a group expression.
+///
+/// Syntax:  
+/// `(` _Expression_ `)`
+#[derive(Debug, Clone)]
 pub struct Group {
 	pub expression: Box<Expression>,
 }

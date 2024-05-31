@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::Statement;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a code block.
+///
+/// Syntax:  
+/// `{` _Statement_* `}`
+#[derive(Debug, Clone)]
 pub struct Block {
 	pub stmts: Vec<Statement>,
 }

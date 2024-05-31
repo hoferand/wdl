@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Node, Span};
 
 pub mod array;
@@ -27,8 +25,8 @@ pub use unary::*;
 pub mod variable;
 pub use variable::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+/// Represents an arbitrary expression.
+#[derive(Debug, Clone)]
 pub enum Expression {
 	Array(Node<Array>),
 	Binary(Node<Binary>),

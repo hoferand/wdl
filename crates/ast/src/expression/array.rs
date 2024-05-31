@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::Expression;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents an array value.
+///
+/// Syntax:  
+/// `[` ( _Expression_ `,` )* `]`
+#[derive(Debug, Clone)]
 pub struct Array {
 	pub values: Vec<Expression>,
 }

@@ -1,13 +1,10 @@
 use std::fmt::Debug;
 
-use serde::{Deserialize, Serialize};
-
 use crate::Span;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a generic node of the AST.
+#[derive(Debug, Clone)]
 pub struct Node<V: Debug + Clone> {
-	// TODO: add Serialize + Deserialize bound to V
 	pub span: Span,
 	pub val: V,
 }

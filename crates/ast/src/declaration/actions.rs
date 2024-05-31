@@ -1,9 +1,12 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Block, Node};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents the entry point of a workflow.
+///
+/// Syntax:  
+/// `actions` `{`
+///     _Statement_*
+/// `}`
+#[derive(Debug, Clone)]
 pub struct Actions {
 	pub block: Node<Block>,
 }

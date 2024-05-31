@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::Expression;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a return statement.
+///
+/// Syntax:  
+/// `return` _Expression_ `;`
+#[derive(Debug, Clone)]
 pub struct Return {
 	pub value: Option<Expression>,
 }

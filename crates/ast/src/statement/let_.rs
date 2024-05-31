@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Expression, Identifier, Node};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a local variable declaration.
+///
+/// Syntax:  
+/// `let` _Identifier_ `=` _Expression_ `;`
+#[derive(Debug, Clone)]
 pub struct Let {
 	pub id: Node<Identifier>,
 	pub value: Expression,

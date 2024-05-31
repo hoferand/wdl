@@ -4,7 +4,7 @@ use std::{collections::HashMap, error::Error};
 use clap::Parser;
 use log::{error, info, warn, LevelFilter};
 use simplelog::{ColorChoice, Config, TermLogger, TerminalMode}; // cspell:disable-line
-use tokio::fs::{self, read_to_string};
+use tokio::fs::read_to_string;
 use tokio::sync::mpsc;
 
 use ::router::RouterClientGrpc;
@@ -22,10 +22,6 @@ enum Cli {
 		file: String,
 		variables: Vec<String>,
 	},
-	#[clap(name = "compile", about = "Compile the program")]
-	Compile { file: String },
-	#[clap(name = "fmt", about = "Format the program")]
-	Fmt { file: String },
 	#[clap(name = "check", about = "Check the program")]
 	Check { file: String },
 	#[clap(name = "router", about = "Simulates the router")]
@@ -43,8 +39,6 @@ async fn main() -> Result<ExitCode, Box<dyn Error>> {
 
 	match Cli::parse() {
 		Cli::Run { file, variables } => run(&file, variables).await,
-		Cli::Compile { file } => compile(&file).await,
-		Cli::Fmt { .. } => todo!(),
 		Cli::Check { file } => check(&file).await,
 		Cli::Router => router().await,
 	}
@@ -112,23 +106,6 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 	Ok(ExitCode::SUCCESS)
 }
 
-async fn compile(file: &str) -> Result<ExitCode, Box<dyn Error>> {
-	let src_code = read_to_string(file).await?;
-	let workflow = match parser::get_ast(&src_code) {
-		Ok(wf) => wf,
-		Err(error) => {
-			print_parser_error(&error, &src_code);
-			return Ok(ExitCode::FAILURE);
-		}
-	};
-
-	let json = serde_json::to_string_pretty(&workflow)?;
-
-	fs::write(format!("{}.compiled", file), json).await?;
-
-	Ok(ExitCode::SUCCESS)
-}
-
 async fn check(file: &str) -> Result<ExitCode, Box<dyn Error>> {
 	let src_code = read_to_string(file).await?;
 	if let Err(error) = parser::get_ast(&src_code) {
@@ -141,27 +118,29 @@ async fn check(file: &str) -> Result<ExitCode, Box<dyn Error>> {
 
 fn print_interpreter_error(err: &interpreter::Error, src_code: &str) {
 	let error = format::format_interpreter_error(err, src_code, ColorMode::ANSI);
+	let error_loc = match error.pos {
+		None => String::new(),
+		Some(pos) => format!("\n{}", pos.span_str),
+	};
 	match err.kind {
 		interpreter::ErrorKind::OrderDone => {
-			info!("{}", error.title);
+			info!("{}{}", error.title, error_loc);
 		}
 		interpreter::ErrorKind::OrderCancel => {
-			warn!("{}", error.title);
+			warn!("{}{}", error.title, error_loc);
 		}
 		_ => {
-			error!("{}", error.title);
+			error!("{}{}", error.title, error_loc);
 		}
-	}
-	if let Some(pos) = error.pos {
-		eprintln!("{}", pos.span_str);
 	}
 }
 
 fn print_parser_error(error: &parser::Error, src_code: &str) {
 	for error in format_parser_error(error, src_code, ColorMode::ANSI) {
-		error!("{}", error.title);
 		if let Some(pos) = error.pos {
-			eprintln!("{}", pos.span_str);
+			error!("{}\n{}", error.title, pos.span_str);
+		} else {
+			error!("{}", error.title);
 		}
 	}
 }

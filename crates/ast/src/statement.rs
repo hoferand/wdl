@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Expression, Node, Span};
 
 pub mod assignment;
@@ -21,8 +19,8 @@ pub use send::*;
 pub mod while_;
 pub use while_::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+/// Represents an arbitrary statement.
+#[derive(Debug, Clone)]
 pub enum Statement {
 	Assignment(Node<Assignment>),
 	Block(Node<Block>),

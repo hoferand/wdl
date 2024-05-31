@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Expression, Identifier, Node};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a member expression.
+///
+/// Syntax:  
+/// _Expression_ `.` _Identifier_
+#[derive(Debug, Clone)]
 pub struct Member {
 	pub object: Box<Expression>,
 	pub member: Node<Identifier>,

@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::Expression;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a send statement.
+///
+/// Syntax:  
+/// _Expression_ `<-` _Expression_ `;`
+#[derive(Debug, Clone)]
 pub struct Send {
 	pub ch: Expression,
 	pub value: Expression,

@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Block, Expression, Node};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a while statement.
+///
+/// Syntax:  
+/// `while` _Expression_ `{` _Statement_* `}`
+#[derive(Debug, Clone)]
 pub struct While {
 	pub condition: Expression,
 	pub do_: Node<Block>,

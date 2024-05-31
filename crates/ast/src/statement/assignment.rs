@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Expression, Identifier, Node};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a variable assignment.
+///
+/// Syntax:  
+/// _Identifier_ `=` _Expression_ `;`
+#[derive(Debug, Clone)]
 pub struct Assignment {
 	pub id: Node<Identifier>,
 	pub value: Expression,

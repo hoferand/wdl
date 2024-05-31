@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Identifier, Node};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a variable.
+///
+/// Syntax:  
+/// ( _Identifier_ `::` )* _Identifier_
+#[derive(Debug, Clone)]
 pub struct Variable {
 	pub id: Node<Identifier>,
 	pub scope: Vec<Node<Identifier>>,

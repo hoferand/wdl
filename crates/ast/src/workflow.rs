@@ -1,9 +1,10 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Actions, Function, Global, Node};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents a workflow.
+///
+/// Syntax:  
+/// ( _Global_ | _Function_ )* _Actions_ ( _Global_ | _Function_ )*
+#[derive(Debug, Clone)]
 pub struct Workflow {
 	pub globals: Vec<Node<Global>>,
 	pub actions: Node<Actions>,

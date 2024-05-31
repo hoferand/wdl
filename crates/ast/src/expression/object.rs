@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
-
 use crate::Expression;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type")]
+/// Represents an object.
+///
+/// Syntax:  
+/// `{` ( ( _Identifier_ | _String_ ) `:` _Expression_ `,` )* `}`
+#[derive(Debug, Clone)]
 pub struct Object {
 	pub values: HashMap<String, Expression>,
 }

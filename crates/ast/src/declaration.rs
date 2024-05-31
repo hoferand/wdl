@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 use crate::{Node, Span};
 
 pub mod actions;
@@ -9,8 +7,8 @@ pub use function::*;
 pub mod global;
 pub use global::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
+/// Represents a declaration on the outermost scope.
+#[derive(Debug, Clone)]
 pub enum Declaration {
 	Actions(Node<Actions>),
 	FunctionDeclaration(Node<Function>),
