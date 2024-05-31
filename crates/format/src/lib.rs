@@ -1,3 +1,6 @@
+//! This library provides common functions to format errors from the parser
+//! and interpreter crate into user-friendly messages.
+
 use serde::Serialize;
 
 use ast::{Location, Span};
@@ -5,6 +8,7 @@ use ast::{Location, Span};
 pub mod colored_string;
 pub use colored_string::*;
 
+/// User-readable representation for different kinds of errors.
 #[derive(Debug, Serialize)]
 #[serde(tag = "type")]
 pub struct Error {
@@ -12,6 +16,8 @@ pub struct Error {
 	pub pos: Option<Position>,
 }
 
+/// Contains the structured representation of a span
+/// as well its human readable version.
 #[derive(Debug, Serialize)]
 #[serde(tag = "type")]
 pub struct Position {
@@ -19,7 +25,7 @@ pub struct Position {
 	pub span_str: String,
 }
 
-pub fn format_parser_error(error: &parser::Error, src_code: &str, target: ColorMode) -> Vec<Error> {
+pub fn format_parser_error(error: &parser::Error, src_code: &str, mode: ColorMode) -> Vec<Error> {
 	let mut ret = Vec::new();
 	match error {
 		parser::Error::Lexer(errors) => {
@@ -42,7 +48,7 @@ pub fn format_parser_error(error: &parser::Error, src_code: &str, target: ColorM
 					title,
 					pos: Some(Position {
 						span: err.span,
-						span_str: format_span(&err.span.start, &err.span.end, src_code, target),
+						span_str: format_span(&err.span.start, &err.span.end, src_code, mode),
 					}),
 				})
 			}
@@ -121,7 +127,7 @@ pub fn format_parser_error(error: &parser::Error, src_code: &str, target: ColorM
 				title,
 				pos: span.map(|span| Position {
 					span,
-					span_str: format_span(&span.start, &span.end, src_code, target),
+					span_str: format_span(&span.start, &span.end, src_code, mode),
 				}),
 			});
 		}
@@ -130,11 +136,13 @@ pub fn format_parser_error(error: &parser::Error, src_code: &str, target: ColorM
 	ret
 }
 
+// This function is only available with the `interpreter` feature flag
+// because the interpreter crate is not compatible with WASM.
 #[cfg(feature = "interpreter")]
 pub fn format_interpreter_error(
 	error: &interpreter::Error,
 	src_code: &str,
-	target: ColorMode,
+	mode: ColorMode,
 ) -> Error {
 	let title = match &error.kind {
 		interpreter::ErrorKind::ArityMismatch { expected, given } => {
@@ -168,18 +176,19 @@ pub fn format_interpreter_error(
 		title,
 		pos: error.span.map(|span| Position {
 			span,
-			span_str: format_span(&span.start, &span.end, src_code, target),
+			span_str: format_span(&span.start, &span.end, src_code, mode),
 		}),
 	}
 }
 
-pub fn format_span(start: &Location, end: &Location, src: &str, target: ColorMode) -> String {
+/// Returns a string showing the precise error location inside the source code.
+pub fn format_span(start: &Location, end: &Location, src: &str, mode: ColorMode) -> String {
 	let mut ret = String::new();
 
 	let mut lines: Vec<&str> = src.lines().collect();
 	lines.push("");
 
-	let pipe = ColoredString::blue("|", target);
+	let pipe = ColoredString::blue("|", mode);
 
 	let number_padding = (end.line + 1).to_string().len();
 	ret += &format!("{:>pad$}\n", pipe, pad = number_padding + 2);
@@ -195,19 +204,19 @@ pub fn format_span(start: &Location, end: &Location, src: &str, target: ColorMod
 				ret += &format!(
 					"{:>pad$} {}\n",
 					pipe,
-					ColoredString::blue("...", target),
+					ColoredString::blue("...", mode),
 					pad = number_padding + 2
 				);
 			}
 		} else if let Some(line) = lines.get(line_number) {
-			let line = if target == ColorMode::HTML {
+			let line = if mode == ColorMode::HTML {
 				html_escape::encode_text(line).to_string()
 			} else {
 				line.to_owned().to_owned()
 			};
 			ret += &format!(
 				"{:<pad$} {:} {}\n",
-				ColoredString::blue((line_number + 1).to_string(), target),
+				ColoredString::blue((line_number + 1).to_string(), mode),
 				pipe,
 				line,
 				pad = number_padding,
@@ -226,7 +235,7 @@ pub fn format_span(start: &Location, end: &Location, src: &str, target: ColorMod
 			"{:>pad$} {}{}\n",
 			pipe,
 			" ".repeat(start.column),
-			ColoredString::red("^".repeat(end.column - start.column), target),
+			ColoredString::red("^".repeat(end.column - start.column), mode),
 			pad = number_padding + 2
 		);
 	}
