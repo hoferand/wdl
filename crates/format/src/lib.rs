@@ -9,6 +9,8 @@ pub mod colored_string;
 pub use colored_string::*;
 
 /// User-readable representation for different kinds of errors.
+///
+/// CAUTION: The `title` is not escaped in any way, so it is not HTML safe!
 #[derive(Debug, Serialize)]
 #[serde(tag = "type")]
 pub struct Error {
@@ -17,7 +19,10 @@ pub struct Error {
 }
 
 /// Contains the structured representation of a span
-/// as well its human readable version.
+/// as well its human readable version.  
+///
+/// CAUTION: The `span_str` is only HTML safe if generated
+/// with the `HTML` color mode.
 #[derive(Debug, Serialize)]
 #[serde(tag = "type")]
 pub struct Position {
@@ -181,7 +186,9 @@ pub fn format_interpreter_error(
 	}
 }
 
-/// Returns a string showing the precise error location inside the source code.
+/// Returns a string showing the precise error location inside the source code.  
+///
+/// CAUTION: The returned string is only HTML safe if called with the `HTML` color mode.
 pub fn format_span(start: &Location, end: &Location, src: &str, mode: ColorMode) -> String {
 	let mut ret = String::new();
 
