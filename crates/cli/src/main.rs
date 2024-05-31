@@ -1,8 +1,10 @@
+//! With this CLI, you can check and run workflows and emulate the router.
+
 use std::process::ExitCode;
 use std::{collections::HashMap, error::Error};
 
 use clap::Parser;
-use log::{error, info, warn, LevelFilter};
+use log::{debug, error, info, trace, warn, LevelFilter};
 use simplelog::{ColorChoice, Config, TermLogger, TerminalMode}; // cspell:disable-line
 use tokio::fs::read_to_string;
 use tokio::sync::mpsc;
@@ -24,7 +26,7 @@ enum Cli {
 	},
 	#[clap(name = "check", about = "Check the program")]
 	Check { file: String },
-	#[clap(name = "router", about = "Simulates the router")]
+	#[clap(name = "router", about = "Emulate the router")]
 	Router,
 }
 
@@ -73,7 +75,7 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 	let workflow = match parser::get_ast(&src_code) {
 		Ok(wf) => wf,
 		Err(error) => {
-			print_parser_error(&error, &src_code);
+			log_parser_error(&error, &src_code);
 			return Ok(ExitCode::FAILURE);
 		}
 	};
@@ -82,7 +84,14 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 
 	let log_handle = tokio::spawn(async move {
 		while let Some(log) = user_log_receiver.recv().await {
-			eprintln!("[{}]{}", log.level, log.msg);
+			let msg = format!("{}{}", if log.user { "[user]: " } else { "" }, log.msg);
+			match log.level {
+				interpreter::LogEntryLevel::Error => error!("{}", msg),
+				interpreter::LogEntryLevel::Warn => warn!("{}", msg),
+				interpreter::LogEntryLevel::Info => info!("{}", msg),
+				interpreter::LogEntryLevel::Debug => debug!("{}", msg),
+				interpreter::LogEntryLevel::Trace => trace!("{}", msg),
+			}
 		}
 	});
 
@@ -95,11 +104,11 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 	.await;
 
 	if let Err(err) = log_handle.await {
-		error!("Failed to wait for log receiver: `{}`", err);
+		error!("Failed to wait for log receiver: `{}`!", err);
 	};
 
 	if let Err(error) = ret {
-		print_interpreter_error(&error, &src_code);
+		log_interpreter_error(&error, &src_code);
 		return Ok(ExitCode::FAILURE);
 	}
 
@@ -109,14 +118,14 @@ async fn run(file: &str, vars: Vec<String>) -> Result<ExitCode, Box<dyn Error>> 
 async fn check(file: &str) -> Result<ExitCode, Box<dyn Error>> {
 	let src_code = read_to_string(file).await?;
 	if let Err(error) = parser::get_ast(&src_code) {
-		print_parser_error(&error, &src_code);
+		log_parser_error(&error, &src_code);
 		return Ok(ExitCode::FAILURE);
 	};
 
 	Ok(ExitCode::SUCCESS)
 }
 
-fn print_interpreter_error(err: &interpreter::Error, src_code: &str) {
+fn log_interpreter_error(err: &interpreter::Error, src_code: &str) {
 	let error = format::format_interpreter_error(err, src_code, ColorMode::ANSI);
 	let error_loc = match error.pos {
 		None => String::new(),
@@ -135,7 +144,7 @@ fn print_interpreter_error(err: &interpreter::Error, src_code: &str) {
 	}
 }
 
-fn print_parser_error(error: &parser::Error, src_code: &str) {
+fn log_parser_error(error: &parser::Error, src_code: &str) {
 	for error in format_parser_error(error, src_code, ColorMode::ANSI) {
 		if let Some(pos) = error.pos {
 			error!("{}\n{}", error.title, pos.span_str);

@@ -1,6 +1,10 @@
-use std::error::Error;
-use std::io::{self, BufRead};
-use std::process::ExitCode;
+//! Implementation of the router emulator over gRPC.
+
+use std::{
+	error::Error,
+	io::{self, BufRead},
+	process::ExitCode,
+};
 
 use tonic::transport::Server;
 
@@ -8,69 +12,6 @@ use router::{
 	proto::{RouterRequest, RouterResponse},
 	Router, RouterServer, Target,
 };
-
-#[derive(Debug, Default)]
-pub struct RouterService;
-
-#[tonic::async_trait]
-impl Router for RouterService {
-	async fn pickup(
-		&self,
-		request: tonic::Request<RouterRequest>,
-	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
-		let target: Target = match request.get_ref().clone().target {
-			Some(t) => t.into(),
-			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
-		};
-		eprintln!("Pickup from station `{:?}`", target);
-
-		eprintln!("Enter: 0 for action done, 1 to trigger no station left");
-		let Some(input) = read_i32_stdin() else {
-			return Err(tonic::Status::internal("Failed to read from stdin"));
-		};
-		eprintln!();
-
-		Ok(tonic::Response::new(RouterResponse { status: input }))
-	}
-
-	async fn drop(
-		&self,
-		request: tonic::Request<RouterRequest>,
-	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
-		let target: Target = match request.get_ref().clone().target {
-			Some(t) => t.into(),
-			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
-		};
-		eprintln!("Drop to station `{:?}`", target);
-
-		eprintln!("Enter: 0 for action done, 1 to trigger no station left");
-		let Some(input) = read_i32_stdin() else {
-			return Err(tonic::Status::internal("Failed to read from stdin"));
-		};
-		eprintln!();
-
-		Ok(tonic::Response::new(RouterResponse { status: input }))
-	}
-
-	async fn drive(
-		&self,
-		request: tonic::Request<RouterRequest>,
-	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
-		let target: Target = match request.get_ref().clone().target {
-			Some(t) => t.into(),
-			None => return Err(tonic::Status::invalid_argument("Target must not be None")),
-		};
-		eprintln!("Drive to station `{:?}`", target);
-
-		eprintln!("Enter: 0 for action done, 1 to trigger no station left");
-		let Some(input) = read_i32_stdin() else {
-			return Err(tonic::Status::internal("Failed to read from stdin"));
-		};
-		eprintln!();
-
-		Ok(tonic::Response::new(RouterResponse { status: input }))
-	}
-}
 
 pub async fn router() -> Result<ExitCode, Box<dyn Error>> {
 	let addr = router::URL.parse()?;
@@ -83,6 +24,51 @@ pub async fn router() -> Result<ExitCode, Box<dyn Error>> {
 		.await?;
 
 	Ok(ExitCode::SUCCESS)
+}
+
+pub struct RouterService;
+
+#[tonic::async_trait]
+impl Router for RouterService {
+	async fn pickup(
+		&self,
+		request: tonic::Request<RouterRequest>,
+	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
+		action("Pickup from", request).await
+	}
+
+	async fn drop(
+		&self,
+		request: tonic::Request<RouterRequest>,
+	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
+		action("Drop to", request).await
+	}
+
+	async fn drive(
+		&self,
+		request: tonic::Request<RouterRequest>,
+	) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
+		action("Drive to", request).await
+	}
+}
+
+pub async fn action(
+	action_txt: &str,
+	request: tonic::Request<RouterRequest>,
+) -> Result<tonic::Response<RouterResponse>, tonic::Status> {
+	let target: Target = match request.get_ref().clone().target {
+		Some(t) => t.into(),
+		None => return Err(tonic::Status::invalid_argument("Target must not be None")),
+	};
+	eprintln!("{} target `{:?}`", action_txt, target);
+
+	eprintln!("Enter: 0 for action done, 1 to trigger no station left");
+	let Some(input) = read_i32_stdin() else {
+		return Err(tonic::Status::internal("Failed to read from stdin"));
+	};
+	eprintln!();
+
+	Ok(tonic::Response::new(RouterResponse { status: input }))
 }
 
 fn read_i32_stdin() -> Option<i32> {
