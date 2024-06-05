@@ -20,12 +20,10 @@ The only requirement is the [Rust](https://www.rust-lang.org/) toolchain, includ
 
 ### Usage
 
-The CLI can be used with `cargo run`. Currently, the CLI supports 4 subcommands:
+The CLI can be used with `cargo run`. Currently, the CLI supports 3 subcommands:
 
 - `check`: Checks if the syntax of a program is valid.
   - e.g. `cargo run -- check examples/station2station.wdl`
-- `compile`: Checks the program and saves the AST as JSON.
-  - e.g. `cargo run -- compile examples/station2station.wdl`, outputs to `examples/station2station.wdl.compiled`
 - `run`: Checks the program and if it's valid, runs it.
   - e.g. `cargo run -- run examples/station2station.wdl`
 - `router`: Can be used to simulate the router, which executes the actions physically.
