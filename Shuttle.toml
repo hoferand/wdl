@@ -1,1 +1,1 @@
-assets = ["lang-playground/*", "lang-doc/book/*"]
+assets = ["wdl-playground-ui/*", "doc/book/*"]

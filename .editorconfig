@@ -7,7 +7,7 @@ indent_style = tab
 indent_style = space
 indent_size = 4
 
-[lang-doc/**]
+[doc/**]
 indent_style = space
 indent_size = 4
 

@@ -1,3 +1,7 @@
+//! The back end server for the online playground.  
+//! Can be either started locally with `./start-playground.sh`.  
+//! Or deployed to shuttle.rs with `./deploy-playground.sh`.
+
 use std::{collections::HashMap, time::Duration};
 
 use axum::{http::Method, Router};
@@ -31,11 +35,11 @@ async fn main() -> shuttle_axum::ShuttleAxum {
 	let router = Router::new()
 		.nest_service(
 			"/npm_modules",
-			ServeDir::new("lang-playground/node_modules"),
+			ServeDir::new("wdl-playground-ui/node_modules"),
 		)
-		.nest_service("/wasm", ServeDir::new("lang-playground/wasm"))
-		.nest_service("/doc", ServeDir::new("lang-doc/book"))
-		.nest_service("/", ServeDir::new("lang-playground/public"))
+		.nest_service("/wasm", ServeDir::new("wdl-playground-ui/wasm"))
+		.nest_service("/doc", ServeDir::new("doc/book"))
+		.nest_service("/", ServeDir::new("wdl-playground-ui/src"))
 		.layer(ws_layer)
 		.layer(cors)
 		.layer(CompressionLayer::new());
@@ -47,8 +51,6 @@ async fn run(socket: SocketRef) {
 	info!("Socket.IO connected: {:?} {:?}", socket.ns(), socket.id);
 
 	socket.on("start", run_workflow);
-
-	// TODO: check if socket must be closed manually
 }
 
 async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {

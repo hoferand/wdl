@@ -123,7 +123,7 @@ impl PartialEq for Value {
 
 impl PartialOrd for Value {
 	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-		// TODO: rethink or throw error on other types
+		// TODO: rethink
 		match (self, other) {
 			(Self::Number(n1), Self::Number(n2)) => n1.partial_cmp(n2),
 			_ => None,

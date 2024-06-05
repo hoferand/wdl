@@ -1,3 +1,7 @@
+//! This crate provides dummy router client implementations used in the
+//! interpreter and interface definitions for implementing router servers.  
+//! The client is currently implemented using gRPC and WebSockets for communication.
+
 use serde::{Deserialize, Serialize};
 
 pub mod target;

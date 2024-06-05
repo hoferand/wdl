@@ -29,8 +29,6 @@ pub const fn id(name: &[u8]) -> u32 {
 	}
 }
 
-// TODO: add unit test that compares `name()` with `id()`
-
 pub const fn name(id: u32) -> &'static [u8] {
 	match id {
 		1 => b"ms",

@@ -32,6 +32,7 @@ use scope::Scope;
 mod statement;
 mod wdl_std;
 
+/// Runs the given workflow until its done or a runtime error occurs.
 pub async fn run_workflow(
 	workflow: Workflow,
 	variables: HashMap<Identifier, Value>,
@@ -72,7 +73,6 @@ pub async fn run_workflow(
 						}
 					} else {
 						error!("Failed to finish background task!");
-						// TODO: panic?
 					}
 				}
 			}
@@ -84,7 +84,6 @@ pub async fn run_workflow(
 				Err(err)
 			} else {
 				error!("Error channel closed!");
-				// TODO: panic?
 				Ok(())
 			}
 		}

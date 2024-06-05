@@ -11,6 +11,7 @@ use parser::*;
 mod token;
 use token::*;
 
+/// Converts the given source code into the AST.
 pub fn get_ast(src_code: &str) -> Result<Workflow, Error> {
 	let lexer = Lexer::new(src_code);
 	let tokens = lexer.get_tokens()?;
