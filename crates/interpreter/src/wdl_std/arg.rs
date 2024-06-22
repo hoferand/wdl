@@ -1,14 +1,13 @@
 use ast::Span;
 
 pub struct Arg<V, const N: u32> {
-	pub idx: usize, // useful if named arguments are used
 	pub span: Span,
 	pub val: V,
 }
 
 impl<V, const N: u32> Arg<V, N> {
-	pub fn new(idx: usize, span: Span, val: V) -> Self {
-		Self { idx, span, val }
+	pub fn new(span: Span, val: V) -> Self {
+		Self { span, val }
 	}
 }
 

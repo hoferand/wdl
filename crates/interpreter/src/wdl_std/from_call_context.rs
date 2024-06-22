@@ -48,7 +48,7 @@ impl<T: FromValue, const N: u32> FromCallContext for Option<Arg<T, N>> {
 				err
 			})?;
 			if let Some(val) = value {
-				Ok(Some(Arg::new(arg_clone.idx, arg_clone.span, val)))
+				Ok(Some(Arg::new(arg_clone.span, val)))
 			} else if is_null {
 				return Ok(None);
 			} else {
