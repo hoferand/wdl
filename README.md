@@ -1,10 +1,10 @@
 # Workflow Definition Language (WDL)
 
+**This project was developed as part of my bachelor's thesis and is therefore not open for contributions.**
+
 Workflow Definition Language (WDL) is a domain-specific language tailored for mobile robotics. Its semantics are based on the pi-calculus, introducing interesting features such as concurrent execution and synchronization channels. Moreover, it supports well-known concepts from other languages like JSON compatible values, global and local variables, functions, operators, and control structures like if-else statements and while loops.
 
 In addition to its core functionality, WDL provides a comprehensive standard library. This library offers functions to perform physical actions like pickup and drop actions, accessing the web through HTTP calls, using regex for searching, finding, and replacing strings, and many more.
-
-**This language was developed as part of my bachelor's thesis.**
 
 ## Interpreter
 
