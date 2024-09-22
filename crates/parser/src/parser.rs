@@ -3,7 +3,7 @@ use ast::{Actions, Declaration, Node, Workflow};
 use crate::Token;
 
 pub mod parser_error;
-pub use parser_error::*;
+use parser_error::*;
 
 mod declaration;
 use declaration::*;

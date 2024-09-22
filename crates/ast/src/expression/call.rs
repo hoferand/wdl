@@ -3,7 +3,7 @@ use crate::{Expression, Identifier, Node};
 /// Represents a function call.
 ///
 /// Syntax:  
-/// _Expression_ `(` ( ( _Identifier_ `:` )? _Expression_ `,` )* `)`
+/// [`Expression`] `(` ( ( [`Identifier`] `:` )? [`Expression`] `,` )* `)`
 #[derive(Debug, Clone)]
 pub struct Call {
 	pub function: Box<Expression>,

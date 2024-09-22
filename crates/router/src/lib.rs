@@ -4,12 +4,12 @@
 
 use serde::{Deserialize, Serialize};
 
-pub mod target;
+mod target;
 pub use target::*;
-pub mod router_client_grpc;
-pub use router_client_grpc::RouterClientGrpc;
-pub mod router_client_ws;
-pub use router_client_ws::RouterClientWs;
+mod router_client_grpc;
+pub use router_client_grpc::*;
+mod router_client_ws;
+pub use router_client_ws::*;
 
 pub mod proto {
 	tonic::include_proto!("router");

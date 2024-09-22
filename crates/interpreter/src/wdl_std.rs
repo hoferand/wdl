@@ -6,12 +6,12 @@ use crate::{
 	expression::run_function, Environment, Error, ErrorKind, FunctionId, FunctionValue, Value,
 };
 
-pub mod call_context;
+mod call_context;
 pub use call_context::*;
-pub mod modules;
-pub use modules::resolve_id;
-pub mod std_function;
-pub use std_function::StdFunction;
+mod modules;
+pub use modules::*;
+mod std_function;
+pub use std_function::*;
 
 mod arg_type;
 use arg_type::ArgType;

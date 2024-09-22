@@ -1,6 +1,6 @@
-pub mod actions;
+mod actions;
 pub use actions::interpret_actions;
-pub mod function;
+mod function;
 pub use function::interpret_function;
-pub mod global;
+mod global;
 pub use global::interpret_global;

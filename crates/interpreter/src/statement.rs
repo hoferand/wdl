@@ -6,7 +6,7 @@ use ast::Statement;
 
 use crate::{expression::interpret_expression, Environment, Error, Interrupt, Scope};
 
-pub mod block;
+mod block;
 pub use block::interpret_block;
 
 mod assignment;

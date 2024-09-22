@@ -28,7 +28,7 @@ pub async fn interpret_send(
 			if ch.send(value).await.is_none() {
 				// TODO: improve error message
 				Err(Error::positional(
-					"Cannot send on closed channel".to_owned(),
+					"Cannot send on closed channel",
 					expr.span,
 				))
 			} else {

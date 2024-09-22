@@ -1,9 +1,11 @@
 use ast::{Argument, Call, Expression, Member, Node, Offset, Span};
 
 use crate::{
-	parser::{parse_atomic, parse_expression, parse_identifier},
+	parser::{parse_expression, parse_identifier},
 	Parser, ParserError, TokenValue,
 };
+
+use super::parse_atomic;
 
 pub fn parse_member_call_index(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut expr = parse_atomic(parser)?;

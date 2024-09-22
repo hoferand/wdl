@@ -1,9 +1,8 @@
 use ast::{If, Node, Span};
 
-use crate::{
-	parser::{parse_block, parse_else, parse_expression},
-	Parser, ParserError, TokenValue,
-};
+use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
+
+use super::{parse_block, parse_else};
 
 pub fn parse_if(parser: &mut Parser) -> Result<Node<If>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::If)?.span.start;

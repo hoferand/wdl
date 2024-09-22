@@ -3,7 +3,7 @@ use crate::{Identifier, Node};
 /// Represents a variable.
 ///
 /// Syntax:  
-/// ( _Identifier_ `::` )* _Identifier_
+/// ( [`Identifier`] `::` )* [`Identifier`]
 #[derive(Debug, Clone)]
 pub struct Variable {
 	pub id: Node<Identifier>,

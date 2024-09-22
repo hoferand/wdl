@@ -1,22 +1,22 @@
 use crate::{Expression, Node, Span};
 
-pub mod assignment;
+mod assignment;
 pub use assignment::*;
-pub mod block;
+mod block;
 pub use block::*;
-pub mod break_;
+mod break_;
 pub use break_::*;
-pub mod continue_;
+mod continue_;
 pub use continue_::*;
-pub mod if_;
+mod if_;
 pub use if_::*;
-pub mod let_;
+mod let_;
 pub use let_::*;
-pub mod return_;
+mod return_;
 pub use return_::*;
-pub mod send;
+mod send;
 pub use send::*;
-pub mod while_;
+mod while_;
 pub use while_::*;
 
 /// Represents an arbitrary statement.

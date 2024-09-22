@@ -3,22 +3,10 @@ use crate::{Block, Identifier, Node};
 /// Represents a function declaration.
 ///
 /// Syntax:  
-/// `function` _Identifier_ `(` ( _Identifier_ `,` )* `)` `{`
-///     _Statement_*
-/// `}`
+/// `function` [`Identifier`] `(` ( [`Identifier`] `,` )* `)` [`Block`]
 #[derive(Debug, Clone)]
 pub struct Function {
 	pub id: Node<Identifier>,
-	pub function: Node<FunctionBody>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FunctionBody {
-	pub parameters: Vec<Node<FormalParameter>>,
+	pub params: Vec<Node<Identifier>>,
 	pub body: Node<Block>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FormalParameter {
-	pub id: Node<Identifier>,
 }

@@ -1,10 +1,10 @@
 use crate::{Node, Span};
 
-pub mod actions;
+mod actions;
 pub use actions::*;
-pub mod function;
+mod function;
 pub use function::*;
-pub mod global;
+mod global;
 pub use global::*;
 
 /// Represents a declaration on the outermost scope.

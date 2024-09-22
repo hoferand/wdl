@@ -1,28 +1,28 @@
 use crate::{Node, Span};
 
-pub mod array;
+mod array;
 pub use array::*;
-pub mod binary;
+mod binary;
 pub use binary::*;
-pub mod call;
+mod call;
 pub use call::*;
-pub mod group;
+mod group;
 pub use group::*;
-pub mod literal;
+mod literal;
 pub use literal::*;
-pub mod logic;
+mod logic;
 pub use logic::*;
-pub mod member;
+mod member;
 pub use member::*;
-pub mod object;
+mod object;
 pub use object::*;
-pub mod offset;
+mod offset;
 pub use offset::*;
-pub mod spawn;
+mod spawn;
 pub use spawn::*;
-pub mod unary;
+mod unary;
 pub use unary::*;
-pub mod variable;
+mod variable;
 pub use variable::*;
 
 /// Represents an arbitrary expression.

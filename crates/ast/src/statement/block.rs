@@ -3,7 +3,7 @@ use crate::Statement;
 /// Represents a code block.
 ///
 /// Syntax:  
-/// `{` _Statement_* `}`
+/// `{` [`Statement`]* `}`
 #[derive(Debug, Clone)]
 pub struct Block {
 	pub stmts: Vec<Statement>,

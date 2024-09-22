@@ -3,7 +3,7 @@ use crate::{Expression, Node};
 /// Represents a binary operation.
 ///
 /// Syntax:  
-/// _Expression_ _BinaryOperator_ _Expression_
+/// [`Expression`] [`BinaryOperator`] [`Expression`]
 #[derive(Debug, Clone)]
 pub struct Binary {
 	pub left: Box<Expression>,

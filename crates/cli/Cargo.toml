@@ -3,18 +3,17 @@ name = "cli"
 version = "0.1.0"
 edition = "2021"
 
-
 [dependencies]
 ast = { path = "../ast" }
+format = { path = "../format", features = ["interpreter"] }
+interpreter = { path = "../interpreter" }
 parser = { path = "../parser" }
 router = { path = "../router" }
-interpreter = { path = "../interpreter" }
-format = { path = "../format", features = ["interpreter"] }
 
-log = "0.4.21"
 clap = { version = "4.4.8", features = ["derive"] }
+log = "0.4.21"
 serde = { version = "1.0.192", features = ["serde_derive"] }
 serde_json = "1.0.108"
+simplelog = "0.12.2"
 tokio = { version = "1.37", features = ["rt-multi-thread", "fs"] }
 tonic = "0.11"
-simplelog = "0.12.2"

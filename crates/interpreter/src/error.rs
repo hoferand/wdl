@@ -7,16 +7,16 @@ pub struct Error {
 }
 
 impl Error {
-	pub fn fatal(msg: String) -> Self {
+	pub fn fatal(msg: impl Into<String>) -> Self {
 		Error {
-			kind: ErrorKind::Fatal(msg),
+			kind: ErrorKind::Fatal(msg.into()),
 			span: None,
 		}
 	}
 
-	pub fn positional(msg: String, span: Span) -> Self {
+	pub fn positional(msg: impl Into<String>, span: Span) -> Self {
 		Error {
-			kind: ErrorKind::Fatal(msg),
+			kind: ErrorKind::Fatal(msg.into()),
 			span: Some(span),
 		}
 	}

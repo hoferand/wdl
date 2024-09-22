@@ -11,11 +11,8 @@ pub async fn interpret_function(
 	stmt: &Node<Function>,
 	env: &Arc<Environment>,
 ) -> Result<Interrupt, Error> {
-	env.declare_fn(
-		stmt.val.id.clone(),
-		FunctionValue::Custom(stmt.val.function.val.clone()),
-	)
-	.await?;
+	env.declare_fn(stmt.val.id.clone(), FunctionValue::Custom(stmt.val.clone()))
+		.await?;
 
 	Ok(Interrupt::None)
 }

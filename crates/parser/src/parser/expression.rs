@@ -2,24 +2,24 @@ use ast::{Expression, Node, Span, Spawn};
 
 use crate::{Parser, ParserError, TokenValue};
 
-pub mod additive;
-pub use additive::parse_additive;
-pub mod and;
-pub use and::parse_and;
-pub mod atomic;
-pub use atomic::parse_atomic;
-pub mod comparison;
-pub use comparison::parse_comparison;
-pub mod member_call_index;
-pub use member_call_index::parse_member_call_index;
-pub mod multiplicative;
-pub use multiplicative::parse_multiplicative;
-pub mod null_coalescing;
-pub use null_coalescing::parse_null_coalescing;
-pub mod or;
-pub use or::parse_or;
-pub mod unary;
-pub use unary::parse_unary;
+mod additive;
+use additive::parse_additive;
+mod and;
+use and::parse_and;
+mod atomic;
+use atomic::parse_atomic;
+mod comparison;
+use comparison::parse_comparison;
+mod member_call_index;
+use member_call_index::parse_member_call_index;
+mod multiplicative;
+use multiplicative::parse_multiplicative;
+mod null_coalescing;
+use null_coalescing::parse_null_coalescing;
+mod or;
+use or::parse_or;
+mod unary;
+use unary::parse_unary;
 
 pub fn parse_expression(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let spawn_option = parser.tokens.want(TokenValue::Spawn).cloned();

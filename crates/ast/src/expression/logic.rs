@@ -3,7 +3,7 @@ use crate::{Expression, Node};
 /// Represents a logical expression.
 ///
 /// Syntax:  
-/// _Expression_ _LogicOperator_ _Expression_
+/// [`Expression`] [`LogicOperator`] [`Expression`]
 #[derive(Debug, Clone)]
 pub struct Logic {
 	pub left: Box<Expression>,

@@ -3,7 +3,7 @@ use crate::{Expression, Node};
 /// Represents a unary operation.
 ///
 /// Syntax:  
-/// _UnaryOperator_ _Expression_
+/// [`UnaryOperator`] [`Expression`]
 #[derive(Debug, Clone)]
 pub struct Unary {
 	pub op: Node<UnaryOperator>,

@@ -2,6 +2,8 @@ global source = "mySource";
 global destination = "myDestination";
 
 actions {
+    log::info("Order started.");
+
     action::pickup(
         target: {
             stations: [

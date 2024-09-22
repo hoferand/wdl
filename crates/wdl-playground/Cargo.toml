@@ -5,12 +5,14 @@ edition = "2021"
 
 [dependencies]
 format = { path = "../format", features = ["interpreter"] }
-router = { path = "../router" }
-parser = { path = "../parser" }
 interpreter = { path = "../interpreter", features = ["playground"] }
+parser = { path = "../parser" }
+router = { path = "../router" }
 
-log = "0.4.21"
 axum = "0.7.4"
+log = "0.4.21"
+serde_json = "1.0.116"
+socketioxide = "0.13.0"
 shuttle-axum = "0.45.0"
 shuttle-runtime = "0.45.0"
 tokio = "1.28.2"
@@ -20,5 +22,3 @@ tower-http = { version = "0.5.2", features = [
 	"cors",
 	"compression-full",
 ] }
-socketioxide = "0.13.0"
-serde_json = "1.0.116"

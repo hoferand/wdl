@@ -15,8 +15,8 @@ use tokio::{
 use ast::{Identifier, Node};
 
 use crate::{
-	wdl_std::resolve_id, Channel, ChannelId, Error, ErrorKind, FunctionId, FunctionValue, Router,
-	Scope, LogEntry, Value,
+	wdl_std::resolve_id, Channel, ChannelId, Error, ErrorKind, FunctionId, FunctionValue, LogEntry,
+	Router, Scope, Value,
 };
 
 pub struct Environment {

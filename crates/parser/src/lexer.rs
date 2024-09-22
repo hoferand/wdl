@@ -7,7 +7,7 @@ use ast::{Location, Span};
 use crate::{Token, TokenValue};
 
 pub mod lexer_error;
-pub use lexer_error::*;
+use lexer_error::*;
 
 pub struct Lexer<'c> {
 	chars: Peekable<Chars<'c>>,

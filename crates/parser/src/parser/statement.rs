@@ -2,22 +2,22 @@ use ast::{Assignment, Expression, Node, Send, Span, Statement};
 
 use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
 
-pub mod block;
+mod block;
 pub use block::parse_block;
-pub mod break_;
-pub use break_::parse_break;
-pub mod continue_;
-pub use continue_::parse_continue;
-pub mod else_;
-pub use else_::parse_else;
-pub mod if_;
-pub use if_::parse_if;
-pub mod let_;
-pub use let_::parse_let;
-pub mod return_;
-pub use return_::parse_return;
-pub mod while_;
-pub use while_::parse_while;
+mod break_;
+use break_::parse_break;
+mod continue_;
+use continue_::parse_continue;
+mod else_;
+use else_::parse_else;
+mod if_;
+use if_::parse_if;
+mod let_;
+use let_::parse_let;
+mod return_;
+use return_::parse_return;
+mod while_;
+use while_::parse_while;
 
 pub fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, ParserError> {
 	let Some(token) = parser.tokens.peek() else {

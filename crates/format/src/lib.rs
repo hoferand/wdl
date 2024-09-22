@@ -5,7 +5,7 @@ use serde::Serialize;
 
 use ast::{Location, Span};
 
-pub mod colored_string;
+mod colored_string;
 pub use colored_string::*;
 
 /// User-readable representation for different kinds of errors.

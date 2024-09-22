@@ -82,20 +82,18 @@ pub async fn run_function(
 			let inner_scope = Arc::new(Scope::with_parent(Arc::clone(&env.global_scope)));
 
 			let mut vals = args.into_iter();
-			for id in function.parameters.iter() {
+			for id in function.params.iter() {
 				if let Some(val) = vals.next() {
 					// positional argument
-					inner_scope.declare(id.val.id.clone(), val.val).await?;
-				} else if let Some(val) = named_args.get(&id.val.id.val).cloned() {
+					inner_scope.declare(id.clone(), val.val).await?;
+				} else if let Some(val) = named_args.get(&id.val).cloned() {
 					// named argument
-					named_args.remove(&id.val.id.val);
-					inner_scope.declare(id.val.id.clone(), val.val).await?;
+					named_args.remove(&id.val);
+					inner_scope.declare(id.clone(), val.val).await?;
 				} else {
 					// parameter missing
 					return Err(Error {
-						kind: ErrorKind::MissingArgument {
-							id: id.val.id.val.clone(),
-						},
+						kind: ErrorKind::MissingArgument { id: id.val.clone() },
 						span: Some(fn_span),
 					});
 				}
@@ -112,7 +110,7 @@ pub async fn run_function(
 			}
 
 			if strict && rem != 0 {
-				let expected = function.parameters.len();
+				let expected = function.params.len();
 				return Err(Error {
 					kind: ErrorKind::ArityMismatch {
 						expected,

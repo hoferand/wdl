@@ -1,4 +1,4 @@
-use ast::{FormalParameter, Function, FunctionBody, Node, Span};
+use ast::{Function, Identifier, Node, Span};
 
 use crate::{
 	parser::{parse_block, parse_identifier},
@@ -13,19 +13,16 @@ pub fn parse_function(parser: &mut Parser) -> Result<Node<Function>, ParserError
 	parser.tokens.expect(TokenValue::ParenOpen)?;
 
 	// parse parameters
-	let mut parameters: Vec<Node<FormalParameter>> = Vec::new();
+	let mut params: Vec<Node<Identifier>> = Vec::new();
 	while let Some(token) = parser.tokens.peek() {
 		if token.value == TokenValue::ParenClose {
 			break;
 		}
 		let id = parse_identifier(parser)?;
-		if parameters.iter().any(|p| p.val.id.val.id == id.val.id) {
+		if params.iter().any(|p| p.val.id == id.val.id) {
 			return Err(ParserError::duplicate_parameter(id.val.id, id.span));
 		}
-		parameters.push(Node {
-			span: id.span,
-			val: FormalParameter { id },
-		});
+		params.push(id);
 
 		if parser.tokens.want(TokenValue::Comma).is_none() {
 			break;
@@ -39,19 +36,11 @@ pub fn parse_function(parser: &mut Parser) -> Result<Node<Function>, ParserError
 	let body = parse_block(parser)?;
 	parser.state.leave_function();
 
-	let function = Node {
+	Ok(Node {
 		span: Span {
 			start,
 			end: body.span.end,
 		},
-		val: FunctionBody { parameters, body },
-	};
-
-	Ok(Node {
-		span: Span {
-			start,
-			end: function.span.end,
-		},
-		val: Function { id, function },
+		val: Function { id, params, body },
 	})
 }

@@ -2,10 +2,13 @@ use std::collections::HashMap;
 
 use crate::Expression;
 
+#[allow(unused)]
+use crate::Identifier;
+
 /// Represents an object.
 ///
 /// Syntax:  
-/// `{` ( ( _Identifier_ | _String_ ) `:` _Expression_ `,` )* `}`
+/// `{` ( ( [`Identifier`] | _String_ ) `:` [`Expression`] `,` )* `}`
 #[derive(Debug, Clone)]
 pub struct Object {
 	pub values: HashMap<String, Expression>,

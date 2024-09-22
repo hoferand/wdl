@@ -10,7 +10,7 @@ mod array;
 use array::interpret_array;
 mod binary;
 use binary::interpret_binary;
-pub mod call;
+mod call;
 use call::interpret_call;
 pub use call::run_function;
 mod group;

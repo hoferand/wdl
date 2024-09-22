@@ -8,9 +8,9 @@ interpreter = ["dep:interpreter"]
 
 [dependencies]
 ast = { path = "../ast" }
-parser = { path = "../parser" }
 interpreter = { path = "../interpreter", optional = true }
+parser = { path = "../parser" }
 
-serde = { version = "1.0.200", features = ["derive"] }
 colored = "2.1.0"
 html-escape = "0.2.13"
+serde = { version = "1.0.200", features = ["derive"] }

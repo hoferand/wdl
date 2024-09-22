@@ -21,12 +21,12 @@ macro_rules! impl_handler {
 	($($ty:ident),*) => {
 		impl<F, Fut, $($ty,)* R> Handler<($($ty,)*)> for F
 		where
-			F: FnOnce($($ty,)*) -> Fut + Clone + Send + 'static,
+			F: Fn($($ty,)*) -> Fut + Clone + Send + 'static,
 			Fut: Future<Output = R> + Send,
 			$($ty: FromCallContext + Send,)*
 			R: IntoResult
 		{
-			#[allow(non_snake_case, unused_variables, unused_mut)]
+			#[allow(non_snake_case, unused_mut)]
 			fn call(self, mut ctx: CallContext, strict: bool) -> BoxFuture<'static, Result<Value, Error>> {
 				Box::pin(async move {
 					let mut cnt = 0;

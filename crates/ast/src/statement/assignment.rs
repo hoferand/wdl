@@ -3,7 +3,7 @@ use crate::{Expression, Identifier, Node};
 /// Represents a variable assignment.
 ///
 /// Syntax:  
-/// _Identifier_ `=` _Expression_ `;`
+/// [`Identifier`] `=` [`Expression`] `;`
 #[derive(Debug, Clone)]
 pub struct Assignment {
 	pub id: Node<Identifier>,

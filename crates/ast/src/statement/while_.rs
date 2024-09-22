@@ -3,7 +3,7 @@ use crate::{Block, Expression, Node};
 /// Represents a while statement.
 ///
 /// Syntax:  
-/// `while` _Expression_ `{` _Statement_* `}`
+/// `while` [`Expression`] [`Block`]
 #[derive(Debug, Clone)]
 pub struct While {
 	pub condition: Expression,

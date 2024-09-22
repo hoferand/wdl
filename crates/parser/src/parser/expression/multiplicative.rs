@@ -1,6 +1,8 @@
 use ast::{Binary, Expression, Node, Span};
 
-use crate::{parser::parse_unary, Parser, ParserError};
+use crate::{Parser, ParserError};
+
+use super::parse_unary;
 
 pub fn parse_multiplicative(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let mut left = parse_unary(parser)?;

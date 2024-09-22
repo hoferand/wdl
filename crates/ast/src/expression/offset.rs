@@ -3,7 +3,7 @@ use crate::Expression;
 /// Represents an offset expression.
 ///
 /// Syntax:  
-/// _Expression_ `[` _Expression_ `]`
+/// [`Expression`] `[` [`Expression`] `]`
 #[derive(Debug, Clone)]
 pub struct Offset {
 	pub value: Box<Expression>,

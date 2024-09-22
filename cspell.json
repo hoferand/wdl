@@ -1,18 +1,19 @@
 {
 	"version": "0.2",
-	"language": "en",
+	"language": "en, en-GB",
 	"words": [
 		"arity",
+		"bindgen",
 		"boolify",
-		"vals",
+		"curr",
+		"mdbook",
 		"peekable",
+		"proto",
 		"reqwest",
+		"socketioxide",
 		"stationarea",
 		"stationareas",
-		"proto",
-		"mdbook",
-		"bindgen",
-		"socketioxide"
+		"vals"
 	],
 	"flagWords": []
 }

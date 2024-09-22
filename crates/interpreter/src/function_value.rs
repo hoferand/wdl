@@ -1,12 +1,12 @@
 use std::{fmt::Debug, sync::Arc};
 
-use ast::FunctionBody;
+use ast::Function;
 
 use crate::wdl_std::StdFunction;
 
 #[derive(Clone)]
 pub enum FunctionValue {
-	Custom(FunctionBody),
+	Custom(Function),
 	Std(Arc<dyn StdFunction + Send + Sync>),
 }
 
