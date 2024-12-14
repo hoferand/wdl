@@ -30,7 +30,7 @@ struct Events {
 	pub no_station_left: Option<FunctionId>,
 }
 
-impl<'de> ArgType<'de> for Events {}
+impl ArgType<'_> for Events {}
 
 async fn pickup(
 	target: Arg<Target, { id(b"target") }>,

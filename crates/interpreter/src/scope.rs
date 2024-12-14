@@ -74,7 +74,10 @@ impl Scope {
 	}
 
 	#[async_recursion]
-	async fn resolve(&self, id: &Identifier) -> Option<&RwLock<HashMap<Identifier, Value>>> {
+	async fn resolve<'a>(
+		&'a self,
+		id: &Identifier,
+	) -> Option<&'a RwLock<HashMap<Identifier, Value>>> {
 		if self.variables.read().await.contains_key(id) {
 			Some(&self.variables)
 		} else if let Some(parent) = &self.parent {
