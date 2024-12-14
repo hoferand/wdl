@@ -33,7 +33,7 @@ The CLI can be used with `cargo run`. Currently, the CLI supports 3 subcommands:
 
 In addition to the CLI, we provide a web playground for writing and testing workflows. The playground leverages the [Monaco Editor](https://github.com/microsoft/monaco-editor) for editing workflows, WASM for providing parser checks inside the browser while writing code, and WebSockets for testing workflows with an interpreter instance in the back end.
 
-The Playground showing an error because of a missing semicolon:  
+The playground showing an error because of a missing semicolon:  
 ![The Playground showing an error.](assets/playground-error.jpg)
 
 The playground during the execution of a workflow and waiting for user input:  
