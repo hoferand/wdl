@@ -10,6 +10,6 @@ crate-type = ["cdylib"]
 format = { path = "../format" }
 parser = { path = "../parser" }
 
-serde = { version = "1.0.202", features = ["derive"] }
+serde = { version = "1.0.217", features = ["derive"] }
 serde-wasm-bindgen = "0.6.5"
-wasm-bindgen = { version = "0.2.92", features = ["serde", "serde-serialize"] }
+wasm-bindgen = { version = "0.2.100", features = ["serde", "serde-serialize"] }

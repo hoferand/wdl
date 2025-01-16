@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-log = "0.4.21"
-prost = "0.12"
-serde = "1.0.197"
-tokio = "1.37.0"
-tonic = "0.11"
+log = "0.4.25"
+prost = "0.13.4"
+serde = "1.0.217"
+tokio = "1.43.0"
+tonic = "0.12.3"
 
 [build-dependencies]
-tonic-build = "0.11"
+tonic-build = "0.12.3"
