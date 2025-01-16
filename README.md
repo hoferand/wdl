@@ -34,10 +34,10 @@ The CLI can be used with `cargo run`. Currently, the CLI supports 3 subcommands:
 In addition to the CLI, we provide a web playground for writing and testing workflows. The playground leverages the [Monaco Editor](https://github.com/microsoft/monaco-editor) for editing workflows, WASM for providing parser checks inside the browser while writing code, and WebSockets for testing workflows with an interpreter instance in the back end.
 
 The playground showing an error because of a missing semicolon:  
-![The Playground showing an error.](assets/playground-error.jpg)
+![The Playground showing an error.](assets/playground-missing-semicolon.png)
 
 The playground during the execution of a workflow and waiting for user input:  
-![The Playground during execution.](assets/playground-execution.jpg)
+![The Playground during execution.](assets/playground-execution.png)
 
 To run locally or deploy the server you need the shuttle cli (`cargo install cargo-shuttle`) and run one of the following shell scripts:
 
