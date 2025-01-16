@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"description": "",
 	"dependencies": {
-		"monaco-editor": "^0.48.0",
-		"socket.io-client": "^4.7.5"
+		"monaco-editor": "0.52.2",
+		"socket.io-client": "4.8.1"
 	}
 }
