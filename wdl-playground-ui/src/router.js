@@ -103,7 +103,7 @@ function send_status(status) {
 		Output.add_error("Failed to send router status!");
 		throw "Router response callback not set!";
 	}
-	response_callback(status);
+	response_callback([status]);
 	response_callback = null;
 }
 

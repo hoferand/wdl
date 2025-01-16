@@ -6,7 +6,7 @@ use std::{collections::HashMap, time::Duration};
 
 use axum::{http::Method, Router};
 use log::info;
-use serde_json::Value;
+use serde_json::{json, Value};
 use socketioxide::{
 	extract::{Data, SocketRef},
 	SocketIo,
@@ -39,7 +39,7 @@ async fn main() -> shuttle_axum::ShuttleAxum {
 		)
 		.nest_service("/wasm", ServeDir::new("wdl-playground-ui/wasm"))
 		.nest_service("/doc", ServeDir::new("doc/book"))
-		.nest_service("/", ServeDir::new("wdl-playground-ui/src"))
+		.fallback_service(ServeDir::new("wdl-playground-ui/src"))
 		.layer(ws_layer)
 		.layer(cors)
 		.layer(CompressionLayer::new());
@@ -59,9 +59,7 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		Ok(ast) => ast,
 		Err(err) => {
 			let errors = format::format_parser_error(&err, &src_code, ColorMode::HTML);
-			socket
-				.emit("error", serde_json::to_string(&errors).unwrap())
-				.ok();
+			socket.emit("error", &errors).ok();
 			return;
 		}
 	};
@@ -83,15 +81,22 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 					}
 					match async_socket
 						.timeout(Duration::from_secs(600))
-						.emit_with_ack::<_, Vec<String>>("router_request", request)
+						.emit_with_ack::<_, Vec<String>>("router_request", &request)
 						.unwrap()
 						.await
 					{
-						Ok(ack) => match ack.data[0].as_str() {
+						Ok(ack) => match ack[0].as_str() {
 							"Done" => sender.send(RouterStatus::Done).await.unwrap(),
 							"NoStationLeft" => sender.send(RouterStatus::NoStationLeft).await.unwrap(),
 							status => {
-								async_socket.emit("error", format!("[{{\"title\": \"Internal error, received invalid router status `{}`!\"}}]", status)).ok();
+								async_socket.emit(
+									"error",
+									&json!([
+										{
+											"title": format!("Internal error, received invalid router status `{}`!", status)
+										}
+									])
+								).ok();
 								return;
 							}
 						},
@@ -99,7 +104,11 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 							async_socket
 								.emit(
 									"error",
-									format!("[{{\"title\": \"Router error `{}`!\"}}]", err),
+									&json!([
+										{
+											"title": format!("Router error `{}`!", err)
+										}
+									])
 								)
 								.ok();
 							return;
@@ -121,7 +130,7 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 				user: log.user,
 				span: log.span,
 			};
-			async_socket.emit("log", send_log).ok();
+			async_socket.emit("log", &send_log).ok();
 		}
 	});
 
@@ -139,19 +148,17 @@ async fn run_workflow(socket: SocketRef, Data(src_code): Data<String>) {
 		let error = format::format_interpreter_error(&err, &src_code, ColorMode::HTML);
 		match err.kind {
 			interpreter::ErrorKind::OrderDone => {
-				socket.emit("done", error.pos).ok();
+				socket.emit("done", &error.pos).ok();
 			}
 			interpreter::ErrorKind::OrderCancel => {
-				socket.emit("canceled", error.pos).ok();
+				socket.emit("canceled", &error.pos).ok();
 			}
 			_ => {
-				socket
-					.emit("error", serde_json::to_string(&vec![error]).unwrap())
-					.ok();
+				socket.emit("error", &vec![error]).ok();
 			}
 		}
 	} else {
-		socket.emit("done", Value::Null).ok();
+		socket.emit("done", &Value::Null).ok();
 	}
 }
 

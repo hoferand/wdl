@@ -10,6 +10,7 @@
 		"peekable",
 		"proto",
 		"reqwest",
+		"serde",
 		"socketioxide",
 		"stationarea",
 		"stationareas",

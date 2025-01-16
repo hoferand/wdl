@@ -41,10 +41,8 @@ RUN_BTN.addEventListener("click", async (_event) => {
 
 	socket.on("router_request", Router.set_request);
 
-	socket.on("error", (/** @type {string} err_str */ err_str) => {
+	socket.on("error", (/** @type {WdlError[]} errors */ errors) => {
 		close_socket();
-		/** @type {WdlError[]} errors */
-		const errors = JSON.parse(err_str);
 		display_errors(errors);
 		Output.add_warn("Order canceled due to previous error(s).");
 	});

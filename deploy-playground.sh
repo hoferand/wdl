@@ -5,6 +5,6 @@
 
 # deploy server
 echo "deploy server ..."
-cargo shuttle deploy --name wdl-playground
+shuttle deploy --name wdl-playground
 
-# open `wdl-playground.shuttleapp.rs` in your browser
+# open `wdl-playground-dt9y.shuttle.app` in your browser
