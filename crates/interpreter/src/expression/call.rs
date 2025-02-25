@@ -5,10 +5,10 @@ use async_recursion::async_recursion;
 use ast::{Call, Identifier, Node, Span};
 
 use crate::{
+	Environment, Error, ErrorKind, FunctionId, FunctionValue, Interrupt, Scope, Value,
 	expression::interpret_expression,
 	statement::interpret_block,
 	wdl_std::{ArgumentValue, CallContext},
-	Environment, Error, ErrorKind, FunctionId, FunctionValue, Interrupt, Scope, Value,
 };
 
 #[async_recursion]

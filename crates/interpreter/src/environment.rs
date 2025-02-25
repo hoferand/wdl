@@ -1,22 +1,22 @@
 use std::{
 	collections::HashMap,
 	sync::{
-		atomic::{AtomicU32, Ordering},
 		Arc,
+		atomic::{AtomicU32, Ordering},
 	},
 };
 
 use log::error;
 use tokio::{
-	sync::{mpsc::Sender, Mutex, RwLock},
+	sync::{Mutex, RwLock, mpsc::Sender},
 	task::JoinHandle,
 };
 
 use ast::{Identifier, Node};
 
 use crate::{
-	wdl_std::resolve_id, Channel, ChannelId, Error, ErrorKind, FunctionId, FunctionValue, LogEntry,
-	Router, Scope, Value,
+	Channel, ChannelId, Error, ErrorKind, FunctionId, FunctionValue, LogEntry, Router, Scope,
+	Value, wdl_std::resolve_id,
 };
 
 pub struct Environment {

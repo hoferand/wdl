@@ -3,8 +3,8 @@ use std::sync::Arc;
 use ast::{Identifier, Span};
 
 use crate::{
-	wdl_std::{name, Arg, CallContext, FromValue},
 	Environment, Error, ErrorKind, Value,
+	wdl_std::{Arg, CallContext, FromValue, name},
 };
 
 pub trait FromCallContext: Sized {

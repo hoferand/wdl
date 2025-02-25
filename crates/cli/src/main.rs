@@ -4,14 +4,14 @@ use std::process::ExitCode;
 use std::{collections::HashMap, error::Error};
 
 use clap::Parser;
-use log::{debug, error, info, trace, warn, LevelFilter};
+use log::{LevelFilter, debug, error, info, trace, warn};
 use simplelog::{ColorChoice, Config, TermLogger, TerminalMode}; // cspell:disable-line
 use tokio::fs::read_to_string;
 use tokio::sync::mpsc;
 
 use ::router::RouterClientGrpc;
 use ast::Identifier;
-use format::{format_parser_error, ColorMode};
+use format::{ColorMode, format_parser_error};
 use interpreter::LogEntry;
 
 mod router;

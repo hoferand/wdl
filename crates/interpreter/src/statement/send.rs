@@ -5,8 +5,8 @@ use async_recursion::async_recursion;
 use ast::{Node, Send};
 
 use crate::{
-	expression::interpret_expression, Environment, Error, ErrorKind, Interrupt, Scope, Value,
-	ValueType,
+	Environment, Error, ErrorKind, Interrupt, Scope, Value, ValueType,
+	expression::interpret_expression,
 };
 
 #[async_recursion]

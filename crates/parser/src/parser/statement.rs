@@ -1,6 +1,6 @@
 use ast::{Assignment, Expression, Node, Send, Span, Statement};
 
-use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
+use crate::{Parser, ParserError, TokenValue, parser::parse_expression};
 
 mod block;
 pub use block::parse_block;
@@ -41,7 +41,7 @@ pub fn parse_statement(parser: &mut Parser) -> Result<Option<Statement>, ParserE
 
 			let Some(peek) = parser.tokens.peek() else {
 				return Err(ParserError::unexpected_eof(vec![
-					TokenValue::Semicolon.get_type()
+					TokenValue::Semicolon.get_type(),
 				]));
 			};
 			let val;

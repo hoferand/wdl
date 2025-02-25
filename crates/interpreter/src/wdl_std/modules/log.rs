@@ -3,8 +3,8 @@ use std::sync::Arc;
 use ast::Span;
 
 use crate::{
-	wdl_std::{get_handler, id, Arg},
 	Environment, FunctionId, FunctionValue, LogEntry, LogEntryLevel, Value,
+	wdl_std::{Arg, get_handler, id},
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {

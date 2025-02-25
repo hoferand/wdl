@@ -1,14 +1,14 @@
 use std::{collections::HashMap, sync::Arc};
 
 use log::error;
-use reqwest::{header::CONTENT_TYPE, Response, Url};
+use reqwest::{Response, Url, header::CONTENT_TYPE};
 use serde::Serialize;
 
 use ast::Span;
 
 use crate::{
-	wdl_std::{get_handler, id, Arg, ResultType},
 	Environment, Error, ErrorKind, FunctionId, FunctionValue, LogEntry, Value,
+	wdl_std::{Arg, ResultType, get_handler, id},
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {

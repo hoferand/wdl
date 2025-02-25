@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use ast::{Identifier, Span};
 
 use crate::{
-	expression::run_function, Environment, Error, ErrorKind, FunctionId, FunctionValue, Value,
+	Environment, Error, ErrorKind, FunctionId, FunctionValue, Value, expression::run_function,
 };
 
 mod call_context;

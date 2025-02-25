@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Member, Node};
 
-use crate::{expression::interpret_expression, Environment, Error, ErrorKind, Scope, Value};
+use crate::{Environment, Error, ErrorKind, Scope, Value, expression::interpret_expression};
 
 #[async_recursion]
 pub async fn interpret_member(

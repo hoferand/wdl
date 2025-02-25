@@ -1,7 +1,7 @@
 [package]
 name = "wdl-playground"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 format = { path = "../format", features = ["interpreter"] }
@@ -17,4 +17,8 @@ shuttle-axum = "0.51.0"
 shuttle-runtime = "0.51.0"
 tokio = "1.43.0"
 tower = "0.5.2"
-tower-http = { version = "0.6.2", features = ["fs", "cors", "compression-full"] }
+tower-http = { version = "0.6.2", features = [
+    "fs",
+    "cors",
+    "compression-full",
+] }

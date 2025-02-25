@@ -5,8 +5,8 @@ use async_recursion::async_recursion;
 use ast::{Node, While};
 
 use crate::{
-	expression::interpret_expression, statement::interpret_block, Environment, Error, Interrupt,
-	Scope,
+	Environment, Error, Interrupt, Scope, expression::interpret_expression,
+	statement::interpret_block,
 };
 
 #[async_recursion]

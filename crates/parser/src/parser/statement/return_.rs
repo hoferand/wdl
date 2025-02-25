@@ -1,6 +1,6 @@
 use ast::{Node, Return, Span};
 
-use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
+use crate::{Parser, ParserError, TokenValue, parser::parse_expression};
 
 pub fn parse_return(parser: &mut Parser) -> Result<Node<Return>, ParserError> {
 	let token = parser.tokens.expect(TokenValue::Return)?;

@@ -1,15 +1,14 @@
 use ast::{Global, Identifier, Node, Span};
 
-use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
+use crate::{Parser, ParserError, TokenValue, parser::parse_expression};
 
 pub fn parse_global(parser: &mut Parser) -> Result<Node<Global>, ParserError> {
 	let start = parser.tokens.expect(TokenValue::Global)?.span.start;
 
 	let Some(id_token) = parser.tokens.next().cloned() else {
-		return Err(ParserError::unexpected_eof(vec![TokenValue::Identifier(
-			String::new(),
-		)
-		.get_type()]));
+		return Err(ParserError::unexpected_eof(vec![
+			TokenValue::Identifier(String::new()).get_type(),
+		]));
 	};
 	let TokenValue::Identifier(id) = &id_token.value else {
 		return Err(ParserError::unexpected_token(

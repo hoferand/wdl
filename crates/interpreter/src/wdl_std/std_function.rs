@@ -1,6 +1,6 @@
 use futures::future::BoxFuture;
 
-use crate::{wdl_std::CallContext, Error, Value};
+use crate::{Error, Value, wdl_std::CallContext};
 
 pub trait StdFunction {
 	#[allow(unused)]

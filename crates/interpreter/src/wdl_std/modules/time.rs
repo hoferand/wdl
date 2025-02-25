@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use crate::{
-	wdl_std::{get_handler, id, Arg},
 	FunctionId, FunctionValue,
+	wdl_std::{Arg, get_handler, id},
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {

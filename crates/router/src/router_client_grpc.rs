@@ -1,8 +1,8 @@
 use log::error;
 
 use crate::{
-	proto::{self, router_client::RouterClient, RouterRequest},
 	RouterStatus, Target,
+	proto::{self, RouterRequest, router_client::RouterClient},
 };
 
 pub struct RouterClientGrpc;

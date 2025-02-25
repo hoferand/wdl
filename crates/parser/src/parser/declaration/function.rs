@@ -1,8 +1,8 @@
 use ast::{Function, Identifier, Node, Span};
 
 use crate::{
-	parser::{parse_block, parse_identifier},
 	Parser, ParserError, TokenValue,
+	parser::{parse_block, parse_identifier},
 };
 
 pub fn parse_function(parser: &mut Parser) -> Result<Node<Function>, ParserError> {

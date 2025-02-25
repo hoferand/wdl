@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{wdl_std::ResultType, ChannelId, Error, FunctionId, Value};
+use crate::{ChannelId, Error, FunctionId, Value, wdl_std::ResultType};
 
 pub trait IntoResult {
 	fn into_result(self) -> Result<Value, Error>;

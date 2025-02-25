@@ -1,6 +1,6 @@
 use ast::Span;
 
-use crate::{wdl_std::get_handler, Error, ErrorKind, FunctionId, FunctionValue};
+use crate::{Error, ErrorKind, FunctionId, FunctionValue, wdl_std::get_handler};
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {
 	if id.scope.len() > 1 {

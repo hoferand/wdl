@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use ast::{Array, Expression, Group, Identifier, Literal, Node, Object, Span, Variable};
 
-use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
+use crate::{Parser, ParserError, TokenValue, parser::parse_expression};
 
 pub fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserError> {
 	let Some(token) = parser.tokens.next() else {
@@ -49,10 +49,9 @@ pub fn parse_atomic(parser: &mut Parser) -> Result<Expression, ParserError> {
 				parser.tokens.expect(TokenValue::ColonColon)?;
 
 				let Some(id) = parser.tokens.next() else {
-					return Err(ParserError::unexpected_eof(vec![TokenValue::Identifier(
-						String::new(),
-					)
-					.get_type()]));
+					return Err(ParserError::unexpected_eof(vec![
+						TokenValue::Identifier(String::new()).get_type(),
+					]));
 				};
 
 				if let TokenValue::Identifier(id_str) = &id.value {

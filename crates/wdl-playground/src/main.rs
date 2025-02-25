@@ -4,12 +4,12 @@
 
 use std::{collections::HashMap, time::Duration};
 
-use axum::{http::Method, Router};
+use axum::{Router, http::Method};
 use log::info;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use socketioxide::{
-	extract::{Data, SocketRef},
 	SocketIo,
+	extract::{Data, SocketRef},
 };
 use tokio::{select, sync::mpsc};
 use tower_http::{

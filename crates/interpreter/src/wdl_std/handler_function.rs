@@ -1,8 +1,8 @@
 use futures::future::BoxFuture;
 
 use crate::{
-	wdl_std::{CallContext, StdFunction},
 	Error, Value,
+	wdl_std::{CallContext, StdFunction},
 };
 
 pub struct HandlerFunction<H: Clone> {

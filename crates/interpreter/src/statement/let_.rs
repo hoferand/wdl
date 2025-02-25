@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Let, Node};
 
-use crate::{expression::interpret_expression, Environment, Error, Interrupt, Scope};
+use crate::{Environment, Error, Interrupt, Scope, expression::interpret_expression};
 
 #[async_recursion]
 pub async fn interpret_let(

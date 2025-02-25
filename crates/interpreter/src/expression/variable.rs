@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Variable};
 
-use crate::{wdl_std::resolve_id, Error, ErrorKind, Scope, Value};
+use crate::{Error, ErrorKind, Scope, Value, wdl_std::resolve_id};
 
 #[async_recursion]
 pub async fn interpret_variable(expr: &Node<Variable>, scope: &Arc<Scope>) -> Result<Value, Error> {

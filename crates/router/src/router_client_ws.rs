@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use serde::Serialize;
 use tokio::sync::{
-	mpsc::{self, Receiver, Sender},
 	Mutex,
+	mpsc::{self, Receiver, Sender},
 };
 
 use crate::{RouterStatus, Target};

@@ -9,8 +9,8 @@ use std::{
 use tonic::transport::Server;
 
 use router::{
-	proto::{RouterRequest, RouterResponse},
 	Router, RouterServer, Target,
+	proto::{RouterRequest, RouterResponse},
 };
 
 pub async fn router() -> Result<ExitCode, Box<dyn Error>> {

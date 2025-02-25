@@ -1,8 +1,8 @@
 use ast::{Node, Span, While};
 
 use crate::{
-	parser::{parse_block, parse_expression},
 	Parser, ParserError, TokenValue,
+	parser::{parse_block, parse_expression},
 };
 
 pub fn parse_while(parser: &mut Parser) -> Result<Node<While>, ParserError> {

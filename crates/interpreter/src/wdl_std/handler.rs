@@ -3,8 +3,8 @@ use std::future::Future;
 use futures::future::BoxFuture;
 
 use crate::{
-	wdl_std::{CallContext, FromCallContext, IntoResult},
 	Error, ErrorKind, Value,
+	wdl_std::{CallContext, FromCallContext, IntoResult},
 };
 
 pub trait Handler<T>: Clone + Send + Sized + 'static {

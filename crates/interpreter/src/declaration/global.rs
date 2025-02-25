@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Global, Node};
 
-use crate::{expression::interpret_expression, Environment, Error, Interrupt, Value};
+use crate::{Environment, Error, Interrupt, Value, expression::interpret_expression};
 
 #[async_recursion]
 pub async fn interpret_global(

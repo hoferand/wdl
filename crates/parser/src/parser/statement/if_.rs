@@ -1,6 +1,6 @@
 use ast::{If, Node, Span};
 
-use crate::{parser::parse_expression, Parser, ParserError, TokenValue};
+use crate::{Parser, ParserError, TokenValue, parser::parse_expression};
 
 use super::{parse_block, parse_else};
 

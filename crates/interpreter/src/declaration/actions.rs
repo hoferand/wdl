@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Actions, Node};
 
-use crate::{statement::interpret_block, Environment, Error, Scope};
+use crate::{Environment, Error, Scope, statement::interpret_block};
 
 #[async_recursion]
 pub async fn interpret_actions(

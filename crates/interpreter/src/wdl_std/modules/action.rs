@@ -7,8 +7,8 @@ use ast::{Identifier, Span};
 use router::{self, RouterClient, RouterStatus, Target};
 
 use crate::{
-	wdl_std::{call_function, get_handler, id, Arg, ArgType},
 	Environment, Error, ErrorKind, FunctionId, FunctionValue, LogEntry, Value,
+	wdl_std::{Arg, ArgType, call_function, get_handler, id},
 };
 
 pub fn resolve_id(id: &FunctionId) -> Option<FunctionValue> {

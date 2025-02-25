@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use tokio::sync::{
-	mpsc::{self, Receiver, Sender},
 	Mutex,
+	mpsc::{self, Receiver, Sender},
 };
 
 use crate::Value;

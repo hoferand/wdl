@@ -1,8 +1,8 @@
 use ast::{Argument, Call, Expression, Member, Node, Offset, Span};
 
 use crate::{
-	parser::{parse_expression, parse_identifier},
 	Parser, ParserError, TokenValue,
+	parser::{parse_expression, parse_identifier},
 };
 
 use super::parse_atomic;

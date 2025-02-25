@@ -4,7 +4,7 @@ use async_recursion::async_recursion;
 
 use ast::{Node, Spawn};
 
-use crate::{expression::interpret_expression, Environment, Error, Scope, Value};
+use crate::{Environment, Error, Scope, Value, expression::interpret_expression};
 
 #[async_recursion]
 pub async fn interpret_spawn(
