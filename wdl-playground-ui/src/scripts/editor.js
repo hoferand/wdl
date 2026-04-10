@@ -1,6 +1,7 @@
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import "monaco-editor/min/vs/editor/editor.main.css";
+import "monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution";
 
 import wasm_init, { check_src } from "./wasm/wasm.js";
 
