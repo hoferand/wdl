@@ -11,10 +11,10 @@ ast = { path = "../ast" }
 router = { path = "../router" }
 
 async-recursion = "1.1.1"
-futures = "0.3.31"
-log = "0.4.25"
-regex = "1.11.1"
-reqwest = "0.12.12"
-serde = "1.0.217"
-serde_json = "1.0.135"
-tokio = { version = "1.43.0", features = ["macros"] }
+futures = "0.3.32"
+regex = "1.12.3"
+reqwest = "0.13.2"
+serde = "1.0.228"
+serde_json = "1.0.149"
+tokio = { version = "1.51.1", features = ["macros"] }
+tracing = "0.1.44"

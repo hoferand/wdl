@@ -1,17 +1,17 @@
 import "./typedef.js";
 import * as Output from "./output.js";
 
-const ROUTER_REQUEST = document.getElementById("router-request");
-const ROUTER_WAIT = document.getElementById("router-wait");
-const ACTION_TEXT = document.getElementById("action-text");
-const TARGET_AREA = document.getElementById("target-area");
+const routerRequest = document.getElementById("router-request");
+const routerWait = document.getElementById("router-wait");
+const actionText = document.getElementById("action-text");
+const targetArea = document.getElementById("target-area");
 
 /**
  * Saves the response callback for the router status.
  *
  * @type {ResponseCallback|null}
  */
-let response_callback = null;
+let responseCallback = null;
 
 /**
  * Displays a new request.
@@ -21,20 +21,20 @@ let response_callback = null;
  * @returns {void}
  */
 export function set_request(request, callback) {
-	response_callback = callback;
+	responseCallback = callback;
 
 	const action = request.action;
-	ACTION_TEXT.innerText = action.charAt(0).toUpperCase() + action.slice(1);
+	actionText.innerText = action.charAt(0).toUpperCase() + action.slice(1);
 	if (action === "Pickup") {
-		ACTION_TEXT.innerText += " from:";
+		actionText.innerText += " from:";
 	} else if (["Drop", "Drive"].includes(action)) {
-		ACTION_TEXT.innerText += " to:";
+		actionText.innerText += " to:";
 	} else {
 		Output.add_error(`Received invalid action type \`${action}\`!`);
 		throw `Received invalid action type \`${action}\`!`;
 	}
 
-	TARGET_AREA.innerText = JSON.stringify(
+	targetArea.innerText = JSON.stringify(
 		request.target,
 		(_key, value) => (value !== null ? value : undefined),
 		4
@@ -49,7 +49,7 @@ export function set_request(request, callback) {
  * @returns {void}
  */
 export function cancel_request() {
-	response_callback = null;
+	responseCallback = null;
 	hide_request();
 }
 
@@ -59,8 +59,8 @@ export function cancel_request() {
  * @returns {void}
  */
 function show_request() {
-	ROUTER_WAIT.style.display = "none";
-	ROUTER_REQUEST.style.display = "block";
+	routerWait.style.display = "none";
+	routerRequest.style.display = "block";
 }
 
 /**
@@ -69,8 +69,8 @@ function show_request() {
  * @returns {void}
  */
 function hide_request() {
-	ROUTER_REQUEST.style.display = "none";
-	ROUTER_WAIT.style.display = "block";
+	routerRequest.style.display = "none";
+	routerWait.style.display = "block";
 }
 
 /**
@@ -99,12 +99,12 @@ function send_no_station_left() {
  */
 function send_status(status) {
 	hide_request();
-	if (!response_callback) {
+	if (!responseCallback) {
 		Output.add_error("Failed to send router status!");
 		throw "Router response callback not set!";
 	}
-	response_callback([status]);
-	response_callback = null;
+	responseCallback([status]);
+	responseCallback = null;
 }
 
 /**

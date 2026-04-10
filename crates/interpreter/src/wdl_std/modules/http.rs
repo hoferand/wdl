@@ -1,8 +1,8 @@
 use std::{collections::HashMap, sync::Arc};
 
-use log::error;
 use reqwest::{Response, Url, header::CONTENT_TYPE};
 use serde::Serialize;
+use tracing::error;
 
 use ast::Span;
 

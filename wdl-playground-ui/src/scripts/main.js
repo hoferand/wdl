@@ -1,11 +1,11 @@
-import { io } from "./npm_modules/socket.io-client/dist/socket.io.esm.min.js";
+import { io } from "socket.io-client";
 
 import "./typedef.js";
 import * as Editor from "./editor.js";
 import * as Router from "./router.js";
 import * as Output from "./output.js";
 
-const RUN_BTN = document.getElementById("run-btn");
+const runButton = document.getElementById("run-btn");
 
 /**
  * Holds the current Socket.IO socket.
@@ -14,7 +14,7 @@ let socket = null;
 
 Editor.init(document.getElementById("editor-container"));
 
-RUN_BTN.addEventListener("click", async (_event) => {
+runButton.addEventListener("click", () => {
 	if (socket) {
 		close_socket();
 		Output.add_warn("Order canceled by user.");
@@ -27,15 +27,11 @@ RUN_BTN.addEventListener("click", async (_event) => {
 	Editor.clear_markers();
 	Editor.disable_output();
 
-	let proto = "ws://";
-	if (window.location.protocol === "https:") {
-		proto = "wss://";
-	}
-	socket = io(proto + window.location.host + "/run", {
+	socket = io("/run", {
 		reconnectionDelayMax: 10_000,
 	});
 
-	RUN_BTN.innerText = "Stop";
+	runButton.innerText = "Stop";
 
 	socket.on("log", Output.add_log);
 
@@ -87,7 +83,7 @@ function close_socket() {
 	Router.cancel_request();
 	socket.close();
 	socket = null;
-	RUN_BTN.innerText = "Start";
+	runButton.innerText = "Start";
 	Editor.enable_output();
 }
 
@@ -99,19 +95,19 @@ function close_socket() {
  * @returns {void}
  */
 function display_errors(errors) {
-	let editor_errors = [];
+	let editorErrors = [];
 	for (let error2 of errors) {
 		Output.add_error(
 			error2.title,
 			error2.pos ? { span_str: error2.pos.span_str } : {}
 		);
 		if (error2.pos) {
-			editor_errors.push({
+			editorErrors.push({
 				severity: "Error",
 				message: error2.title,
 				span: error2.pos.span,
 			});
 		}
 	}
-	Editor.set_markers(editor_errors);
+	Editor.set_markers(editorErrors);
 }

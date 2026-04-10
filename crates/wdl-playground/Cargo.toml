@@ -9,16 +9,21 @@ interpreter = { path = "../interpreter", features = ["playground"] }
 parser = { path = "../parser" }
 router = { path = "../router" }
 
-axum = "0.8.1"
-log = "0.4.25"
-serde_json = "1.0.135"
-socketioxide = "0.15.1"
-shuttle-axum = "0.51.0"
-shuttle-runtime = "0.51.0"
-tokio = "1.43.0"
-tower = "0.5.2"
-tower-http = { version = "0.6.2", features = [
-    "fs",
-    "cors",
-    "compression-full",
+axum = "0.8.8"
+serde_json = "1.0.149"
+socketioxide = "0.18.2"
+tokio = { version = "1.51.1", features = [
+	"macros",
+	"net",
+	"rt-multi-thread",
+	"signal",
+	"sync",
 ] }
+tower = "0.5.3"
+tower-http = { version = "0.6.8", features = [
+	"fs",
+	"cors",
+	"compression-full",
+] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }

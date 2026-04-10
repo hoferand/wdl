@@ -39,10 +39,10 @@ The playground showing an error because of a missing semicolon:
 The playground during the execution of a workflow and waiting for user input:  
 ![The Playground during execution.](assets/playground-execution.png)
 
-To run locally or deploy the server you need the shuttle cli (`cargo install cargo-shuttle`) and run one of the following shell scripts:
+To build and run the playground, use Docker:
 
-- Run: `./start-playground.sh`
-- Deploy: `./deploy-playground.sh`
+- Build: `docker build -t wdl-playground .`
+- Run: `docker run --rm -p 8080:8080 -e PORT=8080 wdl-playground`
 
 ## Language Support
 

@@ -1,7 +1,6 @@
 [book]
 authors = ["Andreas Hofer"]
 language = "en"
-multilingual = false
 src = "src"
 title = "Workflow Definition Language"
 

@@ -1,10 +1,10 @@
 use std::{collections::HashMap, sync::Arc};
 
-use log::{error, info};
 use tokio::{
 	select,
 	sync::mpsc::{self, Sender},
 };
+use tracing::{error, info};
 
 use ast::{Identifier, Workflow};
 

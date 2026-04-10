@@ -1,8 +1,19 @@
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
+import "monaco-editor/min/vs/editor/editor.main.css";
+
 import wasm_init, { check_src } from "./wasm/wasm.js";
-await wasm_init();
 
 import "./typedef.js";
 import * as Output from "./output.js";
+
+globalThis.MonacoEnvironment = {
+	getWorker() {
+		return new editorWorker();
+	},
+};
+
+await wasm_init();
 
 /**
  * This source code is set on editor load.
@@ -52,28 +63,22 @@ let output = true;
  * @returns {void}
  */
 export function init(container) {
-	require.config({
-		paths: { vs: "npm_modules/monaco-editor/min/vs" },
+	define_wdl();
+
+	editor = monaco.editor.create(container, {
+		value: DEFAULT_SOURCE_CODE,
+		language: "wdl",
+		theme: "wdl-theme",
+		minimap: { enabled: false },
 	});
 
-	require(["vs/editor/editor.main"], function () {
-		define_wdl();
+	editor.getModel().updateOptions({ tabSize: 4 });
 
-		editor = monaco.editor.create(container, {
-			value: DEFAULT_SOURCE_CODE,
-			language: "wdl",
-			theme: "wdl-theme",
-			minimap: { enabled: false },
-		});
-
-		editor.getModel().updateOptions({ tabSize: 4 });
-
-		editor.getModel().onDidChangeContent((_event) => {
-			debounced_check(editor.getValue());
-		});
-
-		check(editor.getValue());
+	editor.getModel().onDidChangeContent(() => {
+		debounced_check(editor.getValue());
 	});
+
+	check(editor.getValue());
 }
 
 /**
@@ -205,7 +210,7 @@ const debounced_check = debounce(check, 100);
  * @returns {void}
  */
 function display_errors(errors) {
-	let editor_errors = [];
+	let editorErrors = [];
 	for (let error2 of errors) {
 		if (output) {
 			Output.add_error(
@@ -214,14 +219,14 @@ function display_errors(errors) {
 			);
 		}
 		if (error2.pos) {
-			editor_errors.push({
+			editorErrors.push({
 				severity: "Error",
 				message: error2.title,
 				span: error2.pos.span,
 			});
 		}
 	}
-	set_markers(editor_errors);
+	set_markers(editorErrors);
 }
 
 /**

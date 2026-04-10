@@ -1,0 +1,15 @@
+*
+!Cargo.toml
+!Cargo.lock
+!crates/
+!crates/**
+!doc/
+!doc/book.toml
+!doc/src/
+!doc/src/**
+!wdl-playground-ui/
+!wdl-playground-ui/package.json
+!wdl-playground-ui/package-lock.json
+!wdl-playground-ui/vite.config.js
+!wdl-playground-ui/src/
+!wdl-playground-ui/src/**

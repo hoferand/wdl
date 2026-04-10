@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
-use log::info;
 use serde::Deserialize;
+use tracing::info;
 
 use ast::{Identifier, Span};
 use router::{self, RouterClient, RouterStatus, Target};

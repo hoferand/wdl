@@ -1,5 +1,0 @@
-[deploy]
-include = ["wdl-playground-ui/*", "doc/book/*"]
-
-[build]
-assets = ["wdl-playground-ui/*", "doc/book/*"]

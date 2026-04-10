@@ -1,6 +1,6 @@
 import "./typedef.js";
 
-const output_area = document.getElementById("output-area");
+const outputArea = document.getElementById("output-area");
 
 const TRACE = '<span class="gray">[TRACE]</span>';
 const DEBUG = '<span class="blue">[DEBUG]</span>';
@@ -14,7 +14,7 @@ const ERROR = '<span class="red">[ERROR]</span>';
  * @returns {void}
  */
 export function clear() {
-	output_area.innerHTML = "";
+	outputArea.innerHTML = "";
 }
 
 /**
@@ -24,7 +24,7 @@ export function clear() {
  * @returns {void}
  */
 export function add_log(log) {
-	output_area.innerHTML += format_log(log);
+	outputArea.innerHTML += format_log(log);
 }
 
 /**

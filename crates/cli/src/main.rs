@@ -4,10 +4,10 @@ use std::process::ExitCode;
 use std::{collections::HashMap, error::Error};
 
 use clap::Parser;
-use log::{LevelFilter, debug, error, info, trace, warn};
-use simplelog::{ColorChoice, Config, TermLogger, TerminalMode}; // cspell:disable-line
 use tokio::fs::read_to_string;
 use tokio::sync::mpsc;
+use tracing::{debug, error, info, trace, warn};
+use tracing_subscriber::EnvFilter;
 
 use ::router::RouterClientGrpc;
 use ast::Identifier;
@@ -32,12 +32,12 @@ enum Cli {
 
 #[tokio::main]
 async fn main() -> Result<ExitCode, Box<dyn Error>> {
-	TermLogger::init(
-		LevelFilter::Info,
-		Config::default(),
-		TerminalMode::Stderr,
-		ColorChoice::Auto,
-	)?;
+	tracing_subscriber::fmt()
+		.with_env_filter(
+			EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+		)
+		.with_target(false)
+		.init();
 
 	match Cli::parse() {
 		Cli::Run { file, variables } => run(&file, variables).await,

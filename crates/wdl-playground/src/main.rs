@@ -1,29 +1,38 @@
-//! The back end server for the online playground.  
-//! Can be either started locally with `./start-playground.sh`.  
-//! Or deployed to shuttle.rs with `./deploy-playground.sh`.
+//! The back end server for the online playground.
+//! It serves the static playground assets and exposes the Socket.IO runtime.
 
-use std::{collections::HashMap, time::Duration};
+use std::{collections::HashMap, env, net::SocketAddr, time::Duration};
 
 use axum::{Router, http::Method};
-use log::info;
 use serde_json::{Value, json};
 use socketioxide::{
 	SocketIo,
 	extract::{Data, SocketRef},
 };
+#[cfg(unix)]
+use tokio::signal::unix::{SignalKind, signal};
 use tokio::{select, sync::mpsc};
 use tower_http::{
 	compression::CompressionLayer,
 	cors::{Any, CorsLayer},
 	services::ServeDir,
 };
+use tracing::info;
+use tracing_subscriber::{EnvFilter, fmt};
 
 use format::ColorMode;
 use interpreter::LogEntry;
 use router::{RouterClientWs, RouterStatus};
 
-#[shuttle_runtime::main]
-async fn main() -> shuttle_axum::ShuttleAxum {
+#[tokio::main]
+async fn main() {
+	fmt()
+		.with_env_filter(
+			EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+		)
+		.with_target(false)
+		.init();
+
 	let (ws_layer, io) = SocketIo::new_layer();
 
 	io.ns("/run", run);
@@ -33,18 +42,51 @@ async fn main() -> shuttle_axum::ShuttleAxum {
 		.allow_origin(Any);
 
 	let router = Router::new()
-		.nest_service(
-			"/npm_modules",
-			ServeDir::new("wdl-playground-ui/node_modules"),
-		)
-		.nest_service("/wasm", ServeDir::new("wdl-playground-ui/wasm"))
 		.nest_service("/doc", ServeDir::new("doc/book"))
-		.fallback_service(ServeDir::new("wdl-playground-ui/src"))
+		.fallback_service(ServeDir::new("wdl-playground-ui/dist"))
 		.layer(ws_layer)
 		.layer(cors)
 		.layer(CompressionLayer::new());
 
-	Ok(router.into())
+	let port = env::var("PORT")
+		.ok()
+		.and_then(|port| port.parse::<u16>().ok())
+		.unwrap_or(8080);
+	let addr = SocketAddr::from(([0, 0, 0, 0], port));
+	let listener = tokio::net::TcpListener::bind(addr)
+		.await
+		.expect("failed to bind TCP listener");
+
+	info!("Listening on http://{}", addr);
+
+	axum::serve(listener, router)
+		.with_graceful_shutdown(shutdown_signal())
+		.await
+		.expect("axum server exited unexpectedly");
+}
+
+async fn shutdown_signal() {
+	let ctrl_c = tokio::signal::ctrl_c();
+
+	#[cfg(unix)]
+	let terminate = async {
+		signal(SignalKind::terminate())
+			.expect("failed to install SIGTERM handler")
+			.recv()
+			.await;
+	};
+
+	#[cfg(not(unix))]
+	let terminate = std::future::pending::<()>();
+
+	select! {
+		result = ctrl_c => {
+			result.expect("failed to install Ctrl+C handler");
+		}
+		_ = terminate => {}
+	}
+
+	info!("Shutdown signal received, stopping server");
 }
 
 async fn run(socket: SocketRef) {

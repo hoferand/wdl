@@ -27,7 +27,7 @@ where
 		Box::new(self.clone())
 	}
 
-	fn call_with_ctx(&self, ctx: CallContext, strict: bool) -> BoxFuture<Result<Value, Error>> {
+	fn call_with_ctx(&self, ctx: CallContext, strict: bool) -> BoxFuture<'_, Result<Value, Error>> {
 		(self.call)(self.handler.clone(), ctx, strict)
 	}
 }

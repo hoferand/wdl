@@ -6,11 +6,11 @@ use std::{
 	},
 };
 
-use log::error;
 use tokio::{
 	sync::{Mutex, RwLock, mpsc::Sender},
 	task::JoinHandle,
 };
+use tracing::error;
 
 use ast::{Identifier, Node};
 

@@ -4,11 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-log = "0.4.25"
-prost = "0.13.4"
-serde = "1.0.217"
-tokio = "1.43.0"
-tonic = "0.12.3"
+prost = "0.14.3"
+serde = { version = "1.0.228", features = ["derive"] }
+tokio = "1.51.1"
+tonic = "0.14.5"
+tonic-prost = "0.14.5"
+tracing = "0.1.44"
 
 [build-dependencies]
-tonic-build = "0.12.3"
+tonic-prost-build = "0.14.5"
