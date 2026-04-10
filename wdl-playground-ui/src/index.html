@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -9,44 +9,72 @@
 		<title>WDL Playground</title>
 	</head>
 	<body>
-		<div id="playground">
+		<main id="playground">
 			<h1 id="title">WDL Playground</h1>
-			<div class="row">
+			<div class="row" id="workspace">
 				<!-- EDITOR START -->
-				<div id="editor" class="container">
-					<div class="row" id="editor-row">
-						<h2>Editor</h2>
-						<a href="doc/" target="_blank" id="doc-btn">
-							<img src="./assets/question.svg" alt="Documentation" id="doc-img" />
+				<section id="editor" class="container panel">
+					<div class="panel-header">
+						<h2 class="panel-title">Editor</h2>
+						<a
+							href="doc/"
+							target="_blank"
+							id="doc-btn"
+							class="icon-button"
+							aria-label="Open documentation"
+						>
+							<img
+								src="./assets/question.svg"
+								alt="Documentation"
+								id="doc-img"
+							/>
 						</a>
-						<button id="run-btn">Start</button>
+						<button id="run-btn" class="button button-primary" type="button">
+							Start
+						</button>
 					</div>
 					<div id="editor-container"></div>
-				</div>
+				</section>
 				<!-- EDITOR END -->
 
 				<!-- ROUTER START -->
-				<div id="router" class="container">
-					<h2>Router</h2>
-					<h3 id="router-wait">Waiting for actions ...</h3>
-					<div id="router-request" style="display: none">
-						<h3 id="action-text"></h3>
+				<aside id="router" class="container panel">
+					<div class="panel-header">
+						<h2 class="panel-title">Router</h2>
+					</div>
+					<p id="router-wait" class="panel-subtitle">Waiting for actions ...</p>
+					<div id="router-request" hidden>
+						<p id="action-text" class="field-label"></p>
 						<pre><code id="target-area"></code></pre>
-						<h3>Status:</h3>
-						<div class="row">
-							<button id="router-done-btn">Done</button>
-							<button id="router-no-station-left-btn">No station left</button>
+						<p id="router-status-label" class="field-label">Status:</p>
+						<div class="row button-row">
+							<button
+								id="router-done-btn"
+								class="button button-secondary"
+								type="button"
+							>
+								Done
+							</button>
+							<button
+								id="router-no-station-left-btn"
+								class="button button-secondary"
+								type="button"
+							>
+								No station left
+							</button>
 						</div>
 					</div>
-				</div>
+				</aside>
 				<!-- ROUTER END -->
 			</div>
 			<!-- OUTPUT START -->
-			<div id="output" class="container">
-				<h2>Output</h2>
+			<section id="output" class="container panel">
+				<div class="panel-header">
+					<h2 class="panel-title">Output</h2>
+				</div>
 				<pre><code id="output-area"></code></pre>
-			</div>
+			</section>
 			<!-- OUTPUT END -->
-		</div>
+		</main>
 	</body>
 </html>

@@ -7,6 +7,7 @@
 		"dev": "vite"
 	},
 	"dependencies": {
+		"@fontsource/heebo": "^5.2.8",
 		"monaco-editor": "0.55.1",
 		"socket.io-client": "4.8.3"
 	},

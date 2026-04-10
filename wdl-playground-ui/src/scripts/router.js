@@ -59,8 +59,8 @@ export function cancel_request() {
  * @returns {void}
  */
 function show_request() {
-	routerWait.style.display = "none";
-	routerRequest.style.display = "block";
+	routerWait.hidden = true;
+	routerRequest.hidden = false;
 }
 
 /**
@@ -69,8 +69,8 @@ function show_request() {
  * @returns {void}
  */
 function hide_request() {
-	routerRequest.style.display = "none";
-	routerWait.style.display = "block";
+	routerRequest.hidden = true;
+	routerWait.hidden = false;
 }
 
 /**
